@@ -124,9 +124,20 @@ fun ManualEntryScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Characters,
-                    imeAction = ImeAction.Done,
+                    imeAction = ImeAction.Next,
                 ),
                 isError = uiState.secret.isBlank() && uiState.error != null,
+            )
+            OutlinedTextField(
+                value = uiState.group,
+                onValueChange = viewModel::updateGroup,
+                label = { Text(stringResource(R.string.group_optional)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
+                    imeAction = ImeAction.Done,
+                ),
             )
 
             HorizontalDivider()

@@ -20,4 +20,5 @@
     <string name="processing_image">Bild wird verarbeitet…</string>
     <string name="qr_not_found_in_image">Kein OTP-QR-Code im Bild gefunden</string>
     <string name="retry">Erneut versuchen</string>
+    <string name="group_optional">Gruppe (optional)</string>
 </resources>

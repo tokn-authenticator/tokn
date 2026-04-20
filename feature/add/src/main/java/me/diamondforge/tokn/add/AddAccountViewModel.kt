@@ -40,11 +40,17 @@ class AddAccountViewModel @Inject constructor(
     fun updateDigits(value: Int) = _uiState.update { it.copy(digits = value) }
     fun updatePeriod(value: Int) = _uiState.update { it.copy(period = value) }
     fun updateType(value: OtpType) = _uiState.update { it.copy(type = value) }
+    fun updateGroup(value: String) = _uiState.update { it.copy(group = value) }
 
     fun saveAccount(onSuccess: () -> Unit) {
         val state = _uiState.value
         if (state.secret.isBlank()) {
             _uiState.update { it.copy(error = "Secret is required") }
+            return
+        }
+        val cleanedSecret = state.secret.trim().uppercase().replace(" ", "").trimEnd('=')
+        if (!cleanedSecret.matches(Regex("[A-Z2-7]+"))) {
+            _uiState.update { it.copy(error = "Invalid secret key: only letters A–Z and digits 2–7 are allowed") }
             return
         }
         if (state.accountName.isBlank()) {
@@ -62,6 +68,7 @@ class AddAccountViewModel @Inject constructor(
                         digits = state.digits,
                         period = state.period,
                         type = state.type,
+                        group = state.group.trim().ifBlank { null },
                     ),
                 )
             }.onSuccess { onSuccess() }
@@ -133,6 +140,7 @@ data class AddAccountUiState(
     val digits: Int = 6,
     val period: Int = 30,
     val type: OtpType = OtpType.TOTP,
+    val group: String = "",
     val parsedAccount: OtpAccount? = null,
     val error: String? = null,
 )

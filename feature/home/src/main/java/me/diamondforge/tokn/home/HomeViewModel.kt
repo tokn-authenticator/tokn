@@ -2,6 +2,7 @@ package me.diamondforge.tokn.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
@@ -27,26 +28,40 @@ class HomeViewModel @Inject constructor(
     private val reorderAccountsUseCase: ReorderAccountsUseCase,
     private val generateOtpUseCase: GenerateOtpUseCase,
     private val incrementHotpCounterUseCase: IncrementHotpCounterUseCase,
+    private val appPreferences: AppPreferencesRepository,
 ) : ViewModel() {
 
     private val _currentTimeMillis = MutableStateFlow(System.currentTimeMillis())
     private val _accounts = getAccountsUseCase()
     private val _searchQuery = MutableStateFlow("")
+    private val _selectedGroup = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<HomeUiState> = combine(
-        _accounts, _currentTimeMillis, _searchQuery,
-    ) { accounts, time, query ->
-        val filtered = if (query.isBlank()) accounts
-        else accounts.filter {
-            it.issuer.contains(query, ignoreCase = true) ||
-                it.accountName.contains(query, ignoreCase = true)
-        }
+        _accounts, _currentTimeMillis, _searchQuery, _selectedGroup, appPreferences.iconFetchEnabled,
+    ) { accounts, time, query, selectedGroup, iconFetchEnabled ->
+        val availableGroups = accounts.mapNotNull { it.group }.distinct().sorted()
+
+        val filtered = accounts
+            .filter { account ->
+                query.isBlank() ||
+                    account.issuer.contains(query, ignoreCase = true) ||
+                    account.accountName.contains(query, ignoreCase = true)
+            }
+            .filter { account ->
+                selectedGroup == null || account.group == selectedGroup
+            }
+
         HomeUiState(
             isLoading = false,
             items = filtered.map { account ->
-                AccountItem(account = account, otpResult = generateOtpUseCase(account, time))
+                val otpResult = runCatching { generateOtpUseCase(account, time) }
+                    .getOrElse { OtpResult("------", -1L, account.period * 1000L) }
+                AccountItem(account = account, otpResult = otpResult)
             },
             searchQuery = query,
+            availableGroups = availableGroups,
+            selectedGroup = selectedGroup,
+            iconFetchEnabled = iconFetchEnabled,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
@@ -75,12 +90,19 @@ class HomeViewModel @Inject constructor(
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }
+
+    fun selectGroup(group: String?) {
+        _selectedGroup.value = group
+    }
 }
 
 data class HomeUiState(
     val isLoading: Boolean = false,
     val items: List<AccountItem> = emptyList(),
     val searchQuery: String = "",
+    val availableGroups: List<String> = emptyList(),
+    val selectedGroup: String? = null,
+    val iconFetchEnabled: Boolean = false,
 )
 
 data class AccountItem(

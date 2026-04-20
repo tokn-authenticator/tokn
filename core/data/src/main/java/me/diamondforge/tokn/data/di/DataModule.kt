@@ -39,6 +39,7 @@ object DataModule {
         val factory = SupportOpenHelperFactory(passphrase)
         return Room.databaseBuilder(context, AppDatabase::class.java, "otp_database")
             .openHelperFactory(factory)
+            .addMigrations(AppDatabase.MIGRATION_1_2)
             .build()
     }
 

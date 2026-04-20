@@ -27,4 +27,6 @@
     <string name="edit_period">Period</string>
     <string name="edit_advanced">Advanced</string>
     <string name="edit_save">Save changes</string>
+    <string name="edit_group">Group (optional)</string>
+    <string name="group_all">All</string>
 </resources>

@@ -11,6 +11,7 @@ data class OtpAccount(
     val counter: Long = 0,
     val type: OtpType = OtpType.TOTP,
     val sortOrder: Int = 0,
+    val group: String? = null,
 )
 
 enum class OtpAlgorithm { SHA1, SHA256, SHA512 }

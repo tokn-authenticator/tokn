@@ -11,12 +11,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.security.VaultPasswordManager
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val preferences: UserPreferencesRepository,
+    private val appPreferences: AppPreferencesRepository,
     private val vaultPasswordManager: VaultPasswordManager,
 ) : ViewModel() {
 
@@ -38,6 +40,8 @@ class SettingsViewModel @Inject constructor(
         )
     }.combine(_passwordError) { state, error ->
         state.copy(passwordVerificationFailed = error)
+    }.combine(appPreferences.iconFetchEnabled) { state, iconFetch ->
+        state.copy(iconFetchEnabled = iconFetch)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     fun setThemeMode(mode: ThemeMode) {
@@ -54,6 +58,10 @@ class SettingsViewModel @Inject constructor(
 
     fun setScreenshotsEnabled(enabled: Boolean) {
         viewModelScope.launch { preferences.setScreenshotsEnabled(enabled) }
+    }
+
+    fun setIconFetchEnabled(enabled: Boolean) {
+        viewModelScope.launch { appPreferences.setIconFetchEnabled(enabled) }
     }
 
     fun setupEncryption(password: String) {
@@ -83,5 +91,6 @@ data class SettingsUiState(
     val biometricEnabled: Boolean = true,
     val screenshotsEnabled: Boolean = false,
     val encryptionEnabled: Boolean = false,
+    val iconFetchEnabled: Boolean = false,
     val passwordVerificationFailed: Boolean = false,
 )

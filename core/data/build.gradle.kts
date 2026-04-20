@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.sqlcipher)
     implementation(libs.sqlite.ktx)
 
+    implementation(libs.datastore.preferences)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 

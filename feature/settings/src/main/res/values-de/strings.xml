@@ -13,6 +13,10 @@
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
     <string name="theme_system">System</string>
+    <string name="account_icons">Konto-Icons</string>
+    <string name="account_icons_desc">Service-Logos aus dem Internet laden (Simple Icons)</string>
+    <string name="account_icons_privacy_title">Icons aus dem Internet laden?</string>
+    <string name="account_icons_privacy_body">Dies lädt ein Logo für jeden Dienst über den Simple Icons CDN. Deine Aussteller-Namen werden als Teil der Anfrage-URL übertragen. Jederzeit deaktivierbar.</string>
     <string name="language">Sprache</string>
     <string name="language_desc">App-Sprache auswählen</string>
     <string name="language_system_default">Systemstandard</string>

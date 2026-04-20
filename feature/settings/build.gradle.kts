@@ -30,6 +30,7 @@ android {
 dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:security"))
+    implementation(project(":core:data"))
 
     implementation(libs.appcompat)
     implementation(libs.androidx.core.ktx)

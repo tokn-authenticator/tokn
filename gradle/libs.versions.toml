@@ -15,6 +15,7 @@ datastore = "1.2.1"
 biometric = "1.2.0-alpha05"
 sqlcipher = "4.14.1"
 reorderable = "3.0.0"
+coil = "3.4.0"
 accompanist = "0.37.3"
 coreKtx = "1.18.0"
 activityCompose = "1.13.0"
@@ -67,6 +68,9 @@ sqlcipher = { group = "net.zetetic", name = "sqlcipher-android", version.ref = "
 sqlite-ktx = { group = "androidx.sqlite", name = "sqlite-ktx", version = "2.4.0" }
 
 reorderable = { group = "sh.calvin.reorderable", name = "reorderable", version.ref = "reorderable" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 guava = { group = "com.google.guava", name = "guava", version = "33.4.0-android" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }

@@ -317,6 +317,7 @@ class BackupViewModel @Inject constructor(
                     put("counter", account.counter)
                     put("type", account.type.name)
                     put("sortOrder", account.sortOrder)
+                    account.group?.let { put("group", it) }
                 },
             )
         }
@@ -338,6 +339,7 @@ class BackupViewModel @Inject constructor(
                 counter = obj.optLong("counter", 0),
                 type = OtpType.valueOf(obj.optString("type", "TOTP")),
                 sortOrder = obj.optInt("sortOrder", 0),
+                group = obj.optString("group").ifBlank { null },
             )
         }
     }

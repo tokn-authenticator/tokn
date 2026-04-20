@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.AlertDialog
@@ -24,6 +25,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -40,7 +42,6 @@ import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-// "en" and "de" are always shown in their own language by convention
 private val LANGUAGE_TAGS = listOf("", "en", "de")
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,6 +59,8 @@ fun AppearanceScreen(
         )
     }
     var showLangDialog by remember { mutableStateOf(false) }
+    var showIconPrivacyDialog by remember { mutableStateOf(false) }
+
     val systemDefaultLabel = stringResource(R.string.language_system_default)
     val languages = remember(systemDefaultLabel) {
         listOf(
@@ -90,10 +93,7 @@ fun AppearanceScreen(
                                 .padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            RadioButton(
-                                selected = currentLangTag == tag,
-                                onClick = null,
-                            )
+                            RadioButton(selected = currentLangTag == tag, onClick = null)
                             Spacer(Modifier.width(12.dp))
                             Text(label, style = MaterialTheme.typography.bodyLarge)
                         }
@@ -102,6 +102,27 @@ fun AppearanceScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showLangDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
+
+    if (showIconPrivacyDialog) {
+        AlertDialog(
+            onDismissRequest = { showIconPrivacyDialog = false },
+            title = { Text(stringResource(R.string.account_icons_privacy_title)) },
+            text = { Text(stringResource(R.string.account_icons_privacy_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showIconPrivacyDialog = false
+                    viewModel.setIconFetchEnabled(true)
+                }) {
+                    Text(stringResource(R.string.enable_anyway))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showIconPrivacyDialog = false }) {
                     Text(stringResource(R.string.cancel))
                 }
             },
@@ -161,6 +182,23 @@ fun AppearanceScreen(
                     supportingContent = { Text(currentLangLabel) },
                     leadingContent = { Icon(Icons.Default.Language, contentDescription = null) },
                     modifier = Modifier.clickable { showLangDialog = true },
+                )
+            }
+            item { HorizontalDivider() }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.account_icons)) },
+                    supportingContent = { Text(stringResource(R.string.account_icons_desc)) },
+                    leadingContent = { Icon(Icons.Default.Image, contentDescription = null) },
+                    trailingContent = {
+                        Switch(
+                            checked = uiState.iconFetchEnabled,
+                            onCheckedChange = { enabled ->
+                                if (enabled) showIconPrivacyDialog = true
+                                else viewModel.setIconFetchEnabled(false)
+                            },
+                        )
+                    },
                 )
             }
         }

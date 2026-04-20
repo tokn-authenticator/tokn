@@ -18,6 +18,7 @@ data class OtpAccountEntity(
     val counter: Long,
     val type: String,
     val sortOrder: Int,
+    val group: String? = null,
 )
 
 fun OtpAccountEntity.toDomain(): OtpAccount = OtpAccount(
@@ -31,6 +32,7 @@ fun OtpAccountEntity.toDomain(): OtpAccount = OtpAccount(
     counter = counter,
     type = OtpType.valueOf(type),
     sortOrder = sortOrder,
+    group = group,
 )
 
 fun OtpAccount.toEntity(): OtpAccountEntity = OtpAccountEntity(
@@ -44,4 +46,5 @@ fun OtpAccount.toEntity(): OtpAccountEntity = OtpAccountEntity(
     counter = counter,
     type = type.name,
     sortOrder = sortOrder,
+    group = group,
 )

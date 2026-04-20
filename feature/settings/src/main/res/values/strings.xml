@@ -16,6 +16,10 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System</string>
+    <string name="account_icons">Account icons</string>
+    <string name="account_icons_desc">Load service logos from the internet (Simple Icons)</string>
+    <string name="account_icons_privacy_title">Load icons from the internet?</string>
+    <string name="account_icons_privacy_body">Enabling this fetches a logo for each service from the Simple Icons CDN. Your issuer names are sent as part of the request URL. Disable anytime.</string>
 
     <!-- Security -->
     <string name="security">Security</string>

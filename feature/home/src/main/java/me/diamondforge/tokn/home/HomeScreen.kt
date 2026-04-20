@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,8 +21,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.runtime.collectAsState
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -39,6 +47,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -65,6 +74,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -81,6 +92,7 @@ import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -169,6 +181,29 @@ fun HomeScreen(
                 )
             }
 
+            if (uiState.availableGroups.isNotEmpty()) {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(vertical = 4.dp),
+                ) {
+                    item {
+                        FilterChip(
+                            selected = uiState.selectedGroup == null,
+                            onClick = { viewModel.selectGroup(null) },
+                            label = { Text(stringResource(R.string.group_all)) },
+                        )
+                    }
+                    items(uiState.availableGroups) { group ->
+                        FilterChip(
+                            selected = uiState.selectedGroup == group,
+                            onClick = { viewModel.selectGroup(group) },
+                            label = { Text(group) },
+                        )
+                    }
+                }
+            }
+
             if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -176,7 +211,7 @@ fun HomeScreen(
             } else if (listItems.isEmpty()) {
                 EmptyState(
                     modifier = Modifier.fillMaxSize(),
-                    isFiltered = uiState.searchQuery.isNotBlank(),
+                    isFiltered = uiState.searchQuery.isNotBlank() || uiState.selectedGroup != null,
                 )
             } else {
                 LazyColumn(
@@ -191,6 +226,7 @@ fun HomeScreen(
                             AccountCard(
                                 item = item,
                                 isDragging = isDragging,
+                                iconFetchEnabled = uiState.iconFetchEnabled,
                                 onCopy = {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
@@ -277,6 +313,7 @@ private fun AddOptionsSheet(
 private fun ReorderableCollectionItemScope.AccountCard(
     item: AccountItem,
     isDragging: Boolean,
+    iconFetchEnabled: Boolean,
     onCopy: () -> Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
@@ -318,6 +355,8 @@ private fun ReorderableCollectionItemScope.AccountCard(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                IssuerAvatar(issuer = item.account.issuer, iconFetchEnabled = iconFetchEnabled)
+                Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = item.account.issuer,
@@ -391,6 +430,64 @@ private fun ReorderableCollectionItemScope.AccountCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun IssuerAvatar(issuer: String, iconFetchEnabled: Boolean, modifier: Modifier = Modifier) {
+    if (iconFetchEnabled) {
+        val url = remember(issuer) {
+            val slug = issuer.lowercase().replace(Regex("[^a-z0-9]"), "")
+            "https://cdn.simpleicons.org/$slug"
+        }
+        SubcomposeAsyncImage(
+            model = url,
+            contentDescription = null,
+            modifier = modifier.size(38.dp).clip(CircleShape),
+            contentScale = ContentScale.Crop,
+        ) {
+            val state = painter.state.collectAsState()
+            if (state.value is AsyncImagePainter.State.Success) {
+                SubcomposeAsyncImageContent()
+            } else {
+                LetterAvatarBox(issuer)
+            }
+        }
+    } else {
+        LetterAvatarBox(issuer, modifier)
+    }
+}
+
+@Composable
+private fun LetterAvatarBox(issuer: String, modifier: Modifier = Modifier) {
+    val avatarColors = listOf(
+        Color(0xFF1976D2),
+        Color(0xFF388E3C),
+        Color(0xFFF57C00),
+        Color(0xFF7B1FA2),
+        Color(0xFFD32F2F),
+        Color(0xFF0097A7),
+        Color(0xFF5D4037),
+        Color(0xFF455A64),
+        Color(0xFF00796B),
+        Color(0xFFC62828),
+    )
+    val color = remember(issuer) { avatarColors[issuer.hashCode().absoluteValue % avatarColors.size] }
+    val letter = issuer.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+
+    Box(
+        modifier = modifier
+            .size(38.dp)
+            .clip(CircleShape)
+            .background(color),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = letter,
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+        )
     }
 }
 
