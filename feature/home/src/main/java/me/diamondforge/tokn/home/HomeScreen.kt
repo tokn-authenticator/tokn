@@ -512,6 +512,8 @@ private fun EmptyState(modifier: Modifier = Modifier, isFiltered: Boolean = fals
     }
 }
 
-private fun formatOtpCode(code: String): String =
-    if (code.length == 6) "${code.substring(0, 3)} ${code.substring(3)}"
-    else "${code.substring(0, 4)} ${code.substring(4)}"
+private fun formatOtpCode(code: String): String = when (code.length) {
+    6 -> "${code.substring(0, 3)} ${code.substring(3)}"
+    8 -> "${code.substring(0, 4)} ${code.substring(4)}"
+    else -> code
+}
