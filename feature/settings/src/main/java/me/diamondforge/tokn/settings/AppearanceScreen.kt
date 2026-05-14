@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.diamondforge.tokn.data.preferences.ThemeMode
 
 private val LANGUAGE_TAGS = listOf("", "en", "de")
 

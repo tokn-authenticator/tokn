@@ -54,6 +54,7 @@ import me.diamondforge.tokn.add.QrScannerScreen
 import me.diamondforge.tokn.backup.BackupScreen
 import me.diamondforge.tokn.home.EditAccountScreen
 import me.diamondforge.tokn.home.HomeScreen
+import me.diamondforge.tokn.onboarding.OnboardingScreen
 import me.diamondforge.tokn.settings.AppearanceScreen
 import me.diamondforge.tokn.settings.SecurityScreen
 import me.diamondforge.tokn.settings.SettingsScreen
@@ -61,12 +62,17 @@ import me.diamondforge.tokn.settings.SettingsScreen
 @Composable
 fun AppNavHost(
     isLocked: Boolean?,
+    onboardingDone: Boolean?,
     onUnlock: () -> Unit,
     onUnlockWithPassword: suspend (String) -> Boolean,
     hasVaultPassword: Boolean,
     biometricEnabled: Boolean,
 ) {
-    if (isLocked == null) return
+    if (onboardingDone == null || isLocked == null) return
+    if (!onboardingDone) {
+        OnboardingScreen(onFinished = {})
+        return
+    }
     if (isLocked) {
         LockScreen(
             onUnlock = onUnlock,

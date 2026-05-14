@@ -1,4 +1,4 @@
-package me.diamondforge.tokn.settings
+package me.diamondforge.tokn.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -14,13 +14,13 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
+private val Context.userPrefsDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 @Singleton
 class UserPreferencesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
-    private val dataStore = context.dataStore
+    private val dataStore = context.userPrefsDataStore
 
     val themeMode: Flow<ThemeMode> = dataStore.data.map { prefs ->
         ThemeMode.valueOf(prefs[Keys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
@@ -40,6 +40,10 @@ class UserPreferencesRepository @Inject constructor(
 
     val encryptionEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.ENCRYPTION_ENABLED] ?: false
+    }
+
+    val onboardingDone: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.ONBOARDING_DONE] ?: false
     }
 
     suspend fun setThemeMode(mode: ThemeMode) {
@@ -62,12 +66,17 @@ class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.ENCRYPTION_ENABLED] = enabled }
     }
 
+    suspend fun setOnboardingDone(done: Boolean) {
+        dataStore.edit { it[Keys.ONBOARDING_DONE] = done }
+    }
+
     private object Keys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val AUTO_LOCK_TIMEOUT = intPreferencesKey("auto_lock_timeout")
         val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
         val SCREENSHOTS_ENABLED = booleanPreferencesKey("screenshots_enabled")
         val ENCRYPTION_ENABLED = booleanPreferencesKey("encryption_enabled")
+        val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
     }
 }
 

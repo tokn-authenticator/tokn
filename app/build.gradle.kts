@@ -19,8 +19,8 @@ android {
         applicationId = "me.diamondforge.tokn"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.2.1"
+        versionCode = 5
+        versionName = "1.2.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -70,6 +70,7 @@ dependencies {
     implementation(project(":feature:add"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:backup"))
+    implementation(project(":feature:onboarding"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.appcompat)

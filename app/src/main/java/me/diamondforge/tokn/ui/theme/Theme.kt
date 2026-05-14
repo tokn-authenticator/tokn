@@ -9,7 +9,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import me.diamondforge.tokn.settings.ThemeMode
+import me.diamondforge.tokn.data.preferences.ThemeMode
 
 @Composable
 fun SimpleOTPTheme(

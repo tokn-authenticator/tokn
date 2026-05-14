@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
+import me.diamondforge.tokn.data.preferences.ThemeMode
+import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.security.VaultPasswordManager
 import javax.inject.Inject
 
