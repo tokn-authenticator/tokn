@@ -58,6 +58,7 @@ class EditAccountViewModel @Inject constructor(
 
     fun saveChanges(onSuccess: () -> Unit) {
         val state = _uiState.value
+        if (state.isSaving) return
         if (state.secret.isBlank()) {
             _uiState.update { it.copy(error = "Secret is required") }
             return
@@ -71,6 +72,7 @@ class EditAccountViewModel @Inject constructor(
             _uiState.update { it.copy(error = "Account name is required") }
             return
         }
+        _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             runCatching {
                 val current = getAccountByIdUseCase(accountId) ?: error("Account not found")
@@ -87,7 +89,7 @@ class EditAccountViewModel @Inject constructor(
                     ),
                 )
             }.onSuccess { onSuccess() }
-                .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Failed to save") } }
+                .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Failed to save", isSaving = false) } }
         }
     }
 }
@@ -103,4 +105,5 @@ data class EditAccountUiState(
     val group: String = "",
     val error: String? = null,
     val isLoaded: Boolean = false,
+    val isSaving: Boolean = false,
 )

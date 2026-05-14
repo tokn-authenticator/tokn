@@ -220,6 +220,7 @@ fun ManualEntryScreen(
 
             Button(
                 onClick = { viewModel.saveAccount(onSaved) },
+                enabled = !uiState.isSaving,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),

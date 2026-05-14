@@ -39,6 +39,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -89,14 +92,14 @@ fun AppNavHost(
         navController = navController,
         startDestination = Screen.Home.route,
     ) {
-        composable(Screen.Home.route) {
+        composable(Screen.Home.route) { entry ->
             HomeScreen(
-                onScanQr = { navController.navigate(Screen.AddFlow.route) },
-                onFromImage = { navController.navigate(Screen.FromImage.route) },
-                onManualEntry = { navController.navigate(Screen.ManualEntry.route) },
-                onSettings = { navController.navigate(Screen.Settings.route) },
-                onBackup = { navController.navigate(Screen.Backup.route) },
-                onEditAccount = { id -> navController.navigate(Screen.EditAccount.createRoute(id)) },
+                onScanQr = { entry.navigateOnce(navController, Screen.AddFlow.route) },
+                onFromImage = { entry.navigateOnce(navController, Screen.FromImage.route) },
+                onManualEntry = { entry.navigateOnce(navController, Screen.ManualEntry.route) },
+                onSettings = { entry.navigateOnce(navController, Screen.Settings.route) },
+                onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
+                onEditAccount = { id -> entry.navigateOnce(navController, Screen.EditAccount.createRoute(id)) },
             )
         }
         composable(
@@ -121,9 +124,9 @@ fun AppNavHost(
                 QrScannerScreen(
                     onScanned = { rawValue ->
                         viewModel.onQrScanned(rawValue)
-                        navController.navigate(Screen.ManualEntry.route)
+                        entry.navigateOnce(navController, Screen.ManualEntry.route)
                     },
-                    onManualEntry = { navController.navigate(Screen.ManualEntry.route) },
+                    onManualEntry = { entry.navigateOnce(navController, Screen.ManualEntry.route) },
                     onBack = { navController.popBackStack(Screen.Home.route, inclusive = false) },
                 )
             }
@@ -135,9 +138,9 @@ fun AppNavHost(
                 FromImageScreen(
                     onScanned = { rawValue ->
                         viewModel.onQrScanned(rawValue)
-                        navController.navigate(Screen.ManualEntry.route)
+                        entry.navigateOnce(navController, Screen.ManualEntry.route)
                     },
-                    onManualEntry = { navController.navigate(Screen.ManualEntry.route) },
+                    onManualEntry = { entry.navigateOnce(navController, Screen.ManualEntry.route) },
                     onBack = { navController.popBackStack(Screen.Home.route, inclusive = false) },
                     suppressLock = viewModel::suppressLock,
                 )
@@ -157,12 +160,12 @@ fun AppNavHost(
             }
         }
 
-        composable(Screen.Settings.route) {
+        composable(Screen.Settings.route) { entry ->
             SettingsScreen(
                 onBack = { navController.popBackStack() },
-                onAppearance = { navController.navigate(Screen.Appearance.route) },
-                onSecurity = { navController.navigate(Screen.SecuritySettings.route) },
-                onBackup = { navController.navigate(Screen.Backup.route) },
+                onAppearance = { entry.navigateOnce(navController, Screen.Appearance.route) },
+                onSecurity = { entry.navigateOnce(navController, Screen.SecuritySettings.route) },
+                onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
             )
         }
         composable(Screen.Appearance.route) {
@@ -298,6 +301,12 @@ private fun LockScreen(
                 }
             }
         }
+    }
+}
+
+private fun NavBackStackEntry.navigateOnce(navController: NavController, route: String) {
+    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+        navController.navigate(route)
     }
 }
 

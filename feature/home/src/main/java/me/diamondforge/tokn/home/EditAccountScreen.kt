@@ -225,6 +225,7 @@ fun EditAccountScreen(
 
             Button(
                 onClick = { viewModel.saveChanges(onSaved) },
+                enabled = !uiState.isSaving,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),

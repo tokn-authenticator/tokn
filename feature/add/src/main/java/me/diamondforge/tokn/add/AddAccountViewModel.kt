@@ -44,6 +44,7 @@ class AddAccountViewModel @Inject constructor(
 
     fun saveAccount(onSuccess: () -> Unit) {
         val state = _uiState.value
+        if (state.isSaving) return
         if (state.secret.isBlank()) {
             _uiState.update { it.copy(error = "Secret is required") }
             return
@@ -57,6 +58,7 @@ class AddAccountViewModel @Inject constructor(
             _uiState.update { it.copy(error = "Account name is required") }
             return
         }
+        _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             runCatching {
                 addAccountUseCase(
@@ -73,7 +75,7 @@ class AddAccountViewModel @Inject constructor(
                 )
             }.onSuccess { onSuccess() }
                 .onFailure { throwable ->
-                    _uiState.update { it.copy(error = throwable.message ?: "Failed to save account") }
+                    _uiState.update { it.copy(error = throwable.message ?: "Failed to save account", isSaving = false) }
                 }
         }
     }
@@ -143,4 +145,5 @@ data class AddAccountUiState(
     val group: String = "",
     val parsedAccount: OtpAccount? = null,
     val error: String? = null,
+    val isSaving: Boolean = false,
 )
