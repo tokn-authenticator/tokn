@@ -48,3 +48,4 @@ google-services.json
 # Android Profiling
 *.hprof
 bin/
+analyze/
