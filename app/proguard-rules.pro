@@ -18,7 +18,7 @@
 }
 
 # OTP account model must survive R8 for Room
--keepclassmembers class me.diamondforge.simpleotp.data.db.entity.OtpAccountEntity { *; }
--keepclassmembers class me.diamondforge.simpleotp.domain.model.OtpAccount { *; }
--keepnames class me.diamondforge.simpleotp.domain.model.OtpAlgorithm
--keepnames class me.diamondforge.simpleotp.domain.model.OtpType
+-keepclassmembers class me.diamondforge.tokn.data.db.entity.OtpAccountEntity { *; }
+-keepclassmembers class me.diamondforge.tokn.domain.model.OtpAccount { *; }
+-keepnames class me.diamondforge.tokn.domain.model.OtpAlgorithm
+-keepnames class me.diamondforge.tokn.domain.model.OtpType
