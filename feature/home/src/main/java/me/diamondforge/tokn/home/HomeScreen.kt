@@ -3,6 +3,7 @@ package me.diamondforge.tokn.home
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.PersistableBundle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -231,9 +232,12 @@ fun HomeScreen(
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
                                         as ClipboardManager
-                                    clipboard.setPrimaryClip(
-                                        ClipData.newPlainText("OTP", item.otpResult.code),
-                                    )
+                                    val clip = ClipData.newPlainText("OTP", item.otpResult.code).apply {
+                                        description.extras = PersistableBundle().apply {
+                                            putBoolean("android.content.extra.IS_SENSITIVE", true)
+                                        }
+                                    }
+                                    clipboard.setPrimaryClip(clip)
                                     scope.launch {
                                         snackbarHostState.showSnackbar(copiedMessage)
                                         delay(30_000)
