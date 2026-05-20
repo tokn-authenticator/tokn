@@ -1,5 +1,7 @@
 package me.diamondforge.tokn.sync.qr
 
+import android.os.Handler
+import android.os.Looper
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -46,6 +48,7 @@ fun QrSyncScannerPreview(
             )
         }
     }
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
     val currentCallback by rememberUpdatedState(onRawDetected)
 
     DisposableEffect(lifecycleOwner) {
@@ -74,7 +77,10 @@ fun QrSyncScannerPreview(
                     .build().also { a ->
                         a.setAnalyzer(executor) { imageProxy ->
                             try {
-                                decodeQr(reader, imageProxy)?.let(currentCallback)
+                                val text = decodeQr(reader, imageProxy)
+                                if (text != null) {
+                                    mainHandler.post { currentCallback(text) }
+                                }
                             } finally {
                                 imageProxy.close()
                             }

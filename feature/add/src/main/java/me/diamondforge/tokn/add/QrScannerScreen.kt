@@ -1,6 +1,8 @@
 package me.diamondforge.tokn.add
 
 import android.Manifest
+import android.os.Handler
+import android.os.Looper
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -138,6 +140,7 @@ private fun CameraPreview(
     val executor = remember { Executors.newSingleThreadExecutor() }
     val analyzer = remember { ZxingQrAnalyzer() }
     val scanned = remember { AtomicBoolean(false) }
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
 
     DisposableEffect(lifecycleOwner) {
         onDispose {
@@ -176,7 +179,7 @@ private fun CameraPreview(
                                     value.startsWith("otpauth://") &&
                                     scanned.compareAndSet(false, true)
                                 ) {
-                                    onScanned(value)
+                                    mainHandler.post { onScanned(value) }
                                 }
                             } finally {
                                 imageProxy.close()
