@@ -20,6 +20,7 @@ class KeystoreManager @Inject constructor(
     private val keystore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    @Synchronized
     fun getDatabasePassphrase(): ByteArray {
         val stored = prefs.getString(KEY_DB_PASSPHRASE, null)
         if (stored != null) {

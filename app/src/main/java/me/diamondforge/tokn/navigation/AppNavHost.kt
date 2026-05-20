@@ -1,5 +1,9 @@
 package me.diamondforge.tokn.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -100,9 +104,17 @@ fun AppNavHost(
 
     val navController = rememberNavController()
 
+    val navAnim = tween<Float>(durationMillis = 250)
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        enterTransition = { fadeIn(animationSpec = navAnim) },
+        exitTransition = { fadeOut(animationSpec = navAnim) },
+        popEnterTransition = { fadeIn(animationSpec = navAnim) },
+        popExitTransition = { fadeOut(animationSpec = navAnim) },
     ) {
         composable(Screen.Home.route) { entry ->
             HomeScreen(

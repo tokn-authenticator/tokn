@@ -12,7 +12,9 @@ class GenerateOtpUseCase {
             OtpType.TOTP -> timeMillis / 1000 / account.period
             OtpType.HOTP -> account.counter
         }
-        val code = generateHotp(account.secret, counter, account.digits, account.algorithm)
+        // RFC 4226 caps digits at 8; anything larger overflows intPow10 (Int).
+        val digits = account.digits.coerceIn(6, 8)
+        val code = generateHotp(account.secret, counter, digits, account.algorithm)
         val remainingMillis = when (account.type) {
             OtpType.TOTP -> {
                 val periodMillis = account.period * 1000L
@@ -66,13 +68,13 @@ class GenerateOtpUseCase {
 
     private fun base32Decode(encoded: String): ByteArray {
         val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-        val clean = encoded.uppercase().replace(" ", "")
+        val clean = encoded.uppercase().replace(" ", "").replace("-", "").trimEnd('=')
         var bits = 0
         var bitsCount = 0
         val result = mutableListOf<Byte>()
         for (ch in clean) {
             val idx = alphabet.indexOf(ch)
-            if (idx < 0) continue
+            require(idx >= 0) { "Invalid Base32 character: '$ch'" }
             bits = (bits shl 5) or idx
             bitsCount += 5
             if (bitsCount >= 8) {

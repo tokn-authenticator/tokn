@@ -34,9 +34,16 @@ object WfdSyncTransport {
         localBuild: Long,
         port: Int = WfdManager.DEFAULT_PORT,
     ): SendResult = withContext(Dispatchers.IO) {
-        ServerSocket(port).use { server ->
-            server.soTimeout = HANDSHAKE_TIMEOUT_MS
-            val client = server.accept().apply {
+        // Bind specifically to the Wi-Fi Direct group-owner interface
+        // (Android's GO always advertises 192.168.49.1) so the sync server
+        // is not reachable on any other interface the device may have up
+        // at the same time (regular WLAN, mobile hotspot, USB tethering).
+        // Falls back to wildcard if the GO interface isn't available — the
+        // J-PAKE handshake still gates the connection in that case.
+        val server = openServerOnGroupOwner(port)
+        server.use { sock ->
+            sock.soTimeout = HANDSHAKE_TIMEOUT_MS
+            val client = sock.accept().apply {
                 soTimeout = HANDSHAKE_TIMEOUT_MS
                 tcpNoDelay = true
             }
@@ -97,4 +104,21 @@ object WfdSyncTransport {
     private const val CONNECT_TIMEOUT_MS = 15_000
     private const val HANDSHAKE_TIMEOUT_MS = 60_000
     private const val TRANSFER_TIMEOUT_MS = 30_000
+
+    /**
+     * Android's Wi-Fi Direct framework consistently assigns 192.168.49.1 to
+     * the group owner. This has been stable since the framework's
+     * introduction. If the address ever changes or the interface is not yet
+     * up when we hit this code path, fall back to wildcard binding rather
+     * than failing — the handshake still authenticates the peer.
+     */
+    private fun openServerOnGroupOwner(port: Int): ServerSocket {
+        return try {
+            ServerSocket(port, /* backlog = */ 1, InetAddress.getByName(GROUP_OWNER_ADDRESS))
+        } catch (_: java.io.IOException) {
+            ServerSocket(port)
+        }
+    }
+
+    private const val GROUP_OWNER_ADDRESS = "192.168.49.1"
 }

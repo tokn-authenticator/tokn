@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,11 +34,20 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var vaultPasswordManager: VaultPasswordManager
     @Inject lateinit var getAccountsUseCase: GetAccountsUseCase
 
+    // Set to true once the pre-OOBE migration check has run.
+    // The UI must not render the onboarding flow before this is true; otherwise
+    // upgrade-from-old-version users see a brief flash of OOBE before being
+    // bounced to the home screen.
+    private val migrationComplete = MutableStateFlow(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         enableEdgeToEdge()
-        migrateOnboardingFlag()
+        lifecycleScope.launch {
+            migrateOnboardingFlag()
+            migrationComplete.value = true
+        }
 
         setContent {
             val themeMode by userPreferencesRepository.themeMode.collectAsStateWithLifecycle(ThemeMode.SYSTEM)
@@ -45,7 +55,11 @@ class MainActivity : AppCompatActivity() {
             val screenshotsEnabled by userPreferencesRepository.screenshotsEnabled.collectAsStateWithLifecycle(false)
             val encryptionEnabled by userPreferencesRepository.encryptionEnabled.collectAsStateWithLifecycle(false)
             val biometricEnabled by userPreferencesRepository.biometricEnabled.collectAsStateWithLifecycle(true)
-            val onboardingDone by userPreferencesRepository.onboardingDone.collectAsStateWithLifecycle(initialValue = null)
+            val onboardingDoneRaw by userPreferencesRepository.onboardingDone.collectAsStateWithLifecycle(initialValue = null)
+            val migrated by migrationComplete.collectAsStateWithLifecycle()
+            // Hold the UI at the "loading" state (null) until migration finishes,
+            // so old-install upgrades never briefly render the OOBE flow.
+            val onboardingDone = if (migrated) onboardingDoneRaw else null
 
             LaunchedEffect(screenshotsEnabled) {
                 if (screenshotsEnabled) {
@@ -105,19 +119,17 @@ class MainActivity : AppCompatActivity() {
         lockManager.onAppBackground()
     }
 
-    private fun migrateOnboardingFlag() {
-        // Pre-OOBE installs ship without an onboarding flag. If the user already has accounts
-        // or a vault password from before this version, treat onboarding as done so updates
-        // don't push them through the OOBE.
-        lifecycleScope.launch {
-            if (userPreferencesRepository.onboardingDone.first()) return@launch
-            val hasExistingData = withContext(Dispatchers.IO) {
-                vaultPasswordManager.hasPassword() ||
-                    getAccountsUseCase().first().isNotEmpty()
-            }
-            if (hasExistingData) {
-                userPreferencesRepository.setOnboardingDone(true)
-            }
+    // Pre-OOBE installs ship without an onboarding flag. If the user already has accounts
+    // or a vault password from before this version, treat onboarding as done so updates
+    // don't push them through the OOBE.
+    private suspend fun migrateOnboardingFlag() {
+        if (userPreferencesRepository.onboardingDone.first()) return
+        val hasExistingData = withContext(Dispatchers.IO) {
+            vaultPasswordManager.hasPassword() ||
+                getAccountsUseCase().first().isNotEmpty()
+        }
+        if (hasExistingData) {
+            userPreferencesRepository.setOnboardingDone(true)
         }
     }
 

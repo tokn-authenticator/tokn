@@ -1,9 +1,5 @@
 package me.diamondforge.tokn.home
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.os.PersistableBundle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -79,7 +75,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -88,7 +83,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.diamondforge.tokn.domain.model.OtpType
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
@@ -110,7 +104,6 @@ fun HomeScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     var showAddSheet by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
@@ -230,18 +223,9 @@ fun HomeScreen(
                                 iconFetchEnabled = uiState.iconFetchEnabled,
                                 onCopy = {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
-                                        as ClipboardManager
-                                    val clip = ClipData.newPlainText("OTP", item.otpResult.code).apply {
-                                        description.extras = PersistableBundle().apply {
-                                            putBoolean("android.content.extra.IS_SENSITIVE", true)
-                                        }
-                                    }
-                                    clipboard.setPrimaryClip(clip)
+                                    viewModel.copyToClipboard(item)
                                     scope.launch {
                                         snackbarHostState.showSnackbar(copiedMessage)
-                                        delay(30_000)
-                                        clipboard.clearPrimaryClip()
                                     }
                                 },
                                 onDelete = { pendingDeleteItem = item },

@@ -92,8 +92,7 @@ class BackupViewModel @Inject constructor(
                     if (isUnencryptedToknBackup(raw)) {
                         val accounts = runCatching { deserializeAccounts(raw) }
                             .getOrElse { throw BackupException(R.string.error_not_tokn_backup) }
-                        accounts.forEach { addAccountUseCase(it) }
-                        return@withContext accounts.size
+                        return@withContext importDeduplicated(accounts)
                     }
                     if (password.isEmpty())
                         throw BackupException(R.string.error_password_required)
@@ -106,8 +105,7 @@ class BackupViewModel @Inject constructor(
                         }
                     val accounts = runCatching { deserializeAccounts(json) }
                         .getOrElse { throw BackupException(R.string.error_not_tokn_backup) }
-                    accounts.forEach { addAccountUseCase(it) }
-                    accounts.size
+                    importDeduplicated(accounts)
                 }
             }.onSuccess { count ->
                 _uiState.update { it.copy(isLoading = false, importedCount = count) }
@@ -138,10 +136,14 @@ class BackupViewModel @Inject constructor(
                     isAegisEncrypted(raw) ->
                         _uiState.update { it.copy(isLoading = false, pendingEncryptedAegisUri = uri) }
                     else -> {
-                        runCatching { parseAegisJson(raw) }
-                            .onSuccess { accounts ->
-                                accounts.forEach { addAccountUseCase(it) }
-                                _uiState.update { it.copy(isLoading = false, importedCount = accounts.size) }
+                        // parseAegisJson + DB writes off the main thread.
+                        runCatching {
+                            withContext(Dispatchers.IO) {
+                                importDeduplicated(parseAegisJson(raw))
+                            }
+                        }
+                            .onSuccess { count ->
+                                _uiState.update { it.copy(isLoading = false, importedCount = count) }
                             }
                             .onFailure {
                                 _uiState.update { it.copy(isLoading = false, error = BackupError(R.string.import_error_title, R.string.error_not_aegis_backup)) }
@@ -168,8 +170,7 @@ class BackupViewModel @Inject constructor(
                         ?: throw BackupException(R.string.error_file_not_readable)
                     val dbJson = decryptAegisEncrypted(json, password)
                     val accounts = parseAegisDb(dbJson)
-                    accounts.forEach { addAccountUseCase(it) }
-                    accounts.size
+                    importDeduplicated(accounts)
                 }
             }.onSuccess { count ->
                 _uiState.update { it.copy(isLoading = false, importedCount = count) }
@@ -185,6 +186,30 @@ class BackupViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Inserts every incoming account whose normalized secret is not already
+     * present locally. Re-importing the same backup is a no-op rather than
+     * a silent duplication. Mirrors the dedup logic used by sync transfers
+     * so the two import paths behave consistently.
+     */
+    private suspend fun importDeduplicated(incoming: List<OtpAccount>): Int {
+        val existingSecrets = getAccountsUseCase().first()
+            .map { it.secret.normalize() }
+            .toHashSet()
+        var imported = 0
+        for (account in incoming) {
+            val normalized = account.secret.normalize()
+            if (normalized in existingSecrets) continue
+            addAccountUseCase(account.copy(id = 0))
+            existingSecrets.add(normalized)
+            imported++
+        }
+        return imported
+    }
+
+    private fun String.normalize(): String =
+        replace(" ", "").replace("-", "").uppercase()
 
     fun cancelEncryptedImport() {
         _uiState.update { it.copy(pendingEncryptedAegisUri = null) }
@@ -290,7 +315,7 @@ class BackupViewModel @Inject constructor(
         val cipher = javax.crypto.Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(
             javax.crypto.Cipher.DECRYPT_MODE,
-            javax.crypto.spec.SecretKeySpec(masterKey!!, "AES"),
+            javax.crypto.spec.SecretKeySpec(masterKey, "AES"),
             javax.crypto.spec.GCMParameterSpec(128, dbNonce),
         )
         return cipher.doFinal(dbCiphertext + dbTag).toString(Charsets.UTF_8)
