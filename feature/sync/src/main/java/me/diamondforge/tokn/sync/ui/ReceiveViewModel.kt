@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -106,6 +107,7 @@ class ReceiveViewModel @Inject constructor(
                         }
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 _uiState.update {
                     it.copy(
                         status = ReceiveUiState.Status.Idle,
@@ -191,6 +193,7 @@ class ReceiveViewModel @Inject constructor(
                     )
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 val msg = when (e) {
                     is AEADBadTagException, is BadPaddingException ->
                         context.getString(me.diamondforge.tokn.sync.R.string.sync_qr_wrong_passphrase)
@@ -265,6 +268,7 @@ class ReceiveViewModel @Inject constructor(
                         }
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 _uiState.update {
                     it.copy(
                         status = ReceiveUiState.Status.Idle,
@@ -310,6 +314,7 @@ class ReceiveViewModel @Inject constructor(
                 )
             }
         }.onFailure { e ->
+            if (e is CancellationException) throw e
             _uiState.update {
                 it.copy(
                     status = ReceiveUiState.Status.Idle,

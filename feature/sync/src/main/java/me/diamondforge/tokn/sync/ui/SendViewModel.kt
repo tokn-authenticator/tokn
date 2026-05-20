@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -125,6 +126,7 @@ class SendViewModel @Inject constructor(
                         }
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
@@ -189,6 +191,7 @@ class SendViewModel @Inject constructor(
                         }
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
@@ -238,6 +241,7 @@ class SendViewModel @Inject constructor(
                     )
                 }
             }.onFailure { e ->
+                if (e is CancellationException) throw e
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
