@@ -3,6 +3,7 @@ package me.diamondforge.tokn.sync.qr
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -16,9 +17,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.common.InputImage
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.DecodeHintType
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.NotFoundException
+import com.google.zxing.PlanarYUVLuminanceSource
+import com.google.zxing.common.HybridBinarizer
 import java.util.concurrent.Executors
 
 /**
@@ -34,13 +39,18 @@ fun QrSyncScannerPreview(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val executor = remember { Executors.newSingleThreadExecutor() }
-    val scanner = remember { BarcodeScanning.getClient() }
+    val reader = remember {
+        MultiFormatReader().apply {
+            setHints(
+                mapOf(DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE)),
+            )
+        }
+    }
     val currentCallback by rememberUpdatedState(onRawDetected)
 
     DisposableEffect(lifecycleOwner) {
         onDispose {
             executor.shutdown()
-            scanner.close()
         }
     }
 
@@ -63,22 +73,11 @@ fun QrSyncScannerPreview(
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build().also { a ->
                         a.setAnalyzer(executor) { imageProxy ->
-                            val mediaImage = imageProxy.image
-                            if (mediaImage == null) {
+                            try {
+                                decodeQr(reader, imageProxy)?.let(currentCallback)
+                            } finally {
                                 imageProxy.close()
-                                return@setAnalyzer
                             }
-                            val image = InputImage.fromMediaImage(
-                                mediaImage,
-                                imageProxy.imageInfo.rotationDegrees,
-                            )
-                            scanner.process(image)
-                                .addOnSuccessListener { barcodes ->
-                                    barcodes.firstOrNull {
-                                        it.format == Barcode.FORMAT_QR_CODE && it.rawValue != null
-                                    }?.rawValue?.let(currentCallback)
-                                }
-                                .addOnCompleteListener { imageProxy.close() }
                         }
                     }
                 runCatching {
@@ -95,4 +94,32 @@ fun QrSyncScannerPreview(
         },
         modifier = modifier,
     )
+}
+
+private fun decodeQr(reader: MultiFormatReader, imageProxy: ImageProxy): String? {
+    val yPlane = imageProxy.planes[0]
+    val buffer = yPlane.buffer
+    val rowStride = yPlane.rowStride
+    val bytes = ByteArray(buffer.remaining())
+    buffer.get(bytes)
+    val source = PlanarYUVLuminanceSource(
+        bytes,
+        rowStride,
+        imageProxy.height,
+        0,
+        0,
+        imageProxy.width,
+        imageProxy.height,
+        false,
+    )
+    val binary = BinaryBitmap(HybridBinarizer(source))
+    return try {
+        reader.decodeWithState(binary).text
+    } catch (_: NotFoundException) {
+        null
+    } catch (_: Throwable) {
+        null
+    } finally {
+        reader.reset()
+    }
 }

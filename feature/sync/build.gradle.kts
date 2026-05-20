@@ -67,7 +67,6 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
     implementation(libs.guava)
-    implementation(libs.mlkit.barcode)
     implementation(libs.accompanist.permissions)
 
     debugImplementation(libs.compose.ui.tooling)

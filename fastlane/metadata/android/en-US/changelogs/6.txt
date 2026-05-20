@@ -1,0 +1,4 @@
+* Replaced Google ML Kit barcode scanner with the libre ZXing decoder so the app no longer depends on any proprietary libraries.
+* Hardened device-to-device sync handshake and backup privacy.
+* Better onboarding handling.
+* Updated dependencies (Kotlin, KSP, Compose BOM, SQLCipher, coroutines).

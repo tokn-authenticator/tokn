@@ -33,15 +33,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
+import me.diamondforge.tokn.add.qr.decodeQrFromUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,44 +61,15 @@ fun FromImageScreen(
         isProcessing = true
         error = null
         scope.launch {
-            val result = withContext(Dispatchers.IO) {
-                runCatching {
-                    val image = InputImage.fromFilePath(context, uri)
-                    val scanner = BarcodeScanning.getClient()
-                    try {
-                        suspendCancellableCoroutine { cont ->
-                            scanner.process(image)
-                                .addOnSuccessListener { barcodes ->
-                                    if (cont.isActive) {
-                                        val rawValue = barcodes.firstOrNull { barcode ->
-                                            barcode.format == Barcode.FORMAT_QR_CODE &&
-                                                barcode.rawValue?.startsWith("otpauth://") == true
-                                        }?.rawValue
-                                        cont.resume(rawValue)
-                                    }
-                                }
-                                .addOnFailureListener { e ->
-                                    if (cont.isActive) cont.resumeWithException(e)
-                                }
-                        }
-                    } finally {
-                        scanner.close()
-                    }
-                }
+            val rawValue = withContext(Dispatchers.IO) {
+                decodeQrFromUri(context, uri)
             }
             isProcessing = false
-            result.fold(
-                onSuccess = { rawValue ->
-                    if (rawValue != null) {
-                        onScanned(rawValue)
-                    } else {
-                        error = context.getString(R.string.qr_not_found_in_image)
-                    }
-                },
-                onFailure = {
-                    error = context.getString(R.string.qr_not_found_in_image)
-                },
-            )
+            if (rawValue != null && rawValue.startsWith("otpauth://")) {
+                onScanned(rawValue)
+            } else {
+                error = context.getString(R.string.qr_not_found_in_image)
+            }
         }
     }
 

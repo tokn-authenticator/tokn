@@ -24,18 +24,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = localProps["KEYSTORE_FILE"]?.let { file(it as String) }
-            storePassword = localProps["KEYSTORE_PASSWORD"] as? String
-            keyAlias = localProps["KEY_ALIAS"] as? String
-            keyPassword = localProps["KEY_PASSWORD"] as? String
+    val releaseKeystore = (localProps["KEYSTORE_FILE"] as? String)
+        ?.let { file(it) }
+        ?.takeIf { it.exists() }
+    if (releaseKeystore != null) {
+        signingConfigs {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = localProps["KEYSTORE_PASSWORD"] as? String
+                keyAlias = localProps["KEY_ALIAS"] as? String
+                keyPassword = localProps["KEY_PASSWORD"] as? String
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

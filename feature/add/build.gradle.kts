@@ -53,7 +53,7 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
     implementation(libs.guava)
-    implementation(libs.mlkit.barcode)
+    implementation(libs.zxing.core)
     implementation(libs.accompanist.permissions)
     implementation(libs.coroutines.android)
 

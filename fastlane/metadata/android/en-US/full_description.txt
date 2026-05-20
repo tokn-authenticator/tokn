@@ -1,0 +1,17 @@
+Tokn is a minimal 2FA / MFA TOTP/HOTP authenticator that keeps your one-time codes encrypted on-device. No accounts, no cloud, no trackers.
+
+Features:
+
+* Standard otpauth:// URIs (TOTP, HOTP, SHA-1 / SHA-256 / SHA-512)
+* Encrypted local vault
+* Unlock with biometrics (with password fallback) or password only
+* Add accounts by scanning a QR code with the camera or from a gallery image
+* Encrypted backup and restore
+* Direct device-to-device sync over Wi-Fi Direct. Nothing leaves your local network, the handshake is end-to-end encrypted
+* Material 3 UI
+* No tracking, no ads, no Google Play Services required
+
+Tokn is free software, licensed under the GNU General Public License v3.0 or later.
+
+Source code and issue tracker:
+https://github.com/fthomys/tokn
