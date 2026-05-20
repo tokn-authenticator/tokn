@@ -1,0 +1,54 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^org\\.jetbrains\\.kotlin", "^com\\.google\\.devtools\\.ksp"],
+      "groupName": "kotlin + ksp"
+    },
+    {
+      "matchPackagePatterns": ["^com\\.android\\.(application|library|tools)"],
+      "groupName": "android gradle plugin"
+    },
+    {
+      "matchPackagePatterns": ["^androidx\\.compose", "^androidx\\.activity"],
+      "groupName": "compose"
+    },
+    {
+      "matchPackagePatterns": ["^androidx\\.lifecycle"],
+      "groupName": "androidx lifecycle"
+    },
+    {
+      "matchPackagePatterns": ["^androidx\\.navigation"],
+      "groupName": "androidx navigation"
+    },
+    {
+      "matchPackagePatterns": ["^androidx\\.room"],
+      "groupName": "androidx room"
+    },
+    {
+      "matchPackagePatterns": ["^androidx\\.camera"],
+      "groupName": "androidx camerax"
+    },
+    {
+      "matchPackagePatterns": ["^com\\.google\\.dagger", "^androidx\\.hilt"],
+      "groupName": "hilt"
+    },
+    {
+      "matchPackagePatterns": ["^org\\.jetbrains\\.kotlinx:kotlinx-coroutines"],
+      "groupName": "kotlinx coroutines"
+    },
+    {
+      "matchPackagePatterns": ["^io\\.coil-kt"],
+      "groupName": "coil"
+    },
+    {
+      "matchPackagePatterns": ["^androidx\\.test", "^junit:junit"],
+      "groupName": "test"
+    },
+    {
+      "matchPackagePatterns": ["^androidx\\.datastore"],
+      "groupName": "androidx datastore"
+    }
+  ]
+}
