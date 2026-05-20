@@ -40,6 +40,7 @@ data class ReceiveUiState(
     val qrTotal: Int = 0,
     val qrComplete: Boolean = false,
     val errorMessage: String? = null,
+    val versionMismatch: VersionMismatchInfo? = null,
     val importSummary: SyncImporter.Summary? = null,
 ) {
     enum class Status { Idle, Connecting, Importing, Done }
@@ -92,7 +93,7 @@ class ReceiveViewModel @Inject constructor(
                             it.copy(
                                 status = ReceiveUiState.Status.Idle,
                                 activePeer = null,
-                                errorMessage = "Pairing code did not match",
+                                errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_bad_code),
                             )
                         }
                     is LanSyncClient.ReceiveResult.VersionMismatch ->
@@ -100,7 +101,7 @@ class ReceiveViewModel @Inject constructor(
                             it.copy(
                                 status = ReceiveUiState.Status.Idle,
                                 activePeer = null,
-                                errorMessage = versionMismatchMessage(result.peerApp, result.peerBuild),
+                                versionMismatch = versionMismatchInfo(result.peerApp, result.peerBuild),
                             )
                         }
                 }
@@ -109,7 +110,7 @@ class ReceiveViewModel @Inject constructor(
                     it.copy(
                         status = ReceiveUiState.Status.Idle,
                         activePeer = null,
-                        errorMessage = e.message ?: "Connection failed",
+                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_connection),
                     )
                 }
             }
@@ -117,7 +118,10 @@ class ReceiveViewModel @Inject constructor(
     }
 
     fun onQrFrameScanned(raw: String) {
-        if (_uiState.value.qrComplete || _uiState.value.errorMessage != null) return
+        if (_uiState.value.qrComplete ||
+            _uiState.value.errorMessage != null ||
+            _uiState.value.versionMismatch != null
+        ) return
         val chunk = QrChunkCodec.parseFrame(raw) ?: return
         if (qrChunks.containsKey(chunk.seq)) return
         qrChunks[chunk.seq] = chunk.data
@@ -131,7 +135,7 @@ class ReceiveViewModel @Inject constructor(
         val assembled = QrChunkCodec.assemble(qrChunks, chunk.total)
         if (assembled == null) {
             _uiState.update {
-                it.copy(qrSeen = qrChunks.size, qrTotal = chunk.total, errorMessage = "Could not reassemble QR payload")
+                it.copy(qrSeen = qrChunks.size, qrTotal = chunk.total, errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_error_qr_reassemble))
             }
             return
         }
@@ -143,7 +147,7 @@ class ReceiveViewModel @Inject constructor(
                 it.copy(
                     qrSeen = qrChunks.size,
                     qrTotal = chunk.total,
-                    errorMessage = mismatch,
+                    versionMismatch = mismatch,
                 )
             }
             return
@@ -154,14 +158,14 @@ class ReceiveViewModel @Inject constructor(
         }
     }
 
-    private fun inspectQrWrapper(payload: ByteArray): String? {
+    private fun inspectQrWrapper(payload: ByteArray): VersionMismatchInfo? {
         return runCatching {
             val wrapper = JSONObject(String(payload, Charsets.UTF_8))
             val protocol = wrapper.optInt("protocol", -1)
             if (protocol == -1 || protocol == SyncProtocol.VERSION) return@runCatching null
             val peerApp = wrapper.optString("app").ifBlank { "?" }
             val peerBuild = wrapper.optLong("build", 0L)
-            versionMismatchMessage(peerApp, peerBuild)
+            versionMismatchInfo(peerApp, peerBuild)
         }.getOrNull()
     }
 
@@ -188,8 +192,10 @@ class ReceiveViewModel @Inject constructor(
                 }
             }.onFailure { e ->
                 val msg = when (e) {
-                    is AEADBadTagException, is BadPaddingException -> "Wrong passphrase"
-                    else -> e.message ?: "Failed to decrypt"
+                    is AEADBadTagException, is BadPaddingException ->
+                        context.getString(me.diamondforge.tokn.sync.R.string.sync_qr_wrong_passphrase)
+                    else -> e.message
+                        ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_decrypt)
                 }
                 _uiState.update {
                     it.copy(status = ReceiveUiState.Status.Idle, errorMessage = msg)
@@ -208,7 +214,7 @@ class ReceiveViewModel @Inject constructor(
 
     fun startWfdDiscovery() {
         if (!wfdManager.isSupported) {
-            _uiState.update { it.copy(errorMessage = "Wi-Fi Direct is not supported on this device") }
+            _uiState.update { it.copy(errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_wfd_unsupported)) }
             return
         }
         wfdManager.register()
@@ -229,10 +235,10 @@ class ReceiveViewModel @Inject constructor(
         wfdJob = viewModelScope.launch {
             runCatching {
                 val ok = wfdManager.connect(device)
-                if (!ok) error("Wi-Fi Direct connect failed")
+                if (!ok) error(context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_connect))
                 val info = withTimeoutOrNull(45_000) {
                     wfdManager.connectionInfo.first { it != null && it.groupFormed && it.groupOwnerAddress != null }
-                } ?: error("Group never formed")
+                } ?: error(context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_group_form))
                 WfdSyncTransport.receiveOverWfd(
                     groupOwner = info.groupOwnerAddress!!,
                     code = code,
@@ -247,14 +253,14 @@ class ReceiveViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 status = ReceiveUiState.Status.Idle,
-                                errorMessage = "Pairing code did not match",
+                                errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_bad_code),
                             )
                         }
                     is WfdSyncTransport.ReceiveResult.VersionMismatch ->
                         _uiState.update {
                             it.copy(
                                 status = ReceiveUiState.Status.Idle,
-                                errorMessage = versionMismatchMessage(result.peerApp, result.peerBuild),
+                                versionMismatch = versionMismatchInfo(result.peerApp, result.peerBuild),
                             )
                         }
                 }
@@ -262,7 +268,7 @@ class ReceiveViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         status = ReceiveUiState.Status.Idle,
-                        errorMessage = e.message ?: "Wi-Fi Direct connection failed",
+                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_connect),
                     )
                 }
             }
@@ -283,12 +289,14 @@ class ReceiveViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    private fun versionMismatchMessage(peerApp: String, peerBuild: Long): String =
-        context.getString(
-            me.diamondforge.tokn.sync.R.string.sync_version_mismatch,
-            localVersionLabel,
-            "$peerApp (build $peerBuild)",
-        )
+    fun clearVersionMismatch() {
+        _uiState.update { it.copy(versionMismatch = null) }
+    }
+
+    private fun versionMismatchInfo(peerApp: String, peerBuild: Long) = VersionMismatchInfo(
+        local = localVersionLabel,
+        peer = "$peerApp (build $peerBuild)",
+    )
 
     private suspend fun applyJsonPayload(json: String) {
         runCatching {
@@ -305,7 +313,7 @@ class ReceiveViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     status = ReceiveUiState.Status.Idle,
-                    errorMessage = e.message ?: "Could not parse payload",
+                    errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_parse),
                 )
             }
         }

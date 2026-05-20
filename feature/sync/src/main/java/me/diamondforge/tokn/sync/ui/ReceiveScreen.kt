@@ -68,6 +68,8 @@ fun LanReceiveScreen(
         titleRes = R.string.sync_method_lan_title,
         onBack = { viewModel.reset(); onBack() },
         state = state,
+        onDismissError = viewModel::clearError,
+        onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         when (state.status) {
             ReceiveUiState.Status.Connecting,
@@ -125,6 +127,8 @@ fun WfdReceiveScreen(
         titleRes = R.string.sync_method_wfd_title,
         onBack = { viewModel.reset(); onBack() },
         state = state,
+        onDismissError = viewModel::clearError,
+        onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         when {
             !viewModel.wfdSupported -> CenteredText(stringResource(R.string.sync_wfd_unsupported))
@@ -195,11 +199,13 @@ fun QrReceiveScreen(
         titleRes = R.string.sync_method_qr_title,
         onBack = { viewModel.reset(); onBack() },
         state = state,
+        onDismissError = viewModel::clearError,
+        onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         when {
             !cameraPermission.status.isGranted -> PermissionRequestView(
-                explanation = "Camera access is required to scan QR codes.",
-                button = "Grant permission",
+                explanation = stringResource(R.string.sync_camera_required),
+                button = stringResource(R.string.sync_wfd_grant),
                 onGrant = { cameraPermission.launchPermissionRequest() },
             )
             state.status == ReceiveUiState.Status.Done -> ImportSuccessView(state) { viewModel.reset() }
@@ -247,7 +253,7 @@ fun QrReceiveScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         val label = if (state.qrTotal == 0) {
-                            "Point at the QR shown on the other device"
+                            stringResource(R.string.sync_qr_aim_hint)
                         } else {
                             stringResource(R.string.sync_qr_scan_progress, state.qrSeen, state.qrTotal)
                         }
@@ -265,6 +271,8 @@ private fun ReceiveScaffold(
     titleRes: Int,
     onBack: () -> Unit,
     state: ReceiveUiState,
+    onDismissError: () -> Unit,
+    onDismissVersionMismatch: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Scaffold(
@@ -280,15 +288,13 @@ private fun ReceiveScaffold(
         },
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            Box(modifier = Modifier.weight(1f)) { content() }
             state.errorMessage?.let { msg ->
-                Text(
-                    text = msg,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(16.dp),
-                )
+                SyncErrorCard(message = msg, onDismiss = onDismissError)
             }
+            Box(modifier = Modifier.weight(1f)) { content() }
+        }
+        state.versionMismatch?.let { info ->
+            SyncVersionMismatchDialog(info = info, onDismiss = onDismissVersionMismatch)
         }
     }
 }

@@ -54,6 +54,24 @@
     <string name="sync_start">Start</string>
 
     <string name="sync_version_mismatch">App versions don\'t match. This device: %1$s. Other device: %2$s. Update both apps to the latest version to sync.</string>
+    <string name="sync_version_mismatch_title">App versions don\'t match</string>
+    <string name="sync_version_mismatch_body">Both devices need to run the same version of Tokn to sync. Update both apps to the latest version and try again.</string>
+    <string name="sync_version_local_label">This device</string>
+    <string name="sync_version_peer_label">Other device</string>
+    <string name="sync_error_dismiss">Got it</string>
+    <string name="sync_error_title">Something went wrong</string>
+    <string name="sync_error_connection">Connection failed</string>
+    <string name="sync_error_transfer">Transfer failed</string>
+    <string name="sync_error_parse">Could not parse payload</string>
+    <string name="sync_error_encrypt">Failed to encrypt payload</string>
+    <string name="sync_error_decrypt">Failed to decrypt</string>
+    <string name="sync_error_qr_reassemble">Could not reassemble QR payload</string>
+    <string name="sync_error_wfd_start_group">Could not start Wi-Fi Direct group</string>
+    <string name="sync_error_wfd_connect">Wi-Fi Direct connection failed</string>
+    <string name="sync_error_wfd_group_form">Wi-Fi Direct group could not be formed</string>
+    <string name="sync_error_wfd_transfer">Wi-Fi Direct transfer failed</string>
+    <string name="sync_camera_required">Camera access is required to scan QR codes.</string>
+    <string name="sync_qr_aim_hint">Point at the QR shown on the other device</string>
 
     <string name="sync_send_intro">Choose how to send your accounts.</string>
     <string name="sync_receive_intro">Choose how to receive accounts.</string>

@@ -54,6 +54,24 @@
     <string name="sync_start">Start</string>
 
     <string name="sync_version_mismatch">App-Versionen stimmen nicht überein. Dieses Gerät: %1$s. Anderes Gerät: %2$s. Aktualisiere beide Apps auf die neueste Version, um zu synchronisieren.</string>
+    <string name="sync_version_mismatch_title">App-Versionen stimmen nicht überein</string>
+    <string name="sync_version_mismatch_body">Beide Geräte müssen die gleiche Version von Tokn nutzen, um zu synchronisieren. Aktualisiere beide Apps auf die neueste Version und versuche es erneut.</string>
+    <string name="sync_version_local_label">Dieses Gerät</string>
+    <string name="sync_version_peer_label">Anderes Gerät</string>
+    <string name="sync_error_dismiss">Verstanden</string>
+    <string name="sync_error_title">Etwas ist schiefgelaufen</string>
+    <string name="sync_error_connection">Verbindung fehlgeschlagen</string>
+    <string name="sync_error_transfer">Übertragung fehlgeschlagen</string>
+    <string name="sync_error_parse">Daten konnten nicht gelesen werden</string>
+    <string name="sync_error_encrypt">Verschlüsselung fehlgeschlagen</string>
+    <string name="sync_error_decrypt">Entschlüsselung fehlgeschlagen</string>
+    <string name="sync_error_qr_reassemble">QR-Daten konnten nicht zusammengesetzt werden</string>
+    <string name="sync_error_wfd_start_group">Wi-Fi Direct-Gruppe konnte nicht gestartet werden</string>
+    <string name="sync_error_wfd_connect">Wi-Fi Direct-Verbindung fehlgeschlagen</string>
+    <string name="sync_error_wfd_group_form">Wi-Fi Direct-Gruppe konnte nicht gebildet werden</string>
+    <string name="sync_error_wfd_transfer">Wi-Fi Direct-Übertragung fehlgeschlagen</string>
+    <string name="sync_camera_required">Kamerazugriff ist erforderlich, um QR-Codes zu scannen.</string>
+    <string name="sync_qr_aim_hint">Richte die Kamera auf den QR-Code des anderen Geräts</string>
 
     <string name="sync_send_intro">Wähle, wie du deine Konten sendest.</string>
     <string name="sync_receive_intro">Wähle, wie du Konten empfängst.</string>

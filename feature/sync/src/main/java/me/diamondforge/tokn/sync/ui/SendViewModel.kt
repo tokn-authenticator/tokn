@@ -37,6 +37,7 @@ data class SendUiState(
     val qrFrames: List<String> = emptyList(),
     val currentFrame: Int = 0,
     val errorMessage: String? = null,
+    val versionMismatch: VersionMismatchInfo? = null,
     val deviceName: String = "",
 ) {
     enum class Status { Idle, Waiting, Transferring, Done }
@@ -112,14 +113,14 @@ class SendViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 status = SendUiState.Status.Idle,
-                                errorMessage = "Pairing code did not match",
+                                errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_bad_code),
                             )
                         }
                     is LanSyncServer.SendResult.VersionMismatch ->
                         _uiState.update {
                             it.copy(
                                 status = SendUiState.Status.Idle,
-                                errorMessage = versionMismatchMessage(result.peerApp, result.peerBuild),
+                                versionMismatch = versionMismatchInfo(result.peerApp, result.peerBuild),
                             )
                         }
                 }
@@ -127,7 +128,7 @@ class SendViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
-                        errorMessage = e.message ?: "Transfer failed",
+                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_transfer),
                     )
                 }
             }
@@ -143,7 +144,7 @@ class SendViewModel @Inject constructor(
     fun startWfdSend() {
         if (wfdJob?.isActive == true) return
         if (!wfdManager.isSupported) {
-            _uiState.update { it.copy(errorMessage = "Wi-Fi Direct is not supported on this device") }
+            _uiState.update { it.copy(errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_wfd_unsupported)) }
             return
         }
         val code = Handshake.newPairingCode()
@@ -159,7 +160,7 @@ class SendViewModel @Inject constructor(
             wfdManager.register()
             runCatching {
                 val groupOk = wfdManager.createGroup()
-                if (!groupOk) error("Could not start Wi-Fi Direct group")
+                if (!groupOk) error(context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_start_group))
                 val payload = SyncPayload.serialize(selectedAccounts())
                     .toByteArray(Charsets.UTF_8)
                 WfdSyncTransport.sendOverWfd(
@@ -176,14 +177,14 @@ class SendViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 status = SendUiState.Status.Idle,
-                                errorMessage = "Pairing code did not match",
+                                errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_bad_code),
                             )
                         }
                     is WfdSyncTransport.SendResult.VersionMismatch ->
                         _uiState.update {
                             it.copy(
                                 status = SendUiState.Status.Idle,
-                                errorMessage = versionMismatchMessage(result.peerApp, result.peerBuild),
+                                versionMismatch = versionMismatchInfo(result.peerApp, result.peerBuild),
                             )
                         }
                 }
@@ -191,7 +192,7 @@ class SendViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
-                        errorMessage = e.message ?: "Wi-Fi Direct transfer failed",
+                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_transfer),
                     )
                 }
             }
@@ -240,7 +241,7 @@ class SendViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
-                        errorMessage = e.message ?: "Failed to encrypt payload",
+                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_encrypt),
                     )
                 }
             }
@@ -263,12 +264,14 @@ class SendViewModel @Inject constructor(
         _uiState.update { SendUiState() }
     }
 
-    private fun versionMismatchMessage(peerApp: String, peerBuild: Long): String =
-        context.getString(
-            me.diamondforge.tokn.sync.R.string.sync_version_mismatch,
-            localVersionLabel,
-            "$peerApp (build $peerBuild)",
-        )
+    fun clearVersionMismatch() {
+        _uiState.update { it.copy(versionMismatch = null) }
+    }
+
+    private fun versionMismatchInfo(peerApp: String, peerBuild: Long) = VersionMismatchInfo(
+        local = localVersionLabel,
+        peer = "$peerApp (build $peerBuild)",
+    )
 
     override fun onCleared() {
         super.onCleared()

@@ -73,7 +73,9 @@ fun LanSendScreen(
             viewModel.cancelLan()
             onBack()
         },
-        errorMessage = state.errorMessage,
+        state = state,
+        onDismissError = viewModel::clearError,
+        onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -113,7 +115,9 @@ fun WfdSendScreen(
             viewModel.cancelWfd()
             onBack()
         },
-        errorMessage = state.errorMessage,
+        state = state,
+        onDismissError = viewModel::clearError,
+        onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         if (!viewModel.wfdSupported) {
             Column(
@@ -167,7 +171,9 @@ fun QrSendScreen(
             viewModel.resetQr()
             onBack()
         },
-        errorMessage = state.errorMessage,
+        state = state,
+        onDismissError = viewModel::clearError,
+        onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         if (state.qrFrames.isEmpty()) {
             Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
@@ -210,7 +216,9 @@ fun QrSendScreen(
 private fun SendScaffold(
     titleRes: Int,
     onBack: () -> Unit,
-    errorMessage: String?,
+    state: SendUiState,
+    onDismissError: () -> Unit,
+    onDismissVersionMismatch: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Scaffold(
@@ -226,15 +234,13 @@ private fun SendScaffold(
         },
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            Box(modifier = Modifier.weight(1f)) { content() }
-            errorMessage?.let { msg ->
-                Text(
-                    text = msg,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(16.dp),
-                )
+            state.errorMessage?.let { msg ->
+                SyncErrorCard(message = msg, onDismiss = onDismissError)
             }
+            Box(modifier = Modifier.weight(1f)) { content() }
+        }
+        state.versionMismatch?.let { info ->
+            SyncVersionMismatchDialog(info = info, onDismiss = onDismissVersionMismatch)
         }
     }
 }
