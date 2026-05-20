@@ -71,6 +71,7 @@ dependencies {
     implementation(project(":feature:settings"))
     implementation(project(":feature:backup"))
     implementation(project(":feature:onboarding"))
+    implementation(project(":feature:sync"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.appcompat)

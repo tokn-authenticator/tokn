@@ -2,12 +2,12 @@
 <resources>
     <string name="settings_title">Einstellungen</string>
 
-    <!-- Hauptmenü -->
     <string name="appearance_desc">Design und Anzeigeoptionen</string>
     <string name="security_desc">Biometrie, Sperrzeit, Datenschutz</string>
     <string name="backup_desc">Konten exportieren und importieren</string>
+    <string name="sync_menu_title">Mit anderem Gerät synchronisieren</string>
+    <string name="sync_menu_desc">Konten über WLAN oder QR-Code übertragen</string>
 
-    <!-- Darstellung -->
     <string name="appearance">Darstellung</string>
     <string name="theme">Design</string>
     <string name="theme_light">Hell</string>
@@ -21,7 +21,6 @@
     <string name="language_desc">App-Sprache auswählen</string>
     <string name="language_system_default">Systemstandard</string>
 
-    <!-- Sicherheit -->
     <string name="security">Sicherheit</string>
     <string name="section_vault">Tresor</string>
     <string name="encrypt_vault">Tresor verschlüsseln</string>
@@ -53,7 +52,6 @@
     <string name="enable_anyway">Trotzdem aktivieren</string>
     <string name="cancel">Abbrechen</string>
 
-    <!-- Daten -->
     <string name="backup_restore">Sicherung &amp; Wiederherstellung</string>
     <string name="open">Öffnen</string>
     <string name="data">Daten</string>

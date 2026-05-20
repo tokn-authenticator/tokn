@@ -61,6 +61,18 @@ import me.diamondforge.tokn.onboarding.OnboardingScreen
 import me.diamondforge.tokn.settings.AppearanceScreen
 import me.diamondforge.tokn.settings.SecurityScreen
 import me.diamondforge.tokn.settings.SettingsScreen
+import me.diamondforge.tokn.data.preferences.SyncMethod
+import me.diamondforge.tokn.sync.ui.ChooseMethodScreen
+import me.diamondforge.tokn.sync.ui.LanReceiveScreen
+import me.diamondforge.tokn.sync.ui.LanSendScreen
+import me.diamondforge.tokn.sync.ui.QrReceiveScreen
+import me.diamondforge.tokn.sync.ui.QrSendScreen
+import me.diamondforge.tokn.sync.ui.ReceiveViewModel
+import me.diamondforge.tokn.sync.ui.SelectAccountsScreen
+import me.diamondforge.tokn.sync.ui.SendViewModel
+import me.diamondforge.tokn.sync.ui.SyncEntryScreen
+import me.diamondforge.tokn.sync.ui.WfdReceiveScreen
+import me.diamondforge.tokn.sync.ui.WfdSendScreen
 
 @Composable
 fun AppNavHost(
@@ -166,7 +178,87 @@ fun AppNavHost(
                 onAppearance = { entry.navigateOnce(navController, Screen.Appearance.route) },
                 onSecurity = { entry.navigateOnce(navController, Screen.SecuritySettings.route) },
                 onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
+                onSync = { entry.navigateOnce(navController, Screen.Sync.route) },
             )
+        }
+        composable(Screen.Sync.route) { entry ->
+            SyncEntryScreen(
+                onBack = { navController.popBackStack() },
+                onSend = { entry.navigateOnce(navController, Screen.SyncSendFlow.route) },
+                onReceive = { entry.navigateOnce(navController, Screen.SyncReceiveFlow.route) },
+            )
+        }
+        navigation(
+            startDestination = Screen.SyncSelect.route,
+            route = Screen.SyncSendFlow.route,
+        ) {
+            composable(Screen.SyncSelect.route) { entry ->
+                val sendVm = entry.sharedSendViewModel(navController)
+                SelectAccountsScreen(
+                    viewModel = sendVm,
+                    onBack = { navController.popBackStack() },
+                    onContinue = { entry.navigateOnce(navController, Screen.SyncSendChoose.route) },
+                )
+            }
+            composable(Screen.SyncSendChoose.route) { entry ->
+                ChooseMethodScreen(
+                    isSender = true,
+                    onBack = { navController.popBackStack() },
+                    onContinue = { method ->
+                        entry.navigateOnce(navController, Screen.syncSendRoute(method))
+                    },
+                )
+            }
+            composable(Screen.SyncSendLan.route) { entry ->
+                LanSendScreen(
+                    onBack = { navController.popBackStack() },
+                    viewModel = entry.sharedSendViewModel(navController),
+                )
+            }
+            composable(Screen.SyncSendWfd.route) { entry ->
+                WfdSendScreen(
+                    onBack = { navController.popBackStack() },
+                    viewModel = entry.sharedSendViewModel(navController),
+                )
+            }
+            composable(Screen.SyncSendQr.route) { entry ->
+                QrSendScreen(
+                    onBack = { navController.popBackStack() },
+                    viewModel = entry.sharedSendViewModel(navController),
+                )
+            }
+        }
+        navigation(
+            startDestination = Screen.SyncReceiveChoose.route,
+            route = Screen.SyncReceiveFlow.route,
+        ) {
+            composable(Screen.SyncReceiveChoose.route) { entry ->
+                ChooseMethodScreen(
+                    isSender = false,
+                    onBack = { navController.popBackStack() },
+                    onContinue = { method ->
+                        entry.navigateOnce(navController, Screen.syncReceiveRoute(method))
+                    },
+                )
+            }
+            composable(Screen.SyncReceiveLan.route) { entry ->
+                LanReceiveScreen(
+                    onBack = { navController.popBackStack() },
+                    viewModel = entry.sharedReceiveViewModel(navController),
+                )
+            }
+            composable(Screen.SyncReceiveWfd.route) { entry ->
+                WfdReceiveScreen(
+                    onBack = { navController.popBackStack() },
+                    viewModel = entry.sharedReceiveViewModel(navController),
+                )
+            }
+            composable(Screen.SyncReceiveQr.route) { entry ->
+                QrReceiveScreen(
+                    onBack = { navController.popBackStack() },
+                    viewModel = entry.sharedReceiveViewModel(navController),
+                )
+            }
         }
         composable(Screen.Appearance.route) {
             AppearanceScreen(onBack = { navController.popBackStack() })
@@ -310,6 +402,18 @@ private fun NavBackStackEntry.navigateOnce(navController: NavController, route: 
     }
 }
 
+@Composable
+private fun NavBackStackEntry.sharedSendViewModel(navController: NavController): SendViewModel {
+    val parent = remember(this) { navController.getBackStackEntry(Screen.SyncSendFlow.route) }
+    return hiltViewModel(parent)
+}
+
+@Composable
+private fun NavBackStackEntry.sharedReceiveViewModel(navController: NavController): ReceiveViewModel {
+    val parent = remember(this) { navController.getBackStackEntry(Screen.SyncReceiveFlow.route) }
+    return hiltViewModel(parent)
+}
+
 sealed class Screen(val route: String) {
     data object Home : Screen("home")
     data object AddFlow : Screen("add_flow")
@@ -320,6 +424,32 @@ sealed class Screen(val route: String) {
     data object Appearance : Screen("appearance")
     data object SecuritySettings : Screen("security_settings")
     data object Backup : Screen("backup")
+    data object Sync : Screen("sync")
+    data object SyncSendFlow : Screen("sync/send_flow")
+    data object SyncSelect : Screen("sync/select")
+    data object SyncSendChoose : Screen("sync/send/choose")
+    data object SyncSendLan : Screen("sync/send/lan")
+    data object SyncSendWfd : Screen("sync/send/wfd")
+    data object SyncSendQr : Screen("sync/send/qr")
+    data object SyncReceiveFlow : Screen("sync/receive_flow")
+    data object SyncReceiveChoose : Screen("sync/receive/choose")
+    data object SyncReceiveLan : Screen("sync/receive/lan")
+    data object SyncReceiveWfd : Screen("sync/receive/wfd")
+    data object SyncReceiveQr : Screen("sync/receive/qr")
+
+    companion object {
+        fun syncSendRoute(method: SyncMethod) = when (method) {
+            SyncMethod.LAN -> SyncSendLan.route
+            SyncMethod.WFD -> SyncSendWfd.route
+            SyncMethod.QR -> SyncSendQr.route
+        }
+
+        fun syncReceiveRoute(method: SyncMethod) = when (method) {
+            SyncMethod.LAN -> SyncReceiveLan.route
+            SyncMethod.WFD -> SyncReceiveWfd.route
+            SyncMethod.QR -> SyncReceiveQr.route
+        }
+    }
     data object EditAccount : Screen("edit/{accountId}") {
         fun createRoute(accountId: Long) = "edit/$accountId"
     }

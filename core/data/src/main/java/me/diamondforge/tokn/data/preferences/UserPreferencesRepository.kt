@@ -46,6 +46,12 @@ class UserPreferencesRepository @Inject constructor(
         prefs[Keys.ONBOARDING_DONE] ?: false
     }
 
+    val lastSyncMethod: Flow<SyncMethod> = dataStore.data.map { prefs ->
+        prefs[Keys.LAST_SYNC_METHOD]
+            ?.let { runCatching { SyncMethod.valueOf(it) }.getOrNull() }
+            ?: SyncMethod.LAN
+    }
+
     suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     }
@@ -70,6 +76,10 @@ class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.ONBOARDING_DONE] = done }
     }
 
+    suspend fun setLastSyncMethod(method: SyncMethod) {
+        dataStore.edit { it[Keys.LAST_SYNC_METHOD] = method.name }
+    }
+
     private object Keys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val AUTO_LOCK_TIMEOUT = intPreferencesKey("auto_lock_timeout")
@@ -77,7 +87,9 @@ class UserPreferencesRepository @Inject constructor(
         val SCREENSHOTS_ENABLED = booleanPreferencesKey("screenshots_enabled")
         val ENCRYPTION_ENABLED = booleanPreferencesKey("encryption_enabled")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
+        val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")
     }
 }
 
 enum class ThemeMode { LIGHT, DARK, SYSTEM }
+enum class SyncMethod { LAN, WFD, QR }

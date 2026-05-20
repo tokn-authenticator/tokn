@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +29,7 @@ fun SettingsScreen(
     onAppearance: () -> Unit,
     onSecurity: () -> Unit,
     onBackup: () -> Unit,
+    onSync: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -77,6 +79,17 @@ fun SettingsScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
                     },
                     modifier = Modifier.clickable(onClick = onBackup),
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.sync_menu_title)) },
+                    supportingContent = { Text(stringResource(R.string.sync_menu_desc)) },
+                    leadingContent = { Icon(Icons.Default.Sync, contentDescription = null) },
+                    trailingContent = {
+                        Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
+                    },
+                    modifier = Modifier.clickable(onClick = onSync),
                 )
             }
         }
