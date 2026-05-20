@@ -19,6 +19,7 @@ android {
     testOptions {
         unitTests {
             isReturnDefaultValues = true
+            isIncludeAndroidResources = true
         }
     }
 
@@ -60,7 +61,9 @@ dependencies {
     implementation(libs.zxing.core)
 
     testImplementation(libs.junit)
-    testImplementation("org.json:json:20240303")
+    testImplementation(libs.org.json)
+    testImplementation(libs.robolectric)
+    testImplementation(testFixtures(project(":core:domain")))
 
     implementation(libs.camerax.core)
     implementation(libs.camerax.camera2)

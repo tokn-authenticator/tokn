@@ -7,3 +7,26 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
 }
+
+subprojects {
+    tasks.withType<Test>().configureEach {
+        testLogging {
+            events("passed", "failed", "skipped")
+            showStandardStreams = false
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
+        }
+        afterSuite(
+            KotlinClosure2<TestDescriptor, TestResult, Unit>({ descriptor, result ->
+                if (descriptor.parent == null) {
+                    val total = result.testCount
+                    val passed = result.successfulTestCount
+                    val failed = result.failedTestCount
+                    val skipped = result.skippedTestCount
+                    println("[$path] $total tests - $passed passed, $failed failed, $skipped skipped")
+                }
+            }),
+        )
+    }
+}

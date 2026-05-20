@@ -25,7 +25,16 @@ jobs:
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
+        run: ./gradlew test --stacktrace
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: '**/build/reports/tests/'
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v7

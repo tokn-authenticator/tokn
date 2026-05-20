@@ -16,6 +16,13 @@ android {
 
     buildFeatures { compose = true }
 
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -50,6 +57,11 @@ dependencies {
 
     implementation(libs.coroutines.android)
     implementation(libs.bouncycastle)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.org.json)
+    testImplementation(libs.androidx.test.core)
 
     debugImplementation(libs.compose.ui.tooling)
 }

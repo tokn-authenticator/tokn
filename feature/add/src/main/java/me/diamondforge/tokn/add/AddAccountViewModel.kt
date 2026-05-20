@@ -1,6 +1,5 @@
 package me.diamondforge.tokn.add
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import me.diamondforge.tokn.domain.model.OtpAccount
@@ -28,7 +27,7 @@ class AddAccountViewModel @Inject constructor(
     fun suppressLock() = lockManager.suppressNextForeground()
 
     fun onQrScanned(rawValue: String) {
-        runCatching { parseOtpAuthUri(rawValue) }
+        runCatching { OtpAuthParser.parse(rawValue) }
             .onSuccess { account -> _uiState.update { it.copy(parsedAccount = account, error = null) } }
             .onFailure { _uiState.update { it.copy(error = "Invalid QR code") } }
     }
@@ -97,41 +96,6 @@ class AddAccountViewModel @Inject constructor(
     }
 
     fun clearError() = _uiState.update { it.copy(error = null) }
-
-    private fun parseOtpAuthUri(raw: String): OtpAccount {
-        val uri = Uri.parse(raw)
-        require(uri.scheme == "otpauth") { "Not an otpauth URI" }
-
-        val type = when (uri.host?.lowercase()) {
-            "totp" -> OtpType.TOTP
-            "hotp" -> OtpType.HOTP
-            else -> OtpType.TOTP
-        }
-
-        val label = Uri.decode(uri.path?.removePrefix("/") ?: "")
-        val issuerFromLabel = if (label.contains(":")) label.substringBefore(":").trim() else ""
-        val accountNameFromLabel = if (label.contains(":")) label.substringAfter(":").trim() else label
-
-        val secret = uri.getQueryParameter("secret") ?: error("Missing secret")
-        val issuer = uri.getQueryParameter("issuer") ?: issuerFromLabel
-        val algorithm = when (uri.getQueryParameter("algorithm")?.uppercase()) {
-            "SHA256" -> OtpAlgorithm.SHA256
-            "SHA512" -> OtpAlgorithm.SHA512
-            else -> OtpAlgorithm.SHA1
-        }
-        val digits = uri.getQueryParameter("digits")?.toIntOrNull() ?: 6
-        val period = uri.getQueryParameter("period")?.toIntOrNull() ?: 30
-
-        return OtpAccount(
-            issuer = issuer,
-            accountName = accountNameFromLabel,
-            secret = secret,
-            algorithm = algorithm,
-            digits = digits,
-            period = period,
-            type = type,
-        )
-    }
 }
 
 data class AddAccountUiState(
