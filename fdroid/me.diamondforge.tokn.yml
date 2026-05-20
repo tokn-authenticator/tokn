@@ -2,6 +2,8 @@ Categories:
   - Security
 License: GPL-3.0-or-later
 AuthorName: fthomys
+AuthorEmail: post@fthomys.me
+AuthorWebSite: https://github.com/fthomys
 WebSite: https://github.com/fthomys/tokn
 SourceCode: https://github.com/fthomys/tokn
 IssueTracker: https://github.com/fthomys/tokn/issues
