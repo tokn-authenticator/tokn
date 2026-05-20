@@ -73,7 +73,7 @@ coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref 
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
-guava = { group = "com.google.guava", name = "guava", version = "33.4.0-android" }
+guava = { group = "com.google.guava", name = "guava", version = "33.6.0-jre" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 bouncycastle = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncycastle" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
