@@ -17,6 +17,12 @@
     @javax.inject.Inject <init>(...);
 }
 
+# BouncyCastle (used directly in feature:sync JPAKE and feature:backup SCrypt)
+-keep class org.bouncycastle.** { *; }
+-keep interface org.bouncycastle.** { *; }
+-dontwarn org.bouncycastle.**
+-dontwarn javax.naming.**
+
 # OTP account model must survive R8 for Room
 -keepclassmembers class me.diamondforge.tokn.data.db.entity.OtpAccountEntity { *; }
 -keepclassmembers class me.diamondforge.tokn.domain.model.OtpAccount { *; }
