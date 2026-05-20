@@ -66,7 +66,7 @@ datastore-preferences = { group = "androidx.datastore", name = "datastore-prefer
 biometric = { group = "androidx.biometric", name = "biometric-ktx", version.ref = "biometric" }
 
 sqlcipher = { group = "net.zetetic", name = "sqlcipher-android", version.ref = "sqlcipher" }
-sqlite-ktx = { group = "androidx.sqlite", name = "sqlite-ktx", version = "2.4.0" }
+sqlite-ktx = { group = "androidx.sqlite", name = "sqlite-ktx", version = "2.6.2" }
 
 reorderable = { group = "sh.calvin.reorderable", name = "reorderable", version.ref = "reorderable" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
