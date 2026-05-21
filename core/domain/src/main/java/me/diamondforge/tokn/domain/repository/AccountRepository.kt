@@ -8,6 +8,7 @@ interface AccountRepository {
     suspend fun addAccount(account: OtpAccount): Long
     suspend fun updateAccount(account: OtpAccount)
     suspend fun deleteAccount(id: Long)
+    suspend fun deleteAccounts(ids: Set<Long>)
     suspend fun reorderAccounts(accounts: List<OtpAccount>)
     suspend fun incrementCounter(id: Long)
     suspend fun getAccountById(id: Long): OtpAccount?

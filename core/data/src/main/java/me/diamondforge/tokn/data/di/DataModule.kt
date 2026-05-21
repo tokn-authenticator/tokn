@@ -8,6 +8,7 @@ import me.diamondforge.tokn.data.repository.AccountRepositoryImpl
 import me.diamondforge.tokn.domain.repository.AccountRepository
 import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
+import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
@@ -54,6 +55,9 @@ object DataModule {
 
     @Provides
     fun provideDeleteAccountUseCase(repo: AccountRepository) = DeleteAccountUseCase(repo)
+
+    @Provides
+    fun provideDeleteAccountsUseCase(repo: AccountRepository) = DeleteAccountsUseCase(repo)
 
     @Provides
     fun provideUpdateAccountUseCase(repo: AccountRepository) = UpdateAccountUseCase(repo)

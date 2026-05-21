@@ -25,6 +25,10 @@ class AccountRepositoryImpl @Inject constructor(
     override suspend fun deleteAccount(id: Long) =
         dao.deleteById(id)
 
+    override suspend fun deleteAccounts(ids: Set<Long>) {
+        if (ids.isNotEmpty()) dao.deleteByIds(ids)
+    }
+
     override suspend fun reorderAccounts(accounts: List<OtpAccount>) {
         accounts.forEachIndexed { index, account ->
             dao.updateSortOrder(account.id, index)

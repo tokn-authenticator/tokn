@@ -1,6 +1,18 @@
+// Selection action-mode and expanding FAB-menu UX inspired by Aegis Authenticator
+// (https://github.com/beemdevelopment/Aegis, GPL-3.0). Reimplemented in Compose.
 package me.diamondforge.tokn.home
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +33,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.runtime.collectAsState
 import coil3.compose.AsyncImagePainter
@@ -29,12 +43,15 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -43,28 +60,28 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -72,22 +89,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.diamondforge.tokn.domain.model.OtpType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.absoluteValue
+
+private const val FAB_STAGGER_MS = 50L
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,9 +128,14 @@ fun HomeScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val haptic = LocalHapticFeedback.current
-    var showAddSheet by remember { mutableStateOf(false) }
+    var fabMenuOpen by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
-    var pendingDeleteItem by remember { mutableStateOf<AccountItem?>(null) }
+    var showBulkDeleteConfirm by remember { mutableStateOf(false) }
+
+    val selectionMode = uiState.selectionMode
+
+    BackHandler(enabled = selectionMode) { viewModel.clearSelection() }
+    BackHandler(enabled = fabMenuOpen) { fabMenuOpen = false }
 
     val items = uiState.items
     var listItems by remember(items) { mutableStateOf(items) }
@@ -121,32 +149,29 @@ fun HomeScreen(
         },
     )
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    IconButton(onClick = {
-                        showSearch = !showSearch
-                        if (!showSearch) viewModel.updateSearchQuery("")
-                    }) {
-                        Icon(
-                            if (showSearch) Icons.Default.Close else Icons.Default.Search,
-                            contentDescription = stringResource(R.string.search),
-                        )
-                    }
-                    IconButton(onClick = onSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
-                    }
+            HomeTopBar(
+                selectionMode = selectionMode,
+                selectedCount = uiState.selectedIds.size,
+                showSearch = showSearch,
+                onToggleSearch = {
+                    showSearch = !showSearch
+                    if (!showSearch) viewModel.updateSearchQuery("")
                 },
+                onSettings = onSettings,
+                onClearSelection = { viewModel.clearSelection() },
+                onEditSelected = {
+                    val id = uiState.selectedIds.singleOrNull() ?: return@HomeTopBar
+                    viewModel.clearSelection()
+                    onEditAccount(id)
+                },
+                onDeleteSelected = { showBulkDeleteConfirm = true },
+                onSelectAll = { viewModel.selectAll() },
                 scrollBehavior = scrollBehavior,
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showAddSheet = true }) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_account))
-            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
@@ -155,7 +180,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            if (showSearch) {
+            if (showSearch && !selectionMode) {
                 OutlinedTextField(
                     value = uiState.searchQuery,
                     onValueChange = viewModel::updateSearchQuery,
@@ -217,19 +242,34 @@ fun HomeScreen(
                     items(listItems, key = { it.account.id }) { item ->
                         ReorderableItem(reorderableState, key = item.account.id) { isDragging ->
                             val copiedMessage = stringResource(R.string.code_copied)
+                            val isSelected = item.account.id in uiState.selectedIds
+                            val canReorder = uiState.selectedIds.size == 1
                             AccountCard(
                                 item = item,
                                 isDragging = isDragging,
                                 iconFetchEnabled = uiState.iconFetchEnabled,
-                                onCopy = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    viewModel.copyToClipboard(item)
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(copiedMessage)
+                                inSelectionMode = selectionMode,
+                                isSelected = isSelected,
+                                canReorder = canReorder,
+                                onTap = {
+                                    if (selectionMode) {
+                                        viewModel.toggleSelection(item.account.id)
+                                    } else {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        viewModel.copyToClipboard(item)
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(copiedMessage)
+                                        }
                                     }
                                 },
-                                onDelete = { pendingDeleteItem = item },
-                                onEdit = { onEditAccount(item.account.id) },
+                                onLongPress = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    if (selectionMode) {
+                                        viewModel.toggleSelection(item.account.id)
+                                    } else {
+                                        viewModel.startSelection(item.account.id)
+                                    }
+                                },
                                 onIncrementCounter = { viewModel.incrementHotpCounter(item.account.id) },
                             )
                         }
@@ -239,60 +279,252 @@ fun HomeScreen(
         }
     }
 
-    pendingDeleteItem?.let { item ->
+        AnimatedVisibility(
+            visible = fabMenuOpen,
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { fabMenuOpen = false },
+                    ),
+            )
+        }
+
+        if (!selectionMode) {
+            val totalFabItems = 3
+            // Bottom-up reveal on open, top-down collapse on close.
+            // Aegis-style: items "expand from" / "collapse into" the FAB.
+            var visibleFabItems by remember { mutableIntStateOf(0) }
+            LaunchedEffect(fabMenuOpen) {
+                if (fabMenuOpen) {
+                    for (c in 1..totalFabItems) {
+                        visibleFabItems = c
+                        delay(FAB_STAGGER_MS)
+                    }
+                } else {
+                    for (c in (totalFabItems - 1) downTo 0) {
+                        visibleFabItems = c
+                        delay(FAB_STAGGER_MS)
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                // Threshold per row: top item appears last on open / disappears first on close.
+                // Row index 0 (top) shows when count > 2; row 2 (bottom, closest to FAB) when count > 0.
+                AnimatedVisibility(
+                    visible = visibleFabItems > 2,
+                    enter = fadeIn() + scaleIn() + expandVertically(),
+                    exit = fadeOut() + scaleOut() + shrinkVertically(),
+                ) {
+                    FabMenuItem(
+                        label = stringResource(R.string.add_scan_qr),
+                        icon = Icons.Default.QrCodeScanner,
+                    ) {
+                        fabMenuOpen = false
+                        onScanQr()
+                    }
+                }
+                AnimatedVisibility(
+                    visible = visibleFabItems > 1,
+                    enter = fadeIn() + scaleIn() + expandVertically(),
+                    exit = fadeOut() + scaleOut() + shrinkVertically(),
+                ) {
+                    FabMenuItem(
+                        label = stringResource(R.string.add_from_image),
+                        icon = Icons.Default.Image,
+                    ) {
+                        fabMenuOpen = false
+                        onFromImage()
+                    }
+                }
+                AnimatedVisibility(
+                    visible = visibleFabItems > 0,
+                    enter = fadeIn() + scaleIn() + expandVertically(),
+                    exit = fadeOut() + scaleOut() + shrinkVertically(),
+                ) {
+                    FabMenuItem(
+                        label = stringResource(R.string.add_manually),
+                        icon = Icons.Default.Keyboard,
+                    ) {
+                        fabMenuOpen = false
+                        onManualEntry()
+                    }
+                }
+                val fabRotation by animateFloatAsState(
+                    targetValue = if (fabMenuOpen) 45f else 0f,
+                    label = "fab-rotation",
+                )
+                FloatingActionButton(onClick = { fabMenuOpen = !fabMenuOpen }) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_account),
+                        modifier = Modifier.rotate(fabRotation),
+                    )
+                }
+            }
+        }
+    }
+
+    if (showBulkDeleteConfirm) {
+        val count = uiState.selectedIds.size
         AlertDialog(
-            onDismissRequest = { pendingDeleteItem = null },
-            title = { Text(stringResource(R.string.delete_confirm_title)) },
-            text = { Text(stringResource(R.string.delete_confirm_message)) },
+            onDismissRequest = { showBulkDeleteConfirm = false },
+            title = {
+                Text(
+                    pluralStringResource(R.plurals.delete_count_confirm_title, count, count),
+                )
+            },
+            text = {
+                Text(
+                    pluralStringResource(R.plurals.delete_count_confirm_message, count, count),
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.deleteAccount(item.account.id)
-                    pendingDeleteItem = null
+                    viewModel.deleteSelected()
+                    showBulkDeleteConfirm = false
                 }) {
                     Text(text = stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDeleteItem = null }) {
+                TextButton(onClick = { showBulkDeleteConfirm = false }) {
                     Text(stringResource(R.string.cancel))
                 }
             },
         )
     }
+}
 
-    if (showAddSheet) {
-        ModalBottomSheet(onDismissRequest = { showAddSheet = false }) {
-            AddOptionsSheet(
-                onScanQr = { showAddSheet = false; onScanQr() },
-                onFromImage = { showAddSheet = false; onFromImage() },
-                onManualEntry = { showAddSheet = false; onManualEntry() },
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeTopBar(
+    selectionMode: Boolean,
+    selectedCount: Int,
+    showSearch: Boolean,
+    onToggleSearch: () -> Unit,
+    onSettings: () -> Unit,
+    onClearSelection: () -> Unit,
+    onEditSelected: () -> Unit,
+    onDeleteSelected: () -> Unit,
+    onSelectAll: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior,
+) {
+    AnimatedContent(
+        targetState = selectionMode,
+        transitionSpec = { fadeIn() togetherWith fadeOut() },
+        label = "topbar",
+    ) { inSelection ->
+        if (inSelection) {
+            var overflowOpen by remember { mutableStateOf(false) }
+            TopAppBar(
+                title = { Text(selectedCount.toString()) },
+                navigationIcon = {
+                    IconButton(onClick = onClearSelection) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.cd_exit_selection),
+                        )
+                    }
+                },
+                actions = {
+                    if (selectedCount == 1) {
+                        IconButton(onClick = onEditSelected) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.edit),
+                            )
+                        }
+                    }
+                    IconButton(onClick = onDeleteSelected) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                        )
+                    }
+                    IconButton(onClick = { overflowOpen = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = null)
+                    }
+                    DropdownMenu(
+                        expanded = overflowOpen,
+                        onDismissRequest = { overflowOpen = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.select_all)) },
+                            onClick = {
+                                overflowOpen = false
+                                onSelectAll()
+                            },
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+            )
+        } else {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = {
+                    IconButton(onClick = onToggleSearch) {
+                        Icon(
+                            if (showSearch) Icons.Default.Close else Icons.Default.Search,
+                            contentDescription = stringResource(R.string.search),
+                        )
+                    }
+                    IconButton(onClick = onSettings) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.settings),
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
             )
         }
     }
 }
 
 @Composable
-private fun AddOptionsSheet(
-    onScanQr: () -> Unit,
-    onFromImage: () -> Unit,
-    onManualEntry: () -> Unit,
+private fun FabMenuItem(
+    label: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
 ) {
-    Column(modifier = Modifier.padding(bottom = 16.dp)) {
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.add_scan_qr)) },
-            leadingContent = { Icon(Icons.Default.QrCodeScanner, contentDescription = null) },
-            modifier = Modifier.clickable(onClick = onScanQr),
-        )
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.add_from_image)) },
-            leadingContent = { Icon(Icons.Default.Image, contentDescription = null) },
-            modifier = Modifier.clickable(onClick = onFromImage),
-        )
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.add_manually)) },
-            leadingContent = { Icon(Icons.Default.Keyboard, contentDescription = null) },
-            modifier = Modifier.clickable(onClick = onManualEntry),
-        )
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(28.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        tonalElevation = 6.dp,
+        shadowElevation = 6.dp,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 }
 
@@ -302,71 +534,60 @@ private fun ReorderableCollectionItemScope.AccountCard(
     item: AccountItem,
     isDragging: Boolean,
     iconFetchEnabled: Boolean,
-    onCopy: () -> Unit,
-    onDelete: () -> Unit,
-    onEdit: () -> Unit,
+    inSelectionMode: Boolean,
+    isSelected: Boolean,
+    canReorder: Boolean,
+    onTap: () -> Unit,
+    onLongPress: () -> Unit,
     onIncrementCounter: () -> Unit,
 ) {
-    val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = { false })
-
-    LaunchedEffect(dismissState.targetValue) {
-        if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
-            onDelete()
-        }
+    val containerColor = when {
+        isSelected -> MaterialTheme.colorScheme.secondaryContainer
+        isDragging -> MaterialTheme.colorScheme.surfaceVariant
+        else -> MaterialTheme.colorScheme.surface
     }
-
-    SwipeToDismissBox(
-        state = dismissState,
-        backgroundContent = {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                contentAlignment = Alignment.CenterEnd,
-            ) {
-                Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-            }
-        },
-        enableDismissFromStartToEnd = false,
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(onClick = onTap, onLongClick = onLongPress),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 1.dp),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
-        Card(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .combinedClickable(onClick = onCopy, onLongClick = onEdit),
-            elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 1.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isDragging) MaterialTheme.colorScheme.surfaceVariant
-                else MaterialTheme.colorScheme.surface,
-            ),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+            if (isSelected) {
+                SelectionCheckmark()
+            } else {
                 IssuerAvatar(issuer = item.account.issuer, iconFetchEnabled = iconFetchEnabled)
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = item.account.issuer,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = item.account.accountName,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = formatOtpCode(item.otpResult.code),
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.SemiBold,
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item.account.issuer,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = item.account.accountName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = formatOtpCode(item.otpResult.code),
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            if (!inSelectionMode) {
                 when (item.account.type) {
                     OtpType.TOTP -> {
                         val progress by animateFloatAsState(
@@ -403,21 +624,40 @@ private fun ReorderableCollectionItemScope.AccountCard(
                         }
                     }
                 }
-                IconButton(onClick = onCopy) {
+                IconButton(onClick = onTap) {
                     Icon(
                         Icons.Default.ContentCopy,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+            }
+            if (canReorder) {
                 Icon(
                     Icons.Default.DragHandle,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_drag_handle),
                     modifier = Modifier.draggableHandle(),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SelectionCheckmark() {
+    Box(
+        modifier = Modifier
+            .size(38.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            Icons.Default.Check,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimary,
+        )
     }
 }
 
@@ -431,8 +671,8 @@ private fun IssuerAvatar(issuer: String, iconFetchEnabled: Boolean, modifier: Mo
         SubcomposeAsyncImage(
             model = url,
             contentDescription = null,
-            modifier = modifier.size(38.dp).clip(CircleShape),
-            contentScale = ContentScale.Crop,
+            modifier = modifier.size(38.dp),
+            contentScale = ContentScale.Fit,
         ) {
             val state = painter.state.collectAsState()
             if (state.value is AsyncImagePainter.State.Success) {

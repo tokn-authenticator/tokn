@@ -72,10 +72,12 @@ class NsdDiscovery(context: Context) {
             trySend(peers.values.toList())
         }
 
+        @Suppress("DEPRECATION")
         fun resolveNext() {
             if (resolving) return
             val next = pendingResolves.removeFirstOrNull() ?: return
             resolving = true
+            // registerServiceInfoCallback requires API 34; this branch keeps minSdk 26 working.
             manager.resolveService(next, object : NsdManager.ResolveListener {
                 override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
                     val host = serviceInfo.host

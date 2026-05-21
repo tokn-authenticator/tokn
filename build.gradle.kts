@@ -9,6 +9,12 @@ plugins {
 }
 
 subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.add("-Xannotation-default-target=param-property")
+        }
+    }
+
     tasks.withType<Test>().configureEach {
         testLogging {
             events("passed", "failed", "skipped")

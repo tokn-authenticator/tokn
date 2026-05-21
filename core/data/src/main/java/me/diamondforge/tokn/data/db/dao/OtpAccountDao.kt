@@ -30,6 +30,9 @@ interface OtpAccountDao {
     @Query("DELETE FROM otp_accounts WHERE id = :id")
     suspend fun deleteById(id: Long)
 
+    @Query("DELETE FROM otp_accounts WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: Set<Long>)
+
     @Query("UPDATE otp_accounts SET counter = counter + 1 WHERE id = :id")
     suspend fun incrementCounter(id: Long)
 

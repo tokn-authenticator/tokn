@@ -36,6 +36,11 @@ class FakeAccountRepository(
         state.value = state.value.filterNot { it.id == id }
     }
 
+    override suspend fun deleteAccounts(ids: Set<Long>) {
+        if (ids.isEmpty()) return
+        state.value = state.value.filterNot { it.id in ids }
+    }
+
     override suspend fun reorderAccounts(accounts: List<OtpAccount>) {
         val byId = accounts.withIndex().associate { (i, a) -> a.id to i }
         state.value = state.value.map { acc ->

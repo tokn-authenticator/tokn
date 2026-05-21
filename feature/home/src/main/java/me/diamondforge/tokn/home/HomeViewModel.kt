@@ -13,6 +13,7 @@ import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
+import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
@@ -34,6 +35,7 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getAccountsUseCase: GetAccountsUseCase,
     private val deleteAccountUseCase: DeleteAccountUseCase,
+    private val deleteAccountsUseCase: DeleteAccountsUseCase,
     private val reorderAccountsUseCase: ReorderAccountsUseCase,
     private val generateOtpUseCase: GenerateOtpUseCase,
     private val incrementHotpCounterUseCase: IncrementHotpCounterUseCase,
@@ -49,10 +51,13 @@ class HomeViewModel @Inject constructor(
     private val _accounts = getAccountsUseCase()
     private val _searchQuery = MutableStateFlow("")
     private val _selectedGroup = MutableStateFlow<String?>(null)
+    private val _selectedIds = MutableStateFlow<Set<Long>>(emptySet())
 
     val uiState: StateFlow<HomeUiState> = combine(
-        _accounts, _currentTimeMillis, _searchQuery, _selectedGroup, appPreferences.iconFetchEnabled,
-    ) { accounts, time, query, selectedGroup, iconFetchEnabled ->
+        combine(_accounts, _currentTimeMillis, _searchQuery, _selectedGroup, _selectedIds, ::Quint),
+        appPreferences.iconFetchEnabled,
+    ) { quint, iconFetchEnabled ->
+        val (accounts, time, query, selectedGroup, selectedIds) = quint
         val availableGroups = accounts.mapNotNull { it.group }.distinct().sorted()
 
         val filtered = accounts
@@ -65,6 +70,13 @@ class HomeViewModel @Inject constructor(
                 selectedGroup == null || account.group == selectedGroup
             }
 
+        // Prune selection of ids that no longer exist (e.g. after delete).
+        val existingIds = accounts.map { it.id }.toSet()
+        val sanitizedSelection = selectedIds.intersect(existingIds)
+        if (sanitizedSelection.size != selectedIds.size) {
+            _selectedIds.value = sanitizedSelection
+        }
+
         HomeUiState(
             isLoading = false,
             items = filtered.map { account ->
@@ -76,6 +88,7 @@ class HomeViewModel @Inject constructor(
             availableGroups = availableGroups,
             selectedGroup = selectedGroup,
             iconFetchEnabled = iconFetchEnabled,
+            selectedIds = sanitizedSelection,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
@@ -91,6 +104,30 @@ class HomeViewModel @Inject constructor(
 
     fun deleteAccount(id: Long) {
         viewModelScope.launch { deleteAccountUseCase(id) }
+    }
+
+    fun startSelection(id: Long) {
+        _selectedIds.value = setOf(id)
+    }
+
+    fun toggleSelection(id: Long) {
+        val current = _selectedIds.value
+        _selectedIds.value = if (id in current) current - id else current + id
+    }
+
+    fun selectAll() {
+        _selectedIds.value = uiState.value.items.map { it.account.id }.toSet()
+    }
+
+    fun clearSelection() {
+        _selectedIds.value = emptySet()
+    }
+
+    fun deleteSelected() {
+        val ids = _selectedIds.value
+        if (ids.isEmpty()) return
+        _selectedIds.value = emptySet()
+        viewModelScope.launch { deleteAccountsUseCase(ids) }
     }
 
     fun reorderAccounts(accounts: List<OtpAccount>) {
@@ -159,6 +196,17 @@ data class HomeUiState(
     val availableGroups: List<String> = emptyList(),
     val selectedGroup: String? = null,
     val iconFetchEnabled: Boolean = false,
+    val selectedIds: Set<Long> = emptySet(),
+) {
+    val selectionMode: Boolean get() = selectedIds.isNotEmpty()
+}
+
+private data class Quint<A, B, C, D, E>(
+    val a: A,
+    val b: B,
+    val c: C,
+    val d: D,
+    val e: E,
 )
 
 data class AccountItem(
