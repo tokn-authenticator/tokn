@@ -13,7 +13,7 @@ plugins {
 
 android {
     namespace = "me.diamondforge.tokn"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "me.diamondforge.tokn"
