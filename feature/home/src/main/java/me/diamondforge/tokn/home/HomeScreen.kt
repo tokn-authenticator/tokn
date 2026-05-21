@@ -97,6 +97,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.pluralStringResource
@@ -307,10 +309,20 @@ fun HomeScreen(
                 }
             }
 
+            val windowInfo = LocalWindowInfo.current
+            val density = LocalDensity.current
+            val widthDp = with(density) { windowInfo.containerSize.width.toDp() }
+
+            val fabPadding = when {
+                widthDp >= 840.dp -> 48.dp
+                widthDp >= 600.dp -> 32.dp
+                else -> 16.dp
+            }
+
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(16.dp),
+                    .padding(fabPadding),
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
