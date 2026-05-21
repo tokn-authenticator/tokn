@@ -148,6 +148,13 @@ attached to GitHub Releases.
 Please open an issue or PR on
 [GitHub](https://github.com/fthomys/tokn). Translations are welcome too.
 
+## AI assistance
+
+Small parts of Tokn were written with help from AI coding assistants
+(Anthropic Claude, primarily). Every line was reviewed and tested by a human
+before landing; the cryptography other critical parts got an extra
+careful pass.
+
 ## License
 
 Tokn is free software, released under the GNU General Public License v3.0 or
