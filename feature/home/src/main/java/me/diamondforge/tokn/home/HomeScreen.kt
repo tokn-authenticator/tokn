@@ -126,7 +126,6 @@ fun HomeScreen(
     onManualEntry: () -> Unit,
     onSettings: () -> Unit,
     onAbout: () -> Unit,
-    onBackup: () -> Unit,
     onEditAccount: (Long) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
