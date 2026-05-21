@@ -72,7 +72,7 @@ private fun loadBitmap(context: Context, uri: Uri): Bitmap? = runCatching {
     }
 }.getOrNull()
 
-private fun decodeQrFromBitmap(bitmap: Bitmap): String? {
+internal fun decodeQrFromBitmap(bitmap: Bitmap): String? {
     val workable = if (bitmap.config == Bitmap.Config.ARGB_8888) bitmap
     else bitmap.copy(Bitmap.Config.ARGB_8888, false) ?: return null
     val width = workable.width

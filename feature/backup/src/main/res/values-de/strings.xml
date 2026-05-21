@@ -21,7 +21,7 @@
     <string name="other_import_select_app">Quell-App auswählen</string>
     <string name="other_import_button">Backup-Datei auswählen</string>
     <string name="migration_picker_label">Google Authenticator (QR)</string>
-    <string name="migration_picker_note">Scanne die QR-Codes, die Google Authenticator unter „Konten übertragen" → „Exportieren" anzeigt.</string>
+    <string name="migration_picker_note">Du brauchst ein zweites Gerät, das den Export zeigt, oder ein Foto davon. Scanne die QR-Codes aus Google Authenticator unter „Konten übertragen" → „Exportieren".</string>
     <string name="migration_scan_title">Migrations-Codes scannen</string>
     <string name="migration_from_image">Aus Bild</string>
     <string name="migration_progress_idle">Kamera auf einen Code richten</string>

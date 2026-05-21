@@ -21,7 +21,7 @@
     <string name="other_import_select_app">Select source app</string>
     <string name="other_import_button">Select backup file</string>
     <string name="migration_picker_label">Google Authenticator (QR)</string>
-    <string name="migration_picker_note">Scan the QR codes shown by Google Authenticator\'s "Transfer accounts" → "Export accounts" flow.</string>
+    <string name="migration_picker_note">Needs a second device showing the export, or a photo of it. Scan the QR codes from Google Authenticator\'s "Transfer accounts" → "Export accounts".</string>
     <string name="migration_scan_title">Scan migration codes</string>
     <string name="migration_from_image">From image</string>
     <string name="migration_progress_idle">Point camera at a code</string>
