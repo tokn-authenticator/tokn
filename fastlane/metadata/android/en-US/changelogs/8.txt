@@ -1,0 +1,9 @@
+* Import accounts from Google Authenticator via "Transfer accounts" QR codes (scan multiple codes live or pick a screenshot).
+* Import encrypted and unencrypted 2FAS backups (.2fas / .json).
+* Import encrypted and unencrypted Aegis JSON exports.
+* Import otpauth:// URI text files (one URI per line).
+* HOTP Counter can now be set manually
+* New About screen with version, changelog link, source, license, third-party licenses, maintainer and issue reporting.
+* Home redesign: multi-select with bulk delete and select-all, search bar, drag-to-reorder.
+* Copied codes now clear from the clipboard automatically after 30 seconds.
+* Clearer import feedback for partial imports, duplicates and wrong passwords.

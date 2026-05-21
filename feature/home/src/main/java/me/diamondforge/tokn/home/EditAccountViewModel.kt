@@ -40,6 +40,7 @@ class EditAccountViewModel @Inject constructor(
                     period = account.period,
                     type = account.type,
                     group = account.group ?: "",
+                    counter = account.counter.toString(),
                     isLoaded = true,
                 )
             }
@@ -54,6 +55,7 @@ class EditAccountViewModel @Inject constructor(
     fun updatePeriod(value: Int) = _uiState.update { it.copy(period = value) }
     fun updateType(value: OtpType) = _uiState.update { it.copy(type = value) }
     fun updateGroup(value: String) = _uiState.update { it.copy(group = value) }
+    fun updateCounter(value: String) = _uiState.update { it.copy(counter = value.filter { c -> c.isDigit() }) }
     fun clearError() = _uiState.update { it.copy(error = null) }
 
     fun saveChanges(onSuccess: () -> Unit) {
@@ -72,6 +74,11 @@ class EditAccountViewModel @Inject constructor(
             _uiState.update { it.copy(error = "Account name is required") }
             return
         }
+        val parsedCounter = state.counter.trim().toLongOrNull()
+        if (state.type == OtpType.HOTP && (parsedCounter == null || parsedCounter < 0)) {
+            _uiState.update { it.copy(error = "Counter must be a non-negative number") }
+            return
+        }
         _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             runCatching {
@@ -86,6 +93,7 @@ class EditAccountViewModel @Inject constructor(
                         period = state.period,
                         type = state.type,
                         group = state.group.trim().ifBlank { null },
+                        counter = if (state.type == OtpType.HOTP) parsedCounter ?: current.counter else current.counter,
                     ),
                 )
             }.onSuccess { onSuccess() }
@@ -103,6 +111,7 @@ data class EditAccountUiState(
     val period: Int = 30,
     val type: OtpType = OtpType.TOTP,
     val group: String = "",
+    val counter: String = "0",
     val error: String? = null,
     val isLoaded: Boolean = false,
     val isSaving: Boolean = false,

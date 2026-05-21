@@ -219,6 +219,18 @@ fun EditAccountScreen(
                                 )
                             }
                         }
+                    } else {
+                        OutlinedTextField(
+                            value = uiState.counter,
+                            onValueChange = viewModel::updateCounter,
+                            label = { Text(stringResource(R.string.edit_counter)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                        )
                     }
                 }
             }

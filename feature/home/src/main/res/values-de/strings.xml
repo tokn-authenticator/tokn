@@ -27,6 +27,7 @@
     <string name="edit_algorithm">Algorithmus</string>
     <string name="edit_digits">Stellen</string>
     <string name="edit_period">Intervall</string>
+    <string name="edit_counter">Zähler</string>
     <string name="edit_advanced">Erweitert</string>
     <string name="edit_save">Änderungen speichern</string>
     <string name="edit_group">Gruppe (optional)</string>
