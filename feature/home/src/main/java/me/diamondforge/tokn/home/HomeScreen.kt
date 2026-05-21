@@ -42,6 +42,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -68,13 +69,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -93,8 +95,11 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -136,6 +141,10 @@ fun HomeScreen(
 
     BackHandler(enabled = selectionMode) { viewModel.clearSelection() }
     BackHandler(enabled = fabMenuOpen) { fabMenuOpen = false }
+    BackHandler(enabled = showSearch && !selectionMode) {
+        showSearch = false
+        viewModel.updateSearchQuery("")
+    }
 
     val items = uiState.items
     var listItems by remember(items) { mutableStateOf(items) }
@@ -157,6 +166,8 @@ fun HomeScreen(
                 selectionMode = selectionMode,
                 selectedCount = uiState.selectedIds.size,
                 showSearch = showSearch,
+                searchQuery = uiState.searchQuery,
+                onSearchQueryChange = viewModel::updateSearchQuery,
                 onToggleSearch = {
                     showSearch = !showSearch
                     if (!showSearch) viewModel.updateSearchQuery("")
@@ -180,26 +191,6 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            if (showSearch && !selectionMode) {
-                OutlinedTextField(
-                    value = uiState.searchQuery,
-                    onValueChange = viewModel::updateSearchQuery,
-                    placeholder = { Text(stringResource(R.string.search_placeholder)) },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    trailingIcon = {
-                        if (uiState.searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { viewModel.updateSearchQuery("") }) {
-                                Icon(Icons.Default.Close, contentDescription = null)
-                            }
-                        }
-                    },
-                )
-            }
-
             if (uiState.availableGroups.isNotEmpty()) {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -415,6 +406,8 @@ private fun HomeTopBar(
     selectionMode: Boolean,
     selectedCount: Int,
     showSearch: Boolean,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     onToggleSearch: () -> Unit,
     onSettings: () -> Unit,
     onClearSelection: () -> Unit,
@@ -474,24 +467,81 @@ private fun HomeTopBar(
                 scrollBehavior = scrollBehavior,
             )
         } else {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    IconButton(onClick = onToggleSearch) {
-                        Icon(
-                            if (showSearch) Icons.Default.Close else Icons.Default.Search,
-                            contentDescription = stringResource(R.string.search),
-                        )
+            AnimatedContent(
+                targetState = showSearch,
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                label = "search-topbar",
+            ) { isSearching ->
+                if (isSearching) {
+                    val focusRequester = remember { FocusRequester() }
+                    val keyboardController = LocalSoftwareKeyboardController.current
+                    LaunchedEffect(Unit) {
+                        focusRequester.requestFocus()
+                        keyboardController?.show()
                     }
-                    IconButton(onClick = onSettings) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = stringResource(R.string.settings),
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
+                    TopAppBar(
+                        navigationIcon = {
+                            IconButton(onClick = onToggleSearch) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.cd_exit_search),
+                                )
+                            }
+                        },
+                        title = {
+                            TextField(
+                                value = searchQuery,
+                                onValueChange = onSearchQueryChange,
+                                singleLine = true,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .focusRequester(focusRequester),
+                                placeholder = {
+                                    Text(stringResource(R.string.search_placeholder))
+                                },
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    disabledContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    disabledIndicatorColor = Color.Transparent,
+                                ),
+                            )
+                        },
+                        actions = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { onSearchQueryChange("") }) {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = stringResource(R.string.cd_clear_search),
+                                    )
+                                }
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                    )
+                } else {
+                    TopAppBar(
+                        title = { Text(stringResource(R.string.app_name)) },
+                        actions = {
+                            IconButton(onClick = onToggleSearch) {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = stringResource(R.string.search),
+                                )
+                            }
+                            IconButton(onClick = onSettings) {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = stringResource(R.string.settings),
+                                )
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                    )
+                }
+            }
         }
     }
 }

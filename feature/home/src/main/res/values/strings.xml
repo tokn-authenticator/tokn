@@ -32,6 +32,8 @@
     <string name="edit">Edit</string>
     <string name="select_all">Select all</string>
     <string name="cd_exit_selection">Exit selection</string>
+    <string name="cd_exit_search">Close search</string>
+    <string name="cd_clear_search">Clear search</string>
     <string name="cd_drag_handle">Drag to reorder</string>
     <plurals name="delete_count_confirm_title">
         <item quantity="one">Delete account?</item>
