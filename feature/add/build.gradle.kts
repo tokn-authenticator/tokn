@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "me.diamondforge.tokn.add"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
