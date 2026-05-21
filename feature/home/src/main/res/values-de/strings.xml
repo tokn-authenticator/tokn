@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name">Tokn</string>
     <string name="settings">Einstellungen</string>
+    <string name="more_options">Weitere Optionen</string>
+    <string name="about">Über</string>
     <string name="add_account">Konto hinzufügen</string>
     <string name="no_accounts_title">Noch keine Konten</string>
     <string name="no_accounts_subtitle">Tippe auf + um dein erstes 2FA-Konto hinzuzufügen</string>

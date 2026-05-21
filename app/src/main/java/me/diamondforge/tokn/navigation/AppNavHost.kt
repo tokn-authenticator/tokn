@@ -63,9 +63,11 @@ import me.diamondforge.tokn.backup.qr.MigrationScanScreen
 import me.diamondforge.tokn.home.EditAccountScreen
 import me.diamondforge.tokn.home.HomeScreen
 import me.diamondforge.tokn.onboarding.OnboardingScreen
+import me.diamondforge.tokn.settings.AboutScreen
 import me.diamondforge.tokn.settings.AppearanceScreen
 import me.diamondforge.tokn.settings.SecurityScreen
 import me.diamondforge.tokn.settings.SettingsScreen
+import me.diamondforge.tokn.settings.ThirdPartyLicensesScreen
 import me.diamondforge.tokn.data.preferences.SyncMethod
 import me.diamondforge.tokn.sync.ui.ChooseMethodScreen
 import me.diamondforge.tokn.sync.ui.LanReceiveScreen
@@ -123,6 +125,7 @@ fun AppNavHost(
                 onFromImage = { entry.navigateOnce(navController, Screen.FromImage.route) },
                 onManualEntry = { entry.navigateOnce(navController, Screen.ManualEntry.route) },
                 onSettings = { entry.navigateOnce(navController, Screen.Settings.route) },
+                onAbout = { entry.navigateOnce(navController, Screen.About.route) },
                 onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
                 onEditAccount = { id -> entry.navigateOnce(navController, Screen.EditAccount.createRoute(id)) },
             )
@@ -278,6 +281,17 @@ fun AppNavHost(
         }
         composable(Screen.SecuritySettings.route) {
             SecurityScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.About.route) { entry ->
+            AboutScreen(
+                onBack = { navController.popBackStack() },
+                onThirdPartyLicenses = {
+                    entry.navigateOnce(navController, Screen.ThirdPartyLicenses.route)
+                },
+            )
+        }
+        composable(Screen.ThirdPartyLicenses.route) {
+            ThirdPartyLicensesScreen(onBack = { navController.popBackStack() })
         }
         composable(Screen.Backup.route) { entry ->
             BackupScreen(
@@ -442,6 +456,8 @@ sealed class Screen(val route: String) {
     data object Settings : Screen("settings")
     data object Appearance : Screen("appearance")
     data object SecuritySettings : Screen("security_settings")
+    data object About : Screen("about")
+    data object ThirdPartyLicenses : Screen("about/third_party")
     data object Backup : Screen("backup")
     data object MigrationScan : Screen("backup/migration_scan")
     data object Sync : Screen("sync")

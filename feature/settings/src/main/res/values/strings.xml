@@ -55,4 +55,27 @@
     <string name="backup_restore">Backup &amp; Restore</string>
     <string name="open">Open</string>
     <string name="data">Data</string>
+
+    <string name="about_title">About</string>
+    <string name="about_app_tagline">A small, opinionated 2FA / MFA authenticator for Android. Your one-time codes stay on the device, encrypted. No sign-up, no sync server, no analytics.</string>
+    <string name="about_section_app">App</string>
+    <string name="about_section_project">Project</string>
+    <string name="about_section_support">Support</string>
+    <string name="about_version">Version</string>
+    <string name="about_changelog">Changelog</string>
+    <string name="about_changelog_desc">See what changed in recent releases</string>
+    <string name="about_source">Source code</string>
+    <string name="about_source_desc">View on GitHub</string>
+    <string name="about_license">License</string>
+    <string name="about_license_desc">GPL-3.0-or-later</string>
+    <string name="about_third_party">Third-party licenses</string>
+    <string name="about_third_party_desc">Open-source dependencies</string>
+    <string name="about_report_issue">Report an issue</string>
+    <string name="about_report_issue_desc">Open GitHub Issues</string>
+    <string name="about_maintainer">Maintainer</string>
+    <string name="about_maintainer_desc">fthomys on GitHub</string>
+    <string name="about_rate">Rate Tokn</string>
+    <string name="about_rate_desc">Open Play Store</string>
+    <string name="about_version_copied">Version copied</string>
+    <string name="third_party_title">Third-party licenses</string>
 </resources>

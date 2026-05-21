@@ -55,4 +55,27 @@
     <string name="backup_restore">Sicherung &amp; Wiederherstellung</string>
     <string name="open">Öffnen</string>
     <string name="data">Daten</string>
+
+    <string name="about_title">Über</string>
+    <string name="about_app_tagline">Ein kleiner, eigensinniger 2FA / MFA Authenticator für Android. Deine Einmalcodes bleiben auf dem Gerät, verschlüsselt. Keine Anmeldung, kein Sync-Server, keine Analytik.</string>
+    <string name="about_section_app">App</string>
+    <string name="about_section_project">Projekt</string>
+    <string name="about_section_support">Unterstützen</string>
+    <string name="about_version">Version</string>
+    <string name="about_changelog">Änderungsverlauf</string>
+    <string name="about_changelog_desc">Neuerungen der letzten Releases</string>
+    <string name="about_source">Quellcode</string>
+    <string name="about_source_desc">Auf GitHub ansehen</string>
+    <string name="about_license">Lizenz</string>
+    <string name="about_license_desc">GPL-3.0-or-later</string>
+    <string name="about_third_party">Drittanbieter-Lizenzen</string>
+    <string name="about_third_party_desc">Open-Source-Abhängigkeiten</string>
+    <string name="about_report_issue">Problem melden</string>
+    <string name="about_report_issue_desc">GitHub Issues öffnen</string>
+    <string name="about_maintainer">Maintainer</string>
+    <string name="about_maintainer_desc">fthomys auf GitHub</string>
+    <string name="about_rate">Tokn bewerten</string>
+    <string name="about_rate_desc">Im Play Store öffnen</string>
+    <string name="about_version_copied">Version kopiert</string>
+    <string name="third_party_title">Drittanbieter-Lizenzen</string>
 </resources>
