@@ -60,6 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun BackupScreen(
     onBack: () -> Unit,
+    onScanMigration: () -> Unit = {},
     viewModel: BackupViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -76,9 +77,15 @@ fun BackupScreen(
     var importResult by remember { mutableStateOf<ImportResult?>(null) }
     var pendingError by remember { mutableStateOf<BackupError?>(null) }
     var showSourcePicker by remember { mutableStateOf(false) }
-    val importers = remember { viewModel.externalImporters }
+    val migrationPickerLabel = stringResource(R.string.migration_picker_label)
+    val migrationNoteRes = R.string.migration_picker_note
+    val pickerOptions = remember(viewModel) {
+        viewModel.externalImporters.map { importer ->
+            ImportPickerOption.File(importer.id, importer.displayName, importer.noteRes)
+        } + ImportPickerOption.MigrationQr(migrationPickerLabel, migrationNoteRes)
+    }
     var selectedImporterId by rememberSaveable {
-        mutableStateOf(importers.firstOrNull()?.id.orEmpty())
+        mutableStateOf(pickerOptions.firstOrNull()?.id.orEmpty())
     }
     var externalPassword by rememberSaveable { mutableStateOf("") }
     var externalPasswordVisible by remember { mutableStateOf(false) }
@@ -168,23 +175,23 @@ fun BackupScreen(
             title = { Text(stringResource(R.string.other_import_select_app)) },
             text = {
                 Column {
-                    importers.forEach { importer ->
+                    pickerOptions.forEach { option ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { selectedImporterId = importer.id }
+                                .clickable { selectedImporterId = option.id }
                                 .padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             RadioButton(
-                                selected = selectedImporterId == importer.id,
-                                onClick = { selectedImporterId = importer.id },
+                                selected = selectedImporterId == option.id,
+                                onClick = { selectedImporterId = option.id },
                             )
                             Spacer(Modifier.width(12.dp))
                             Column {
-                                Text(importer.displayName, style = MaterialTheme.typography.bodyLarge)
+                                Text(option.displayName, style = MaterialTheme.typography.bodyLarge)
                                 Text(
-                                    stringResource(importer.noteRes),
+                                    stringResource(option.noteRes),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -198,9 +205,16 @@ fun BackupScreen(
                     onClick = {
                         showSourcePicker = false
                         viewModel.suppressLock()
-                        val selected = importers.firstOrNull { it.id == selectedImporterId }
-                            ?: return@TextButton
-                        externalLauncher.launch(selected.acceptedMimeTypes)
+                        when (val selected = pickerOptions.firstOrNull { it.id == selectedImporterId }) {
+                            is ImportPickerOption.File ->
+                                externalLauncher.launch(
+                                    viewModel.externalImporters
+                                        .first { it.id == selected.id }
+                                        .acceptedMimeTypes,
+                                )
+                            is ImportPickerOption.MigrationQr -> onScanMigration()
+                            null -> Unit
+                        }
                     },
                     enabled = selectedImporterId.isNotEmpty(),
                 ) {
@@ -472,7 +486,7 @@ fun BackupScreen(
                 OutlinedButton(
                     onClick = { showSourcePicker = true },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = importers.isNotEmpty(),
+                    enabled = pickerOptions.isNotEmpty(),
                 ) {
                     Text(stringResource(R.string.other_import_select_app))
                 }
@@ -482,3 +496,13 @@ fun BackupScreen(
         }
     }
 }
+
+private sealed class ImportPickerOption(
+    val id: String,
+    val displayName: String,
+    val noteRes: Int,
+) {
+    class File(id: String, displayName: String, noteRes: Int) : ImportPickerOption(id, displayName, noteRes)
+    class MigrationQr(displayName: String, noteRes: Int) : ImportPickerOption("migration_qr", displayName, noteRes)
+}
+

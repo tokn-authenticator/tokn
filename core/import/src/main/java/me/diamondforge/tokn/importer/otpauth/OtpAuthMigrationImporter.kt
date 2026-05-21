@@ -7,8 +7,19 @@ import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.importer.ExternalImporter
 import me.diamondforge.tokn.importer.ImportOutcome
-import me.diamondforge.tokn.importer.R
 import javax.inject.Inject
+
+/**
+ * Metadata exposed by the `MigrationPayload` message. Google Authenticator splits exports
+ * with more than ~10 entries across several QR codes; the scanner UI uses these fields to
+ * report progress ("scanned 2 of 3 codes") and detect when a user switches mid-scan to a
+ * different vault.
+ */
+data class MigrationBatchInfo(
+    val batchIndex: Int,
+    val batchSize: Int,
+    val batchId: Int,
+)
 
 /**
  * Google Authenticator's "Export accounts" feature produces one or more
@@ -48,6 +59,36 @@ class OtpAuthMigrationImporter @Inject constructor() : ExternalImporter {
             accounts.addAll(batch)
         }
         return ImportOutcome.Success(accounts)
+    }
+
+    /**
+     * Reads only the batch metadata from a migration URI. Used by the QR scanner to
+     * track progress without paying for full entry decoding. Returns null for non-migration
+     * input or unparseable bytes.
+     */
+    fun peekBatch(uri: String): MigrationBatchInfo? {
+        if (!uri.trimStart().startsWith("otpauth-migration://", ignoreCase = true)) return null
+        val data = runCatching { Uri.parse(uri).getQueryParameter("data") }.getOrNull()
+            ?: return null
+        val bytes = runCatching { Base64.decode(data, Base64.DEFAULT) }.getOrNull() ?: return null
+
+        var batchSize = 0
+        var batchIndex = 0
+        var batchId = 0
+        runCatching {
+            val reader = ProtoReader(bytes)
+            while (reader.hasMore()) {
+                val tag = reader.readTag()
+                when (ProtoReader.fieldNumber(tag)) {
+                    3 -> batchSize = reader.readVarint().toInt()
+                    4 -> batchIndex = reader.readVarint().toInt()
+                    5 -> batchId = reader.readVarint().toInt()
+                    else -> reader.skipValue(tag)
+                }
+            }
+        }.getOrElse { return null }
+
+        return MigrationBatchInfo(batchIndex = batchIndex, batchSize = batchSize, batchId = batchId)
     }
 
     private fun decodeMigrationPayload(bytes: ByteArray): List<OtpAccount> {

@@ -59,6 +59,7 @@ import me.diamondforge.tokn.add.FromImageScreen
 import me.diamondforge.tokn.add.ManualEntryScreen
 import me.diamondforge.tokn.add.QrScannerScreen
 import me.diamondforge.tokn.backup.BackupScreen
+import me.diamondforge.tokn.backup.qr.MigrationScanScreen
 import me.diamondforge.tokn.home.EditAccountScreen
 import me.diamondforge.tokn.home.HomeScreen
 import me.diamondforge.tokn.onboarding.OnboardingScreen
@@ -278,8 +279,14 @@ fun AppNavHost(
         composable(Screen.SecuritySettings.route) {
             SecurityScreen(onBack = { navController.popBackStack() })
         }
-        composable(Screen.Backup.route) {
-            BackupScreen(onBack = { navController.popBackStack() })
+        composable(Screen.Backup.route) { entry ->
+            BackupScreen(
+                onBack = { navController.popBackStack() },
+                onScanMigration = { entry.navigateOnce(navController, Screen.MigrationScan.route) },
+            )
+        }
+        composable(Screen.MigrationScan.route) {
+            MigrationScanScreen(onBack = { navController.popBackStack() })
         }
     }
 }
@@ -436,6 +443,7 @@ sealed class Screen(val route: String) {
     data object Appearance : Screen("appearance")
     data object SecuritySettings : Screen("security_settings")
     data object Backup : Screen("backup")
+    data object MigrationScan : Screen("backup/migration_scan")
     data object Sync : Screen("sync")
     data object SyncSendFlow : Screen("sync/send_flow")
     data object SyncSelect : Screen("sync/select")

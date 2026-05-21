@@ -71,6 +71,42 @@ class OtpAuthMigrationImporterTest {
         assertTrue(importer.parse("just text".toByteArray(), null) is ImportOutcome.Malformed)
     }
 
+    @Test
+    fun `peekBatch returns batch metadata from a multi-batch export`() {
+        val first = MigrationFixtureWriter.buildUri(
+            entries = listOf(rfcVector()),
+            batchIndex = 0,
+            batchSize = 3,
+            batchId = 4242,
+        )
+        val info = importer.peekBatch(first)
+        assertEquals(0, info?.batchIndex)
+        assertEquals(3, info?.batchSize)
+        assertEquals(4242, info?.batchId)
+    }
+
+    @Test
+    fun `peekBatch returns null for non-migration input`() {
+        assertEquals(null, importer.peekBatch("otpauth://totp/X?secret=AAAA"))
+        assertEquals(null, importer.peekBatch("just text"))
+        assertEquals(null, importer.peekBatch(""))
+    }
+
+    @Test
+    fun `parse three batches joined newline returns all accounts`() {
+        val batches = (0 until 3).map { idx ->
+            MigrationFixtureWriter.buildUri(
+                entries = listOf(rfcVector(), rfcVector()),
+                batchIndex = idx,
+                batchSize = 3,
+                batchId = 9,
+            )
+        }
+        val joined = batches.joinToString("\n").toByteArray()
+        val accounts = (importer.parse(joined, null) as ImportOutcome.Success).accounts
+        assertEquals(6, accounts.size)
+    }
+
     private fun rfcVector() = MigrationEntry(
         secret = Base32.decode("JBSWY3DPEHPK3PXP"),
         name = "alice@example.com",

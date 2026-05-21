@@ -59,6 +59,14 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation(libs.bouncycastle)
 
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+    implementation(libs.guava)
+    implementation(libs.zxing.core)
+    implementation(libs.accompanist.permissions)
+
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.org.json)
