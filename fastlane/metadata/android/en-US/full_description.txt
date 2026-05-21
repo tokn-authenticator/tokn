@@ -7,9 +7,11 @@ Features:
 * Unlock with biometrics (with password fallback) or password only
 * Add accounts by scanning a QR code with the camera or from a gallery image
 * Encrypted backup and restore
-* Direct device-to-device sync over Wi-Fi Direct. Nothing leaves your local network, the handshake is end-to-end encrypted
+* Direct device-to-device sync over Wi-Fi Direct, Local Wi-Fi or QR Code. Nothing leaves your local network, the handshake is end-to-end encrypted
 * Material 3 UI
 * No tracking, no ads, no Google Play Services required
+
+You want to move from a other 2FA App? No problem: Tokn supports importing backups from Aegis, 2FAS and Google Authenticator (more soon)
 
 Tokn is free software, licensed under the GNU General Public License v3.0 or later.
 
