@@ -9,6 +9,9 @@ import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.importer.ExternalImporter
+import me.diamondforge.tokn.importer.ImportOutcome
+import me.diamondforge.tokn.importer.ImporterRegistry
 import me.diamondforge.tokn.security.LockManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -31,10 +34,13 @@ class BackupViewModel @Inject constructor(
     private val addAccountUseCase: AddAccountUseCase,
     private val encryptedBackupManager: EncryptedBackupManager,
     private val lockManager: LockManager,
+    private val importerRegistry: ImporterRegistry,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BackupUiState())
     val uiState: StateFlow<BackupUiState> = _uiState.asStateFlow()
+
+    val externalImporters: List<ExternalImporter> get() = importerRegistry.all()
 
     fun exportUnencryptedBackup(uri: Uri) {
         viewModelScope.launch {
@@ -49,7 +55,7 @@ class BackupViewModel @Inject constructor(
                 }
             }.onSuccess {
                 _uiState.update { it.copy(isLoading = false, exportSuccess = true) }
-            }.onFailure { e ->
+            }.onFailure {
                 _uiState.update { it.copy(isLoading = false, error = BackupError(R.string.export_error_title, R.string.error_file_not_writable)) }
             }
         }
@@ -85,10 +91,6 @@ class BackupViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
                     val raw = context.contentResolver.openInputStream(uri)?.bufferedReader()?.readText()
                         ?: throw BackupException(R.string.error_file_not_readable)
-                    // Detect if this is accidentally an Aegis file
-                    if (looksLikeAegisBackup(raw))
-                        throw BackupException(R.string.error_looks_like_aegis)
-                    // Detect unencrypted Tokn backup
                     if (isUnencryptedToknBackup(raw)) {
                         val accounts = runCatching { deserializeAccounts(raw) }
                             .getOrElse { throw BackupException(R.string.error_not_tokn_backup) }
@@ -107,79 +109,11 @@ class BackupViewModel @Inject constructor(
                         .getOrElse { throw BackupException(R.string.error_not_tokn_backup) }
                     importDeduplicated(accounts)
                 }
-            }.onSuccess { count ->
-                _uiState.update { it.copy(isLoading = false, importedCount = count) }
+            }.onSuccess { result ->
+                _uiState.update { it.copy(isLoading = false, importResult = result) }
             }.onFailure { e ->
                 val error = when (e) {
                     is BackupException -> BackupError(R.string.import_error_title, e.messageRes)
-                    else -> BackupError(R.string.import_error_title, R.string.error_generic, e.message)
-                }
-                _uiState.update { it.copy(isLoading = false, error = error) }
-            }
-        }
-    }
-
-    fun importAegisBackup(uri: Uri) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            runCatching {
-                withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.bufferedReader()?.readText()
-                        ?: throw BackupException(R.string.error_file_not_readable)
-                }
-            }.onSuccess { raw ->
-                when {
-                    !isValidJson(raw) ->
-                        _uiState.update { it.copy(isLoading = false, error = BackupError(R.string.import_error_title, R.string.error_not_json)) }
-                    !looksLikeAegisBackup(raw) ->
-                        _uiState.update { it.copy(isLoading = false, error = BackupError(R.string.import_error_title, R.string.error_not_aegis_backup)) }
-                    isAegisEncrypted(raw) ->
-                        _uiState.update { it.copy(isLoading = false, pendingEncryptedAegisUri = uri) }
-                    else -> {
-                        // parseAegisJson + DB writes off the main thread.
-                        runCatching {
-                            withContext(Dispatchers.IO) {
-                                importDeduplicated(parseAegisJson(raw))
-                            }
-                        }
-                            .onSuccess { count ->
-                                _uiState.update { it.copy(isLoading = false, importedCount = count) }
-                            }
-                            .onFailure {
-                                _uiState.update { it.copy(isLoading = false, error = BackupError(R.string.import_error_title, R.string.error_not_aegis_backup)) }
-                            }
-                    }
-                }
-            }.onFailure { e ->
-                val error = when (e) {
-                    is BackupException -> BackupError(R.string.import_error_title, e.messageRes)
-                    else -> BackupError(R.string.import_error_title, R.string.error_generic, e.message)
-                }
-                _uiState.update { it.copy(isLoading = false, error = error) }
-            }
-        }
-    }
-
-    fun importAegisWithPassword(password: String) {
-        val uri = _uiState.value.pendingEncryptedAegisUri ?: return
-        _uiState.update { it.copy(pendingEncryptedAegisUri = null, isLoading = true, error = null) }
-        viewModelScope.launch {
-            runCatching {
-                withContext(Dispatchers.IO) {
-                    val json = context.contentResolver.openInputStream(uri)?.bufferedReader()?.readText()
-                        ?: throw BackupException(R.string.error_file_not_readable)
-                    val dbJson = decryptAegisEncrypted(json, password)
-                    val accounts = parseAegisDb(dbJson)
-                    importDeduplicated(accounts)
-                }
-            }.onSuccess { count ->
-                _uiState.update { it.copy(isLoading = false, importedCount = count) }
-            }.onFailure { e ->
-                val error = when (e) {
-                    is BackupException -> BackupError(R.string.import_error_title, e.messageRes)
-                    is javax.crypto.AEADBadTagException,
-                    is javax.crypto.BadPaddingException ->
-                        BackupError(R.string.import_error_title, R.string.error_wrong_password)
                     else -> BackupError(R.string.import_error_title, R.string.error_generic, e.message)
                 }
                 _uiState.update { it.copy(isLoading = false, error = error) }
@@ -188,12 +122,97 @@ class BackupViewModel @Inject constructor(
     }
 
     /**
-     * Inserts every incoming account whose normalized secret is not already
-     * present locally. Re-importing the same backup is a no-op rather than
-     * a silent duplication. Mirrors the dedup logic used by sync transfers
-     * so the two import paths behave consistently.
+     * Entry point for external-app imports. Reads the file once and either applies the
+     * importer the user picked or — if [importerId] is null — auto-detects via the
+     * registry. Surfaces format-specific outcomes (NeedsPassword / WrongPassword /
+     * Unsupported) through [BackupUiState] so the screen can react without knowing the
+     * underlying format.
      */
-    private suspend fun importDeduplicated(incoming: List<OtpAccount>): Int {
+    fun importExternal(uri: Uri, importerId: String? = null, password: String? = null) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            runCatching {
+                withContext(Dispatchers.IO) {
+                    val raw = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                        ?: throw BackupException(R.string.error_file_not_readable)
+                    val importer = importerId?.let(importerRegistry::byId)
+                        ?: importerRegistry.detect(raw)
+                        ?: throw BackupException(R.string.error_external_not_recognized)
+                    importer to raw
+                }
+            }.onSuccess { (importer, raw) ->
+                handleOutcome(uri, importer, importer.parse(raw, password))
+            }.onFailure { e ->
+                val error = when (e) {
+                    is BackupException -> BackupError(R.string.import_error_title, e.messageRes)
+                    else -> BackupError(R.string.import_error_title, R.string.error_generic, e.message)
+                }
+                _uiState.update { it.copy(isLoading = false, error = error) }
+            }
+        }
+    }
+
+    private fun handleOutcome(uri: Uri, importer: ExternalImporter, outcome: ImportOutcome) {
+        when (outcome) {
+            is ImportOutcome.Success -> {
+                viewModelScope.launch {
+                    val result = withContext(Dispatchers.IO) { importDeduplicated(outcome.accounts) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            importResult = result,
+                            pendingExternal = null,
+                        )
+                    }
+                }
+            }
+            ImportOutcome.NeedsPassword -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        pendingExternal = PendingExternalImport(uri, importer.id, importer.displayName),
+                    )
+                }
+            }
+            is ImportOutcome.WrongPassword -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        pendingExternal = PendingExternalImport(uri, importer.id, importer.displayName),
+                        error = BackupError(R.string.import_error_title, R.string.error_wrong_password),
+                    )
+                }
+            }
+            ImportOutcome.Unsupported -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        pendingExternal = null,
+                        error = BackupError(R.string.import_error_title, R.string.error_external_unsupported),
+                    )
+                }
+            }
+            is ImportOutcome.Malformed -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        pendingExternal = null,
+                        error = BackupError(R.string.import_error_title, R.string.error_external_malformed),
+                    )
+                }
+            }
+        }
+    }
+
+    fun cancelExternalImport() {
+        _uiState.update { it.copy(pendingExternal = null) }
+    }
+
+    /**
+     * Mirrors dedup used by sync transfers: only insert accounts whose normalized secret
+     * isn't already present. Re-importing the same file becomes a no-op.
+     */
+    private suspend fun importDeduplicated(incoming: List<OtpAccount>): ImportResult {
         val existingSecrets = getAccountsUseCase().first()
             .map { it.secret.normalize() }
             .toHashSet()
@@ -205,128 +224,20 @@ class BackupViewModel @Inject constructor(
             existingSecrets.add(normalized)
             imported++
         }
-        return imported
+        return ImportResult(found = incoming.size, imported = imported)
     }
 
     private fun String.normalize(): String =
         replace(" ", "").replace("-", "").uppercase()
 
-    fun cancelEncryptedImport() {
-        _uiState.update { it.copy(pendingEncryptedAegisUri = null) }
-    }
-
     fun suppressLock() = lockManager.suppressNextForeground()
 
-    fun clearMessages() = _uiState.update { it.copy(error = null, exportSuccess = false, importedCount = null) }
+    fun clearMessages() = _uiState.update { it.copy(error = null, exportSuccess = false, importResult = null) }
 
     private class BackupException(val messageRes: Int) : Exception()
 
-    private fun isValidJson(raw: String): Boolean =
-        runCatching { JSONObject(raw); true }.getOrDefault(false)
-
     private fun isUnencryptedToknBackup(raw: String): Boolean =
         runCatching { JSONObject(raw).let { it.has("accounts") && it.has("version") } }.getOrDefault(false)
-
-    private fun looksLikeAegisBackup(raw: String): Boolean =
-        runCatching { JSONObject(raw).let { it.has("db") && it.has("version") } }.getOrDefault(false)
-
-    private fun isAegisEncrypted(json: String): Boolean =
-        runCatching { JSONObject(json).opt("db") is String }.getOrDefault(false)
-
-    private fun parseAegisJson(json: String): List<OtpAccount> {
-        val db = JSONObject(json).getJSONObject("db")
-        return parseAegisDb(db.toString())
-    }
-
-    private fun parseAegisDb(dbJson: String): List<OtpAccount> {
-        val entries = JSONObject(dbJson).getJSONArray("entries")
-        return (0 until entries.length()).mapNotNull { i ->
-            val entry = entries.getJSONObject(i)
-            val type = when (entry.optString("type").lowercase()) {
-                "totp" -> OtpType.TOTP
-                "hotp" -> OtpType.HOTP
-                else -> return@mapNotNull null
-            }
-            val info = entry.getJSONObject("info")
-            val secret = info.optString("secret").ifBlank { return@mapNotNull null }
-            val algo = when (info.optString("algo").uppercase()) {
-                "SHA256" -> OtpAlgorithm.SHA256
-                "SHA512" -> OtpAlgorithm.SHA512
-                else -> OtpAlgorithm.SHA1
-            }
-            OtpAccount(
-                issuer = entry.optString("issuer", ""),
-                accountName = entry.optString("name", ""),
-                secret = secret,
-                algorithm = algo,
-                digits = info.optInt("digits", 6),
-                period = info.optInt("period", 30),
-                counter = info.optLong("counter", 0),
-                type = type,
-            )
-        }
-    }
-
-    private fun decryptAegisEncrypted(json: String, password: String): String {
-        val root = JSONObject(json)
-        val header = root.getJSONObject("header")
-        val slots = header.getJSONArray("slots")
-        val params = header.getJSONObject("params")
-
-        var masterKey: ByteArray? = null
-        for (i in 0 until slots.length()) {
-            val slot = slots.getJSONObject(i)
-            if (slot.getInt("type") != 1) continue  // type 1 = password-based
-
-            val salt = slot.getString("salt").decodeHex()
-            val n = slot.getInt("n")
-            val r = slot.getInt("r")
-            val p = slot.getInt("p")
-            val encryptedKey = slot.getString("key").decodeHex()
-            val keyNonce = slot.getJSONObject("key_params").getString("nonce").decodeHex()
-            val keyTag = slot.getJSONObject("key_params").getString("tag").decodeHex()
-
-            val derivedKey = org.bouncycastle.crypto.generators.SCrypt.generate(
-                password.toByteArray(Charsets.UTF_8), salt, n, r, p, 32,
-            )
-            runCatching {
-                val cipher = javax.crypto.Cipher.getInstance("AES/GCM/NoPadding")
-                cipher.init(
-                    javax.crypto.Cipher.DECRYPT_MODE,
-                    javax.crypto.spec.SecretKeySpec(derivedKey, "AES"),
-                    javax.crypto.spec.GCMParameterSpec(128, keyNonce),
-                )
-                masterKey = cipher.doFinal(encryptedKey + keyTag)
-            }
-            if (masterKey != null) break
-        }
-
-        if (masterKey == null) {
-            // Check if there were any password slots at all
-            val hasPasswordSlot = (0 until slots.length()).any { slots.getJSONObject(it).getInt("type") == 1 }
-            throw if (hasPasswordSlot) BackupException(R.string.error_wrong_password)
-            else BackupException(R.string.error_aegis_no_password_slot)
-        }
-
-        val dbCiphertext = android.util.Base64.decode(root.getString("db"), android.util.Base64.DEFAULT)
-        val dbNonce = params.getString("nonce").decodeHex()
-        val dbTag = params.getString("tag").decodeHex()
-
-        val cipher = javax.crypto.Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(
-            javax.crypto.Cipher.DECRYPT_MODE,
-            javax.crypto.spec.SecretKeySpec(masterKey, "AES"),
-            javax.crypto.spec.GCMParameterSpec(128, dbNonce),
-        )
-        return cipher.doFinal(dbCiphertext + dbTag).toString(Charsets.UTF_8)
-    }
-
-    private fun String.decodeHex(): ByteArray {
-        check(length % 2 == 0)
-        return ByteArray(length / 2) { i ->
-            ((Character.digit(this[i * 2], 16) shl 4) + Character.digit(this[i * 2 + 1], 16)).toByte()
-        }
-    }
 
     private fun serializeAccounts(accounts: List<OtpAccount>): String {
         val array = JSONArray()
@@ -374,8 +285,18 @@ data class BackupUiState(
     val isLoading: Boolean = false,
     val error: BackupError? = null,
     val exportSuccess: Boolean = false,
-    val importedCount: Int? = null,
-    val pendingEncryptedAegisUri: Uri? = null,
+    val importResult: ImportResult? = null,
+    val pendingExternal: PendingExternalImport? = null,
+)
+
+data class ImportResult(val found: Int, val imported: Int) {
+    val skipped: Int get() = found - imported
+}
+
+data class PendingExternalImport(
+    val uri: Uri,
+    val importerId: String,
+    val displayName: String,
 )
 
 data class BackupError(val titleRes: Int, val messageRes: Int, val messageArg: String? = null)

@@ -20,7 +20,7 @@
     <string name="onboarding_security_pick_method">Please choose a method.</string>
 
     <string name="onboarding_setup_title">Set a password</string>
-    <string name="onboarding_setup_description">Your password unlocks the vault when biometrics aren\'t available. Keep it safe — there is no recovery.</string>
+    <string name="onboarding_setup_description">Your password unlocks the vault when biometrics aren\'t available. Keep it safe, there is no recovery.</string>
     <string name="onboarding_password">Password</string>
     <string name="onboarding_password_confirm">Confirm password</string>
     <string name="onboarding_password_too_short">At least 8 characters</string>

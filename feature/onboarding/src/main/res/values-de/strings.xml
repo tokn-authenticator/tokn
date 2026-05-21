@@ -20,7 +20,7 @@
     <string name="onboarding_security_pick_method">Bitte wähle eine Methode.</string>
 
     <string name="onboarding_setup_title">Passwort festlegen</string>
-    <string name="onboarding_setup_description">Dein Passwort entsperrt den Tresor, wenn Biometrie nicht verfügbar ist. Bewahre es sicher auf — es gibt keine Wiederherstellung.</string>
+    <string name="onboarding_setup_description">Dein Passwort entsperrt den Tresor, wenn Biometrie nicht verfügbar ist. Bewahre es sicher auf, es gibt keine Wiederherstellung.</string>
     <string name="onboarding_password">Passwort</string>
     <string name="onboarding_password_confirm">Passwort bestätigen</string>
     <string name="onboarding_password_too_short">Mindestens 8 Zeichen</string>

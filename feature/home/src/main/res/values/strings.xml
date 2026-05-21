@@ -5,7 +5,7 @@
     <string name="add_account">Add account</string>
     <string name="no_accounts_title">No accounts yet</string>
     <string name="no_accounts_subtitle">Tap + to add your first 2FA account</string>
-    <string name="code_copied">Code copied — clears in 30 s</string>
+    <string name="code_copied">Code copied, clears in 30 s</string>
     <string name="delete">Delete</string>
     <string name="add_scan_qr">Scan QR code</string>
     <string name="add_from_image">From image</string>

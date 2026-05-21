@@ -2,8 +2,9 @@
 <resources>
     <string name="backup_title">Backup &amp; Restore</string>
     <string name="export_section">Export</string>
-    <string name="export_description">Encrypt and save all accounts to a file. Use a strong password — this is the only protection for your secrets.</string>
-    <string name="backup_password">Backup password (min. 8 characters)</string>
+    <string name="export_description">Encrypt and save all accounts to a file. Use a strong password, this is the only protection for your secrets.</string>
+    <string name="backup_password">Backup password</string>
+    <string name="export_password_hint">Min. 8 characters</string>
     <string name="export_backup">Export backup</string>
     <string name="export_unencrypted">Export without encryption</string>
     <string name="export_unencrypted_hint">Warning: your OTP secrets will be saved as plain text.</string>
@@ -19,10 +20,11 @@
     <string name="other_import_description">Import accounts from another authenticator app.</string>
     <string name="other_import_select_app">Select source app</string>
     <string name="other_import_button">Select backup file</string>
-    <string name="aegis_import_note">Supports both encrypted and unencrypted Aegis JSON exports.</string>
-    <string name="aegis_encrypted_title">Aegis backup is encrypted</string>
+    <string name="external_password_title">%1$s backup is encrypted</string>
     <string name="import_result_title">Import complete</string>
-    <string name="import_result_body">%d account(s) were imported successfully.</string>
+    <string name="import_result_all_imported">%d account(s) imported.</string>
+    <string name="import_result_partial">%1$d account(s) imported, %2$d already in your library.</string>
+    <string name="import_result_all_duplicates">All %d account(s) in the backup are already in your library, nothing new to import.</string>
     <string name="import_result_empty">No accounts found in the backup file.</string>
     <string name="ok">OK</string>
     <string name="import_error_title">Import failed</string>
@@ -34,10 +36,9 @@
     <string name="error_file_not_writable">Couldn\'t write the backup file. Check available storage.</string>
     <string name="error_wrong_password">Wrong password.</string>
     <string name="error_not_tokn_backup">This doesn\'t look like a Tokn backup file.</string>
-    <string name="error_looks_like_aegis">This looks like an Aegis backup — use "Import from other Authenticator" instead.</string>
-    <string name="error_not_aegis_backup">This doesn\'t look like an Aegis backup file.</string>
-    <string name="error_not_json">This file doesn\'t contain valid JSON.</string>
-    <string name="error_aegis_no_password_slot">This Aegis backup uses hardware or biometric protection and can\'t be imported with a password.</string>
+    <string name="error_external_not_recognized">This file isn\'t recognised by any supported importer.</string>
+    <string name="error_external_unsupported">This backup uses hardware or biometric protection and can\'t be imported with a password.</string>
+    <string name="error_external_malformed">The selected file is incomplete or malformed.</string>
     <string name="error_generic">Something went wrong: %s</string>
     <string name="error_password_required">This backup is password-protected. Enter the backup password to import.</string>
 </resources>

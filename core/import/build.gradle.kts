@@ -1,20 +1,17 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
 
 android {
-    namespace = "me.diamondforge.tokn.backup"
+    namespace = "me.diamondforge.tokn.importer"
     compileSdk = 36
 
     defaultConfig {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
-    buildFeatures { compose = true }
 
     testOptions {
         unitTests {
@@ -36,33 +33,16 @@ android {
 
 dependencies {
     implementation(project(":core:domain"))
-    implementation(project(":core:security"))
-    implementation(project(":core:import"))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-
-    implementation(platform(libs.compose.bom))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.graphics)
-    implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons.extended)
-
-    implementation(libs.navigation.compose)
+    implementation(libs.coroutines.core)
     implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 
-    implementation(libs.coroutines.android)
     implementation(libs.bouncycastle)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.org.json)
     testImplementation(libs.androidx.test.core)
-
-    debugImplementation(libs.compose.ui.tooling)
 }

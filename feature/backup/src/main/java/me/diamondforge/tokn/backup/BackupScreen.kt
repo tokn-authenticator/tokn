@@ -63,7 +63,7 @@ fun BackupScreen(
     viewModel: BackupViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }  // kept for export success
+    val snackbarHostState = remember { SnackbarHostState() }
     var exportPassword by rememberSaveable { mutableStateOf("") }
     var importPassword by rememberSaveable { mutableStateOf("") }
     var exportPasswordVisible by remember { mutableStateOf(false) }
@@ -72,13 +72,16 @@ fun BackupScreen(
     var showUnencryptedWarning by remember { mutableStateOf(false) }
     var pendingExportUri by remember { mutableStateOf<Uri?>(null) }
     var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
-    var pendingAegisUri by remember { mutableStateOf<Uri?>(null) }
-    var importResultCount by remember { mutableStateOf<Int?>(null) }
+    var pendingExternalUri by remember { mutableStateOf<Uri?>(null) }
+    var importResult by remember { mutableStateOf<ImportResult?>(null) }
     var pendingError by remember { mutableStateOf<BackupError?>(null) }
     var showSourcePicker by remember { mutableStateOf(false) }
-    var selectedSource by remember { mutableStateOf("aegis") }
-    var aegisPassword by rememberSaveable { mutableStateOf("") }
-    var aegisPasswordVisible by remember { mutableStateOf(false) }
+    val importers = remember { viewModel.externalImporters }
+    var selectedImporterId by rememberSaveable {
+        mutableStateOf(importers.firstOrNull()?.id.orEmpty())
+    }
+    var externalPassword by rememberSaveable { mutableStateOf("") }
+    var externalPasswordVisible by remember { mutableStateOf(false) }
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/octet-stream"),
@@ -88,9 +91,9 @@ fun BackupScreen(
         ActivityResultContracts.OpenDocument(),
     ) { uri -> pendingImportUri = uri }
 
-    val aegisLauncher = rememberLauncherForActivityResult(
+    val externalLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
-    ) { uri -> pendingAegisUri = uri }
+    ) { uri -> pendingExternalUri = uri }
 
     LaunchedEffect(pendingExportUri) {
         pendingExportUri?.let { uri ->
@@ -107,10 +110,10 @@ fun BackupScreen(
         }
     }
 
-    LaunchedEffect(pendingAegisUri) {
-        pendingAegisUri?.let { uri ->
-            viewModel.importAegisBackup(uri)
-            pendingAegisUri = null
+    LaunchedEffect(pendingExternalUri) {
+        pendingExternalUri?.let { uri ->
+            viewModel.importExternal(uri, selectedImporterId)
+            pendingExternalUri = null
         }
     }
 
@@ -123,9 +126,9 @@ fun BackupScreen(
         }
     }
 
-    LaunchedEffect(uiState.importedCount) {
-        uiState.importedCount?.let { count ->
-            importResultCount = count
+    LaunchedEffect(uiState.importResult) {
+        uiState.importResult?.let { result ->
+            importResult = result
             viewModel.clearMessages()
         }
     }
@@ -137,61 +140,70 @@ fun BackupScreen(
         }
     }
 
-    // Import result dialog
-    importResultCount?.let { count ->
+    importResult?.let { result ->
         AlertDialog(
-            onDismissRequest = { importResultCount = null },
+            onDismissRequest = { importResult = null },
             title = { Text(stringResource(R.string.import_result_title)) },
             text = {
                 Text(
-                    if (count == 0)
-                        stringResource(R.string.import_result_empty)
-                    else
-                        stringResource(R.string.import_result_body, count),
+                    when {
+                        result.found == 0 -> stringResource(R.string.import_result_empty)
+                        result.imported == 0 -> stringResource(R.string.import_result_all_duplicates, result.found)
+                        result.skipped == 0 -> stringResource(R.string.import_result_all_imported, result.imported)
+                        else -> stringResource(R.string.import_result_partial, result.imported, result.skipped)
+                    },
                 )
             },
             confirmButton = {
-                TextButton(onClick = { importResultCount = null }) {
+                TextButton(onClick = { importResult = null }) {
                     Text(stringResource(R.string.ok))
                 }
             },
         )
     }
 
-    // Source picker dialog
     if (showSourcePicker) {
         AlertDialog(
             onDismissRequest = { showSourcePicker = false },
             title = { Text(stringResource(R.string.other_import_select_app)) },
             text = {
                 Column {
-                    // Aegis
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { selectedSource = "aegis" }
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RadioButton(selected = selectedSource == "aegis", onClick = { selectedSource = "aegis" })
-                        Spacer(Modifier.width(12.dp))
-                        Column {
-                            Text("Aegis Authenticator", style = MaterialTheme.typography.bodyLarge)
-                            Text(
-                                stringResource(R.string.aegis_import_note),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    importers.forEach { importer ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { selectedImporterId = importer.id }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(
+                                selected = selectedImporterId == importer.id,
+                                onClick = { selectedImporterId = importer.id },
                             )
+                            Spacer(Modifier.width(12.dp))
+                            Column {
+                                Text(importer.displayName, style = MaterialTheme.typography.bodyLarge)
+                                Text(
+                                    stringResource(importer.noteRes),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
                     }
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
-                    showSourcePicker = false
-                    viewModel.suppressLock()
-                    aegisLauncher.launch(arrayOf("application/json", "*/*"))
-                }) {
+                TextButton(
+                    onClick = {
+                        showSourcePicker = false
+                        viewModel.suppressLock()
+                        val selected = importers.firstOrNull { it.id == selectedImporterId }
+                            ?: return@TextButton
+                        externalLauncher.launch(selected.acceptedMimeTypes)
+                    },
+                    enabled = selectedImporterId.isNotEmpty(),
+                ) {
                     Text(stringResource(R.string.other_import_button))
                 }
             },
@@ -203,26 +215,28 @@ fun BackupScreen(
         )
     }
 
-    // Aegis encrypted backup password dialog
-    if (uiState.pendingEncryptedAegisUri != null) {
+    uiState.pendingExternal?.let { pending ->
         AlertDialog(
             onDismissRequest = {
-                viewModel.cancelEncryptedImport()
-                aegisPassword = ""
+                viewModel.cancelExternalImport()
+                externalPassword = ""
+                externalPasswordVisible = false
             },
-            title = { Text(stringResource(R.string.aegis_encrypted_title)) },
+            title = {
+                Text(stringResource(R.string.external_password_title, pending.displayName))
+            },
             text = {
                 OutlinedTextField(
-                    value = aegisPassword,
-                    onValueChange = { aegisPassword = it },
+                    value = externalPassword,
+                    onValueChange = { externalPassword = it },
                     label = { Text(stringResource(R.string.backup_password)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = if (aegisPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (externalPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { aegisPasswordVisible = !aegisPasswordVisible }) {
+                        IconButton(onClick = { externalPasswordVisible = !externalPasswordVisible }) {
                             Icon(
-                                if (aegisPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                if (externalPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                 contentDescription = null,
                             )
                         }
@@ -236,19 +250,20 @@ fun BackupScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.importAegisWithPassword(aegisPassword)
-                        aegisPassword = ""
-                        aegisPasswordVisible = false
+                        viewModel.importExternal(pending.uri, pending.importerId, externalPassword)
+                        externalPassword = ""
+                        externalPasswordVisible = false
                     },
-                    enabled = aegisPassword.isNotEmpty(),
+                    enabled = externalPassword.isNotEmpty(),
                 ) {
                     Text(stringResource(R.string.other_import_button))
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
-                    viewModel.cancelEncryptedImport()
-                    aegisPassword = ""
+                    viewModel.cancelExternalImport()
+                    externalPassword = ""
+                    externalPasswordVisible = false
                 }) {
                     Text(stringResource(R.string.cancel))
                 }
@@ -256,7 +271,6 @@ fun BackupScreen(
         )
     }
 
-    // Unencrypted export warning dialog
     if (showUnencryptedWarning) {
         AlertDialog(
             onDismissRequest = { showUnencryptedWarning = false },
@@ -282,7 +296,6 @@ fun BackupScreen(
         )
     }
 
-    // Error dialog
     pendingError?.let { err ->
         AlertDialog(
             onDismissRequest = { pendingError = null },
@@ -368,6 +381,7 @@ fun BackupScreen(
                         value = exportPassword,
                         onValueChange = { exportPassword = it },
                         label = { Text(stringResource(R.string.backup_password)) },
+                        supportingText = { Text(stringResource(R.string.export_password_hint)) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         visualTransformation = if (exportPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -458,6 +472,7 @@ fun BackupScreen(
                 OutlinedButton(
                     onClick = { showSourcePicker = true },
                     modifier = Modifier.fillMaxWidth(),
+                    enabled = importers.isNotEmpty(),
                 ) {
                     Text(stringResource(R.string.other_import_select_app))
                 }

@@ -2,8 +2,9 @@
 <resources>
     <string name="backup_title">Sicherung &amp; Wiederherstellung</string>
     <string name="export_section">Exportieren</string>
-    <string name="export_description">Alle Konten verschlüsseln und in eine Datei speichern. Verwende ein starkes Passwort — das ist der einzige Schutz für deine Schlüssel.</string>
-    <string name="backup_password">Backup-Passwort (min. 8 Zeichen)</string>
+    <string name="export_description">Alle Konten verschlüsseln und in eine Datei speichern. Verwende ein starkes Passwort, das ist der einzige Schutz für deine Schlüssel.</string>
+    <string name="backup_password">Backup-Passwort</string>
+    <string name="export_password_hint">Min. 8 Zeichen</string>
     <string name="export_backup">Backup exportieren</string>
     <string name="export_unencrypted">Ohne Verschlüsselung exportieren</string>
     <string name="export_unencrypted_hint">Warnung: OTP-Schlüssel werden als Klartext gespeichert.</string>
@@ -19,10 +20,11 @@
     <string name="other_import_description">Konten aus einer anderen Authenticator-App importieren.</string>
     <string name="other_import_select_app">Quell-App auswählen</string>
     <string name="other_import_button">Backup-Datei auswählen</string>
-    <string name="aegis_import_note">Unterstützt verschlüsselte und unverschlüsselte Aegis-JSON-Exporte.</string>
-    <string name="aegis_encrypted_title">Aegis-Backup ist verschlüsselt</string>
+    <string name="external_password_title">%1$s-Backup ist verschlüsselt</string>
     <string name="import_result_title">Import abgeschlossen</string>
-    <string name="import_result_body">%d Konto(s) erfolgreich importiert.</string>
+    <string name="import_result_all_imported">%d Konto(s) importiert.</string>
+    <string name="import_result_partial">%1$d Konto(s) importiert, %2$d waren schon in deiner Bibliothek.</string>
+    <string name="import_result_all_duplicates">Alle %d Konto(s) im Backup sind bereits in deiner Bibliothek, nichts Neues zu importieren.</string>
     <string name="import_result_empty">Keine Konten in der Backup-Datei gefunden.</string>
     <string name="ok">OK</string>
     <string name="import_error_title">Import fehlgeschlagen</string>
@@ -34,10 +36,9 @@
     <string name="error_file_not_writable">Backup-Datei konnte nicht geschrieben werden. Speicherplatz prüfen.</string>
     <string name="error_wrong_password">Falsches Passwort.</string>
     <string name="error_not_tokn_backup">Das sieht nicht wie eine Tokn-Backup-Datei aus.</string>
-    <string name="error_looks_like_aegis">Das sieht wie ein Aegis-Backup aus – bitte „Aus anderem Authenticator importieren" verwenden.</string>
-    <string name="error_not_aegis_backup">Das sieht nicht wie eine Aegis-Backup-Datei aus.</string>
-    <string name="error_not_json">Diese Datei enthält kein gültiges JSON.</string>
-    <string name="error_aegis_no_password_slot">Dieses Aegis-Backup verwendet Hardware- oder biometrischen Schutz und kann nicht mit einem Passwort importiert werden.</string>
+    <string name="error_external_not_recognized">Diese Datei wird von keinem unterstützten Importer erkannt.</string>
+    <string name="error_external_unsupported">Dieses Backup verwendet Hardware- oder biometrischen Schutz und kann nicht mit einem Passwort importiert werden.</string>
+    <string name="error_external_malformed">Die ausgewählte Datei ist unvollständig oder fehlerhaft.</string>
     <string name="error_generic">Fehler: %s</string>
     <string name="error_password_required">Dieses Backup ist passwortgeschützt. Gib das Backup-Passwort ein, um es zu importieren.</string>
 </resources>
