@@ -40,8 +40,14 @@ class EncryptionManager @Inject constructor() {
     private fun deriveKey(password: String, salt: ByteArray): SecretKeySpec {
         val factory = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM)
         val spec = PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH_BITS)
-        val keyBytes = factory.generateSecret(spec).encoded
-        return SecretKeySpec(keyBytes, "AES")
+        try {
+            val keyBytes = factory.generateSecret(spec).encoded
+            val key = SecretKeySpec(keyBytes, "AES")
+            java.util.Arrays.fill(keyBytes, 0)
+            return key
+        } finally {
+            spec.clearPassword()
+        }
     }
 
     companion object {

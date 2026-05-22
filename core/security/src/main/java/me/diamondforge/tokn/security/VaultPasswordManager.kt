@@ -24,15 +24,19 @@ class VaultPasswordManager @Inject constructor(
 
     fun setup(password: String) {
         val passphrase = keystoreManager.getDatabasePassphrase()
-        val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
-        val derivedKey = deriveKey(password, salt)
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        cipher.init(Cipher.ENCRYPT_MODE, derivedKey)
-        val iv = cipher.iv
-        val encrypted = cipher.doFinal(passphrase)
-        val payload = "${b64(salt)}:${b64(iv)}:${b64(encrypted)}"
-        prefs.edit {
-            putString(KEY_PASSWORD_SLOT, keystoreManager.encrypt(payload.toByteArray()))
+        try {
+            val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
+            val derivedKey = deriveKey(password, salt)
+            val cipher = Cipher.getInstance(TRANSFORMATION)
+            cipher.init(Cipher.ENCRYPT_MODE, derivedKey)
+            val iv = cipher.iv
+            val encrypted = cipher.doFinal(passphrase)
+            val payload = "${b64(salt)}:${b64(iv)}:${b64(encrypted)}"
+            prefs.edit {
+                putString(KEY_PASSWORD_SLOT, keystoreManager.encrypt(payload.toByteArray()))
+            }
+        } finally {
+            java.util.Arrays.fill(passphrase, 0)
         }
     }
 
@@ -46,7 +50,8 @@ class VaultPasswordManager @Inject constructor(
         val derivedKey = deriveKey(password, salt)
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.DECRYPT_MODE, derivedKey, GCMParameterSpec(128, iv))
-        cipher.doFinal(encrypted)
+        val plaintext = cipher.doFinal(encrypted)
+        java.util.Arrays.fill(plaintext, 0)
         true
     }.getOrDefault(false)
 
@@ -55,7 +60,14 @@ class VaultPasswordManager @Inject constructor(
     private fun deriveKey(password: String, salt: ByteArray): SecretKeySpec {
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
         val spec = PBEKeySpec(password.toCharArray(), salt, ITERATIONS, 256)
-        return SecretKeySpec(factory.generateSecret(spec).encoded, "AES")
+        try {
+            val keyBytes = factory.generateSecret(spec).encoded
+            val key = SecretKeySpec(keyBytes, "AES")
+            java.util.Arrays.fill(keyBytes, 0)
+            return key
+        } finally {
+            spec.clearPassword()
+        }
     }
 
     private fun b64(bytes: ByteArray) = Base64.encodeToString(bytes, Base64.NO_WRAP)
