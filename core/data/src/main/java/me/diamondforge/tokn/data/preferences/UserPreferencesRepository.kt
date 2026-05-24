@@ -42,6 +42,10 @@ class UserPreferencesRepository @Inject constructor(
         prefs[Keys.ENCRYPTION_ENABLED] ?: false
     }
 
+    val tapToRevealEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.TAP_TO_REVEAL_ENABLED] ?: false
+    }
+
     val onboardingDone: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.ONBOARDING_DONE] ?: false
     }
@@ -72,6 +76,10 @@ class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.ENCRYPTION_ENABLED] = enabled }
     }
 
+    suspend fun setTapToRevealEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.TAP_TO_REVEAL_ENABLED] = enabled }
+    }
+
     suspend fun setOnboardingDone(done: Boolean) {
         dataStore.edit { it[Keys.ONBOARDING_DONE] = done }
     }
@@ -86,6 +94,7 @@ class UserPreferencesRepository @Inject constructor(
         val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
         val SCREENSHOTS_ENABLED = booleanPreferencesKey("screenshots_enabled")
         val ENCRYPTION_ENABLED = booleanPreferencesKey("encryption_enabled")
+        val TAP_TO_REVEAL_ENABLED = booleanPreferencesKey("tap_to_reveal_enabled")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")
     }

@@ -44,6 +44,8 @@ class SettingsViewModel @Inject constructor(
         state.copy(passwordVerificationFailed = error)
     }.combine(appPreferences.iconFetchEnabled) { state, iconFetch ->
         state.copy(iconFetchEnabled = iconFetch)
+    }.combine(preferences.tapToRevealEnabled) { state, tapToReveal ->
+        state.copy(tapToRevealEnabled = tapToReveal)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     fun setThemeMode(mode: ThemeMode) {
@@ -64,6 +66,10 @@ class SettingsViewModel @Inject constructor(
 
     fun setIconFetchEnabled(enabled: Boolean) {
         viewModelScope.launch { appPreferences.setIconFetchEnabled(enabled) }
+    }
+
+    fun setTapToRevealEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferences.setTapToRevealEnabled(enabled) }
     }
 
     fun setupEncryption(password: String) {
@@ -94,5 +100,6 @@ data class SettingsUiState(
     val screenshotsEnabled: Boolean = false,
     val encryptionEnabled: Boolean = false,
     val iconFetchEnabled: Boolean = false,
+    val tapToRevealEnabled: Boolean = false,
     val passwordVerificationFailed: Boolean = false,
 )

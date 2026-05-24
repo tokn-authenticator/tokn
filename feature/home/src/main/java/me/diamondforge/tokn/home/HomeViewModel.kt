@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
+import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,6 +42,7 @@ class HomeViewModel @Inject constructor(
     private val generateOtpUseCase: GenerateOtpUseCase,
     private val incrementHotpCounterUseCase: IncrementHotpCounterUseCase,
     private val appPreferences: AppPreferencesRepository,
+    private val userPreferences: UserPreferencesRepository,
 ) : ViewModel() {
 
     private val clipboard: ClipboardManager =
@@ -52,6 +55,7 @@ class HomeViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     private val _selectedGroup = MutableStateFlow<String?>(null)
     private val _selectedIds = MutableStateFlow<Set<Long>>(emptySet())
+    private val _reveals = MutableStateFlow<Map<Long, RevealRecord>>(emptyMap())
 
     val uiState: StateFlow<HomeUiState> = combine(
         combine(_accounts, _currentTimeMillis, _searchQuery, _selectedGroup, _selectedIds, ::Quint),
@@ -90,6 +94,24 @@ class HomeViewModel @Inject constructor(
             iconFetchEnabled = iconFetchEnabled,
             selectedIds = sanitizedSelection,
         )
+    }.combine(userPreferences.tapToRevealEnabled) { state, enabled ->
+        state.copy(tapToRevealEnabled = enabled)
+    }.combine(_reveals) { state, reveals ->
+        // A reveal is valid only while the displayed code matches the one
+        // captured at reveal time AND the per-type timeout hasn't elapsed.
+        // Keying on the code (not wall-clock expiry) means a TOTP rollover
+        // re-masks atomically with the new code arriving — no flash of the
+        // freshly generated code.
+        val now = _currentTimeMillis.value
+        val revealed = state.items
+            .mapNotNull { item ->
+                val record = reveals[item.account.id] ?: return@mapNotNull null
+                if (record.code == item.otpResult.code && record.expiresAt > now) {
+                    item.account.id
+                } else null
+            }
+            .toSet()
+        state.copy(revealedIds = revealed)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
@@ -150,6 +172,16 @@ class HomeViewModel @Inject constructor(
      * coroutines racing, and an unrelated clipboard value the user copied
      * later from another app could be wiped mid-flight.
      */
+    fun reveal(item: AccountItem) {
+        val expiresAt = when (item.account.type) {
+            OtpType.TOTP -> Long.MAX_VALUE
+            OtpType.HOTP -> System.currentTimeMillis() + REVEAL_HOTP_MS
+        }
+        _reveals.update {
+            it + (item.account.id to RevealRecord(item.otpResult.code, expiresAt))
+        }
+    }
+
     fun copyToClipboard(item: AccountItem) {
         val code = item.otpResult.code
         val clip = ClipData.newPlainText("OTP", code).apply {
@@ -160,6 +192,9 @@ class HomeViewModel @Inject constructor(
         clipboard.setPrimaryClip(clip)
 
         if (item.account.type == OtpType.HOTP) {
+            // Drop the reveal so the freshly generated code never
+            // briefly shows up unmasked.
+            _reveals.update { it - item.account.id }
             viewModelScope.launch { incrementHotpCounterUseCase(item.account.id) }
         }
 
@@ -186,6 +221,7 @@ class HomeViewModel @Inject constructor(
 
     companion object {
         private const val CLIPBOARD_CLEAR_DELAY_MS = 30_000L
+        private const val REVEAL_HOTP_MS = 15_000L
     }
 }
 
@@ -197,6 +233,8 @@ data class HomeUiState(
     val selectedGroup: String? = null,
     val iconFetchEnabled: Boolean = false,
     val selectedIds: Set<Long> = emptySet(),
+    val tapToRevealEnabled: Boolean = false,
+    val revealedIds: Set<Long> = emptySet(),
 ) {
     val selectionMode: Boolean get() = selectedIds.isNotEmpty()
 }
@@ -212,4 +250,9 @@ private data class Quint<A, B, C, D, E>(
 data class AccountItem(
     val account: OtpAccount,
     val otpResult: OtpResult,
+)
+
+private data class RevealRecord(
+    val code: String,
+    val expiresAt: Long,
 )

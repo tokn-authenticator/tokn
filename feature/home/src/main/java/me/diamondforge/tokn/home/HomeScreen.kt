@@ -56,6 +56,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -238,6 +239,8 @@ fun HomeScreen(
                             val copiedMessage = stringResource(R.string.code_copied)
                             val isSelected = item.account.id in uiState.selectedIds
                             val canReorder = uiState.selectedIds.size == 1
+                            val isMasked = uiState.tapToRevealEnabled &&
+                                item.account.id !in uiState.revealedIds
                             AccountCard(
                                 item = item,
                                 isDragging = isDragging,
@@ -245,9 +248,13 @@ fun HomeScreen(
                                 inSelectionMode = selectionMode,
                                 isSelected = isSelected,
                                 canReorder = canReorder,
+                                isMasked = isMasked,
                                 onTap = {
                                     if (selectionMode) {
                                         viewModel.toggleSelection(item.account.id)
+                                    } else if (isMasked) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        viewModel.reveal(item)
                                     } else {
                                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                         viewModel.copyToClipboard(item)
@@ -622,6 +629,7 @@ private fun ReorderableCollectionItemScope.AccountCard(
     inSelectionMode: Boolean,
     isSelected: Boolean,
     canReorder: Boolean,
+    isMasked: Boolean,
     onTap: () -> Unit,
     onLongPress: () -> Unit,
     onIncrementCounter: () -> Unit,
@@ -663,7 +671,8 @@ private fun ReorderableCollectionItemScope.AccountCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatOtpCode(item.otpResult.code),
+                    text = if (isMasked) maskOtpCode(item.otpResult.code)
+                    else formatOtpCode(item.otpResult.code),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.SemiBold,
@@ -711,7 +720,7 @@ private fun ReorderableCollectionItemScope.AccountCard(
                 }
                 IconButton(onClick = onTap) {
                     Icon(
-                        Icons.Default.ContentCopy,
+                        if (isMasked) Icons.Default.Visibility else Icons.Default.ContentCopy,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -830,3 +839,5 @@ private fun formatOtpCode(code: String): String = when (code.length) {
     8 -> "${code.substring(0, 4)} ${code.substring(4)}"
     else -> code
 }
+
+private fun maskOtpCode(code: String): String = formatOtpCode("•".repeat(code.length))

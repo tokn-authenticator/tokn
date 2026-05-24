@@ -239,6 +239,25 @@ fun SecurityScreen(
                     },
                 )
             }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.tap_to_reveal)) },
+                    supportingContent = { Text(stringResource(R.string.tap_to_reveal_desc)) },
+                    leadingContent = {
+                        Icon(
+                            if (uiState.tapToRevealEnabled) Icons.Default.VisibilityOff
+                            else Icons.Default.Visibility,
+                            contentDescription = null,
+                        )
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = uiState.tapToRevealEnabled,
+                            onCheckedChange = viewModel::setTapToRevealEnabled,
+                        )
+                    },
+                )
+            }
         }
     }
 }
