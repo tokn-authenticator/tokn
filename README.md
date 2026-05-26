@@ -36,19 +36,14 @@ stay on the device, encrypted. No sign-up, no sync server, no analytics.
 
 ## Install
 
-Tokn is available on Google Play:
+Tokn is available on Google Play and F-Droid:
 
 [<img height="80" alt="Get it on Google Play"
 src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
 />](https://play.google.com/store/apps/details?id=me.diamondforge.tokn)
-
-<!--
-F-Droid submission is in progress; uncomment once the app is published.
-
 [<img height="80" alt="Get it on F-Droid"
 src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
 />](https://f-droid.org/app/me.diamondforge.tokn)
--->
 
 Signed APKs are also attached to each
 [GitHub Release](https://github.com/fthomys/tokn/releases) if you prefer
