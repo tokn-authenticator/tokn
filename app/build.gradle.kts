@@ -19,8 +19,8 @@ android {
         applicationId = "me.diamondforge.tokn"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "1.4.1"
+        versionCode = 10
+        versionName = "1.4.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

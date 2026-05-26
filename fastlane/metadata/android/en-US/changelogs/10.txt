@@ -1,0 +1,4 @@
+* New: custom account icons. Pick a PNG from your gallery when adding or editing an account.
+* New: icon packs. Import .zip icon packs (Settings > Appearance > Icon packs) and assign icons to accounts.
+* Sync: custom icons and icon pack references (icon packs excluded) are now included in device-to-device sync.
+* Fix: the system navigation bar no longer overlaps the bottom buttons on the sync "Choose method" and "Select accounts" screens.
