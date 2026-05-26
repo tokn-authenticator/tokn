@@ -173,3 +173,42 @@ later. Full text in [LICENSE](LICENSE).
 ```
 SPDX-License-Identifier: GPL-3.0-or-later
 ```
+
+## Warranty
+
+Tokn is provided "as is", without warranty of any kind, express or implied,
+including but not limited to the warranties of merchantability, fitness for
+a particular purpose, and noninfringement. In no event shall the authors or
+copyright holders be liable for any claim, damages, or other liability,
+whether in an action of contract, tort, or otherwise, arising from, out of,
+or in connection with the software or the use or other dealings in the
+software. See [LICENSE](LICENSE) sections 15 and 16 for the full disclaimer.
+
+**No backup, no pity.** A few practical consequences worth spelling out:
+
+- **You are responsible for your backups.** Tokn stores your secrets only on
+  your device. If you lose, wipe, factory-reset, or break the phone, or
+  uninstall the app, and you do not have an encrypted backup or a sync to
+  another device, your codes are gone. We cannot recover them. No backup,
+  no pity.
+- **You are responsible for your unlock secrets.** If you forget your vault
+  password and biometrics are unavailable, the vault cannot be decrypted.
+  There is no reset link, no support email that can help.
+- **Stolen or compromised devices are out of scope.** If someone gets your
+  unlocked phone, or your vault password, or coerces a biometric unlock,
+  they can read your codes. Treat Tokn like any other sensitive app: use a
+  strong device lock, enable the vault password, and revoke 2FA on the
+  affected accounts immediately if a device goes missing.
+- **Misuse is on you.** Using Tokn for accounts or in contexts that
+  prohibit third-party authenticators, ignoring service provider terms,
+  or relying on it as your only copy of a critical secret, are choices
+  you make at your own risk.
+- **A compromised device is a compromised vault.** Tokn assumes the
+  underlying Android system is intact. On rooted, jailbroken, or
+  malware-infected devices, the keystore guarantees no longer hold and
+  another app or attacker with sufficient privileges can read or tamper
+  with the vault. Running Tokn on such a device is at your own risk.
+- **Software has bugs.** Despite testing, a release could ship a defect
+  that corrupts the database, mangles a sync, or fails to import a file.
+  Keep an encrypted backup before updates or sync operations. If a bug
+  costs you data and you had no backup, that loss is not on the authors.
