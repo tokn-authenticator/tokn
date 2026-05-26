@@ -29,6 +29,11 @@ object SyncPayload {
                     put("type", account.type.name)
                     put("sortOrder", account.sortOrder)
                     account.group?.let { put("group", it) }
+                    account.customIconBytes?.let {
+                        put("customIconPng", android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP))
+                    }
+                    account.iconPackId?.let { put("iconPackId", it) }
+                    account.iconPackFile?.let { put("iconPackFile", it) }
                 },
             )
         }
@@ -43,6 +48,11 @@ object SyncPayload {
         val arr = root.getJSONArray("accounts")
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
+            val customIcon = if (o.has("customIconPng") && !o.isNull("customIconPng")) {
+                runCatching {
+                    android.util.Base64.decode(o.getString("customIconPng"), android.util.Base64.DEFAULT)
+                }.getOrNull()
+            } else null
             OtpAccount(
                 issuer = o.optString("issuer", ""),
                 accountName = o.optString("accountName", ""),
@@ -54,6 +64,9 @@ object SyncPayload {
                 type = OtpType.valueOf(o.optString("type", "TOTP")),
                 sortOrder = o.optInt("sortOrder", 0),
                 group = o.optString("group").ifBlank { null },
+                customIconBytes = customIcon,
+                iconPackId = o.optString("iconPackId").ifBlank { null },
+                iconPackFile = o.optString("iconPackFile").ifBlank { null },
             )
         }
     }

@@ -21,4 +21,12 @@
     <string name="qr_not_found_in_image">Kein OTP-QR-Code im Bild gefunden</string>
     <string name="retry">Erneut versuchen</string>
     <string name="group_optional">Gruppe (optional)</string>
+    <string name="icon_picker_title">Icon wählen</string>
+    <string name="icon_picker_gallery">Aus Galerie</string>
+    <string name="icon_picker_remove">Entfernen</string>
+    <string name="icon_picker_cancel">Abbrechen</string>
+    <string name="icon_picker_suggestions">Vorschläge</string>
+    <string name="icon_picker_no_packs">Keine Icon-Packs installiert. Importiere eines unter Einstellungen › Darstellung › Icon-Packs.</string>
+    <string name="icon_picker_search_placeholder">Icons suchen…</string>
+    <string name="icon_picker_no_search_results">Keine Icons gefunden</string>
 </resources>

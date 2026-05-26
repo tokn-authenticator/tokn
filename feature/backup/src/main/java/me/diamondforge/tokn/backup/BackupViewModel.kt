@@ -254,6 +254,11 @@ class BackupViewModel @Inject constructor(
                     put("type", account.type.name)
                     put("sortOrder", account.sortOrder)
                     account.group?.let { put("group", it) }
+                    account.customIconBytes?.let {
+                        put("customIconPng", android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP))
+                    }
+                    account.iconPackId?.let { put("iconPackId", it) }
+                    account.iconPackFile?.let { put("iconPackFile", it) }
                 },
             )
         }
@@ -265,6 +270,11 @@ class BackupViewModel @Inject constructor(
         val array = root.getJSONArray("accounts")
         return (0 until array.length()).map { i ->
             val obj = array.getJSONObject(i)
+            val customIcon = if (obj.has("customIconPng") && !obj.isNull("customIconPng")) {
+                runCatching {
+                    android.util.Base64.decode(obj.getString("customIconPng"), android.util.Base64.DEFAULT)
+                }.getOrNull()
+            } else null
             OtpAccount(
                 issuer = obj.getString("issuer"),
                 accountName = obj.getString("accountName"),
@@ -276,6 +286,9 @@ class BackupViewModel @Inject constructor(
                 type = OtpType.valueOf(obj.optString("type", "TOTP")),
                 sortOrder = obj.optInt("sortOrder", 0),
                 group = obj.optString("group").ifBlank { null },
+                customIconBytes = customIcon,
+                iconPackId = obj.optString("iconPackId").ifBlank { null },
+                iconPackFile = obj.optString("iconPackFile").ifBlank { null },
             )
         }
     }

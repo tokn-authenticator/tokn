@@ -65,6 +65,7 @@ import me.diamondforge.tokn.home.HomeScreen
 import me.diamondforge.tokn.onboarding.OnboardingScreen
 import me.diamondforge.tokn.settings.AboutScreen
 import me.diamondforge.tokn.settings.AppearanceScreen
+import me.diamondforge.tokn.settings.IconPacksScreen
 import me.diamondforge.tokn.settings.SecurityScreen
 import me.diamondforge.tokn.settings.SettingsScreen
 import me.diamondforge.tokn.settings.ThirdPartyLicensesScreen
@@ -276,8 +277,14 @@ fun AppNavHost(
                 )
             }
         }
-        composable(Screen.Appearance.route) {
-            AppearanceScreen(onBack = { navController.popBackStack() })
+        composable(Screen.Appearance.route) { entry ->
+            AppearanceScreen(
+                onBack = { navController.popBackStack() },
+                onIconPacks = { entry.navigateOnce(navController, Screen.IconPacks.route) },
+            )
+        }
+        composable(Screen.IconPacks.route) {
+            IconPacksScreen(onBack = { navController.popBackStack() })
         }
         composable(Screen.SecuritySettings.route) {
             SecurityScreen(onBack = { navController.popBackStack() })
@@ -455,6 +462,7 @@ sealed class Screen(val route: String) {
     data object ManualEntry : Screen("manual_entry")
     data object Settings : Screen("settings")
     data object Appearance : Screen("appearance")
+    data object IconPacks : Screen("appearance/icon_packs")
     data object SecuritySettings : Screen("security_settings")
     data object About : Screen("about")
     data object ThirdPartyLicenses : Screen("about/third_party")

@@ -1,31 +1,43 @@
 package me.diamondforge.tokn.home
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import me.diamondforge.tokn.domain.model.OtpAlgorithm
-import me.diamondforge.tokn.domain.model.OtpType
-import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
-import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.diamondforge.tokn.data.icon.IconImageUtil
+import me.diamondforge.tokn.data.icon.IconPackManager
+import me.diamondforge.tokn.data.icon.InstalledIconPack
+import me.diamondforge.tokn.domain.model.OtpAlgorithm
+import me.diamondforge.tokn.domain.model.OtpType
+import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
+import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 class EditAccountViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val getAccountByIdUseCase: GetAccountByIdUseCase,
     private val updateAccountUseCase: UpdateAccountUseCase,
+    private val iconPackManager: IconPackManager,
 ) : ViewModel() {
 
     private val accountId: Long = checkNotNull(savedStateHandle["accountId"])
 
     private val _uiState = MutableStateFlow(EditAccountUiState())
     val uiState: StateFlow<EditAccountUiState> = _uiState.asStateFlow()
+
+    val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackManager.installed
 
     init {
         viewModelScope.launch {
@@ -41,6 +53,10 @@ class EditAccountViewModel @Inject constructor(
                     type = account.type,
                     group = account.group ?: "",
                     counter = account.counter.toString(),
+                    customIconBytes = account.customIconBytes,
+                    iconPackId = account.iconPackId,
+                    iconPackFile = account.iconPackFile,
+                    packIconPath = resolvePackPath(account.iconPackId, account.iconPackFile),
                     isLoaded = true,
                 )
             }
@@ -57,6 +73,50 @@ class EditAccountViewModel @Inject constructor(
     fun updateGroup(value: String) = _uiState.update { it.copy(group = value) }
     fun updateCounter(value: String) = _uiState.update { it.copy(counter = value.filter { c -> c.isDigit() }) }
     fun clearError() = _uiState.update { it.copy(error = null) }
+
+    fun pickCustomIcon(uri: Uri) {
+        viewModelScope.launch {
+            val bytes = withContext(Dispatchers.IO) { IconImageUtil.loadAndResize(context, uri) }
+            if (bytes != null) {
+                _uiState.update {
+                    it.copy(
+                        customIconBytes = bytes,
+                        iconPackId = null,
+                        iconPackFile = null,
+                        packIconPath = null,
+                    )
+                }
+            }
+        }
+    }
+
+    fun pickPackIcon(packUuid: String, filename: String) {
+        val path = resolvePackPath(packUuid, filename) ?: return
+        _uiState.update {
+            it.copy(
+                customIconBytes = null,
+                iconPackId = packUuid,
+                iconPackFile = filename,
+                packIconPath = path,
+            )
+        }
+    }
+
+    fun clearIcon() {
+        _uiState.update {
+            it.copy(
+                customIconBytes = null,
+                iconPackId = null,
+                iconPackFile = null,
+                packIconPath = null,
+            )
+        }
+    }
+
+    private fun resolvePackPath(packId: String?, filename: String?): String? {
+        if (packId == null || filename == null) return null
+        return iconPackManager.iconFile(packId, filename)?.absolutePath
+    }
 
     fun saveChanges(onSuccess: () -> Unit) {
         val state = _uiState.value
@@ -94,6 +154,9 @@ class EditAccountViewModel @Inject constructor(
                         type = state.type,
                         group = state.group.trim().ifBlank { null },
                         counter = if (state.type == OtpType.HOTP) parsedCounter ?: current.counter else current.counter,
+                        customIconBytes = state.customIconBytes,
+                        iconPackId = state.iconPackId,
+                        iconPackFile = state.iconPackFile,
                     ),
                 )
             }.onSuccess { onSuccess() }
@@ -115,4 +178,10 @@ data class EditAccountUiState(
     val error: String? = null,
     val isLoaded: Boolean = false,
     val isSaving: Boolean = false,
-)
+    val customIconBytes: ByteArray? = null,
+    val iconPackId: String? = null,
+    val iconPackFile: String? = null,
+    val packIconPath: String? = null,
+) {
+    val hasIcon: Boolean get() = customIconBytes != null || packIconPath != null
+}

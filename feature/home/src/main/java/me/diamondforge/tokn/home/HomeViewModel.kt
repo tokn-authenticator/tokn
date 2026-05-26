@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.OtpAccount
@@ -43,6 +44,7 @@ class HomeViewModel @Inject constructor(
     private val incrementHotpCounterUseCase: IncrementHotpCounterUseCase,
     private val appPreferences: AppPreferencesRepository,
     private val userPreferences: UserPreferencesRepository,
+    private val iconPackManager: IconPackManager,
 ) : ViewModel() {
 
     private val clipboard: ClipboardManager =
@@ -86,7 +88,12 @@ class HomeViewModel @Inject constructor(
             items = filtered.map { account ->
                 val otpResult = runCatching { generateOtpUseCase(account, time) }
                     .getOrElse { OtpResult("------", -1L, account.period * 1000L) }
-                AccountItem(account = account, otpResult = otpResult)
+                val packFilePath = account.iconPackId?.let { pid ->
+                    account.iconPackFile?.let { fname ->
+                        iconPackManager.iconFile(pid, fname)?.absolutePath
+                    }
+                }
+                AccountItem(account = account, otpResult = otpResult, packIconPath = packFilePath)
             },
             searchQuery = query,
             availableGroups = availableGroups,
@@ -250,6 +257,7 @@ private data class Quint<A, B, C, D, E>(
 data class AccountItem(
     val account: OtpAccount,
     val otpResult: OtpResult,
+    val packIconPath: String? = null,
 )
 
 private data class RevealRecord(
