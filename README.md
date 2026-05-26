@@ -6,6 +6,7 @@ alt="App icon">
 <br>
 
 [![Build](https://github.com/fthomys/tokn/actions/workflows/build.yml/badge.svg)](https://github.com/fthomys/tokn/actions/workflows/build.yml?query=branch%3Amain)
+[![GitHub release](https://img.shields.io/github/v/release/fthomys/tokn?label=GitHub)](https://github.com/fthomys/tokn/releases/latest)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 <a href="https://play.google.com/store/apps/details?id=me.diamondforge.tokn"><img height="20" alt="Google Play" src="https://playbadges.pavi2410.com/badge/version?id=me.diamondforge.tokn"></a>
 [![F-Droid](https://img.shields.io/f-droid/v/me.diamondforge.tokn.svg?label=F-Droid)](https://f-droid.org/app/me.diamondforge.tokn)
