@@ -38,6 +38,14 @@
     <string name="cd_exit_search">Close search</string>
     <string name="cd_clear_search">Clear search</string>
     <string name="cd_drag_handle">Drag to reorder</string>
+    <string name="icon_picker_title">Choose an icon</string>
+    <string name="icon_picker_gallery">From gallery</string>
+    <string name="icon_picker_remove">Remove</string>
+    <string name="icon_picker_cancel">Cancel</string>
+    <string name="icon_picker_suggestions">Suggested</string>
+    <string name="icon_picker_no_packs">No icon packs installed. Import one in Settings › Appearance › Icon packs.</string>
+    <string name="icon_picker_search_placeholder">Search icons…</string>
+    <string name="icon_picker_no_search_results">No icons match your search</string>
     <plurals name="delete_count_confirm_title">
         <item quantity="one">Delete account?</item>
         <item quantity="other">Delete %d accounts?</item>

@@ -37,6 +37,7 @@ android {
 dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:security"))
+    implementation(project(":core:data"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -63,6 +64,7 @@ dependencies {
     implementation(libs.zxing.core)
     implementation(libs.accompanist.permissions)
     implementation(libs.coroutines.android)
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)

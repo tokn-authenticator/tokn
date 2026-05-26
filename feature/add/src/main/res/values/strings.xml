@@ -21,4 +21,12 @@
     <string name="qr_not_found_in_image">No OTP QR code found in image</string>
     <string name="retry">Retry</string>
     <string name="group_optional">Group (optional)</string>
+    <string name="icon_picker_title">Choose an icon</string>
+    <string name="icon_picker_gallery">From gallery</string>
+    <string name="icon_picker_remove">Remove</string>
+    <string name="icon_picker_cancel">Cancel</string>
+    <string name="icon_picker_suggestions">Suggested</string>
+    <string name="icon_picker_no_packs">No icon packs installed. Import one in Settings › Appearance › Icon packs.</string>
+    <string name="icon_picker_search_placeholder">Search icons…</string>
+    <string name="icon_picker_no_search_results">No icons match your search</string>
 </resources>

@@ -41,6 +41,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.runtime.collectAsState
+import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
@@ -659,7 +660,12 @@ private fun ReorderableCollectionItemScope.AccountCard(
             if (isSelected) {
                 SelectionCheckmark()
             } else {
-                IssuerAvatar(issuer = item.account.issuer, iconFetchEnabled = iconFetchEnabled)
+                IssuerAvatar(
+                    issuer = item.account.issuer,
+                    customIconBytes = item.account.customIconBytes,
+                    packIconPath = item.packIconPath,
+                    iconFetchEnabled = iconFetchEnabled,
+                )
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -760,28 +766,47 @@ private fun SelectionCheckmark() {
 }
 
 @Composable
-private fun IssuerAvatar(issuer: String, iconFetchEnabled: Boolean, modifier: Modifier = Modifier) {
-    if (iconFetchEnabled) {
-        val url = remember(issuer) {
-            val slug = issuer.lowercase().replace(Regex("[^a-z0-9]"), "")
-            "https://cdn.simpleicons.org/$slug"
-        }
-        SubcomposeAsyncImage(
-            model = url,
-            contentDescription = null,
-            modifier = modifier.size(38.dp),
-            contentScale = ContentScale.Fit,
-        ) {
-            val state = painter.state.collectAsState()
-            if (state.value is AsyncImagePainter.State.Success) {
-                SubcomposeAsyncImageContent()
-            } else {
-                LetterAvatarBox(issuer)
+private fun IssuerAvatar(
+    issuer: String,
+    customIconBytes: ByteArray?,
+    packIconPath: String?,
+    iconFetchEnabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    when {
+        customIconBytes != null -> AsyncIconBox(model = customIconBytes, modifier = modifier)
+        packIconPath != null -> AsyncIconBox(model = java.io.File(packIconPath), modifier = modifier)
+        iconFetchEnabled -> {
+            val url = remember(issuer) {
+                val slug = issuer.lowercase().replace(Regex("[^a-z0-9]"), "")
+                "https://cdn.simpleicons.org/$slug"
+            }
+            SubcomposeAsyncImage(
+                model = url,
+                contentDescription = null,
+                modifier = modifier.size(38.dp),
+                contentScale = ContentScale.Fit,
+            ) {
+                val state = painter.state.collectAsState()
+                if (state.value is AsyncImagePainter.State.Success) {
+                    SubcomposeAsyncImageContent()
+                } else {
+                    LetterAvatarBox(issuer)
+                }
             }
         }
-    } else {
-        LetterAvatarBox(issuer, modifier)
+        else -> LetterAvatarBox(issuer, modifier)
     }
+}
+
+@Composable
+private fun AsyncIconBox(model: Any, modifier: Modifier = Modifier) {
+    AsyncImage(
+        model = model,
+        contentDescription = null,
+        modifier = modifier.size(38.dp),
+        contentScale = ContentScale.Fit,
+    )
 }
 
 @Composable

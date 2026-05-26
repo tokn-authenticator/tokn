@@ -1,5 +1,6 @@
 package me.diamondforge.tokn.data.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import me.diamondforge.tokn.domain.model.OtpAccount
@@ -19,6 +20,9 @@ data class OtpAccountEntity(
     val type: String,
     val sortOrder: Int,
     val group: String? = null,
+    @ColumnInfo(name = "custom_icon_blob") val customIconBlob: ByteArray? = null,
+    @ColumnInfo(name = "icon_pack_id") val iconPackId: String? = null,
+    @ColumnInfo(name = "icon_pack_file") val iconPackFile: String? = null,
 )
 
 fun OtpAccountEntity.toDomain(): OtpAccount = OtpAccount(
@@ -33,6 +37,9 @@ fun OtpAccountEntity.toDomain(): OtpAccount = OtpAccount(
     type = OtpType.valueOf(type),
     sortOrder = sortOrder,
     group = group,
+    customIconBytes = customIconBlob,
+    iconPackId = iconPackId,
+    iconPackFile = iconPackFile,
 )
 
 fun OtpAccount.toEntity(): OtpAccountEntity = OtpAccountEntity(
@@ -47,4 +54,7 @@ fun OtpAccount.toEntity(): OtpAccountEntity = OtpAccountEntity(
     type = type.name,
     sortOrder = sortOrder,
     group = group,
+    customIconBlob = customIconBytes,
+    iconPackId = iconPackId,
+    iconPackFile = iconPackFile,
 )

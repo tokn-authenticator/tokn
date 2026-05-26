@@ -49,6 +49,7 @@ private val LANGUAGE_TAGS = listOf("", "en", "de")
 @Composable
 fun AppearanceScreen(
     onBack: () -> Unit,
+    onIconPacks: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -200,6 +201,14 @@ fun AppearanceScreen(
                             },
                         )
                     },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.icon_packs_section)) },
+                    supportingContent = { Text(stringResource(R.string.icon_packs_section_desc)) },
+                    leadingContent = { Icon(Icons.Default.Image, contentDescription = null) },
+                    modifier = Modifier.clickable { onIconPacks() },
                 )
             }
         }

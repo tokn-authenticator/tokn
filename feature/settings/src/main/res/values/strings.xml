@@ -20,6 +20,23 @@
     <string name="account_icons_desc">Load service logos from the internet (Simple Icons)</string>
     <string name="account_icons_privacy_title">Load icons from the internet?</string>
     <string name="account_icons_privacy_body">Enabling this fetches a logo for each service from the Simple Icons CDN. Your issuer names are sent as part of the request URL. Disable anytime.</string>
+    <string name="icon_packs_section">Icon packs</string>
+    <string name="icon_packs_section_desc">Bundles of icons assignable per account</string>
+    <string name="icon_packs_title">Icon packs</string>
+    <string name="icon_packs_import">Import a pack</string>
+    <string name="icon_packs_import_desc">Aegis-compatible .zip with pack.json and icon files</string>
+    <string name="icon_packs_pick_zip">Choose .zip file…</string>
+    <string name="icon_packs_count_v">%1$d icons · v%2$d</string>
+    <string name="icon_packs_count_v_used">%1$d icons · v%2$d · used by %3$d</string>
+    <string name="icon_packs_delete_body_used">%1$d accounts use icons from this pack. They will fall back to fetched logos or the letter avatar.</string>
+    <string name="icon_packs_empty">No icon packs installed yet.</string>
+    <string name="icon_packs_automatch_title">Auto-assign icons?</string>
+    <string name="icon_packs_automatch_body">%1$d of your accounts can use icons from \"%2$s\". Apply them?</string>
+    <string name="icon_packs_automatch_apply">Apply</string>
+    <string name="icon_packs_automatch_skip">Skip</string>
+    <string name="icon_packs_delete_title">Remove icon pack?</string>
+    <string name="icon_packs_delete_body">Accounts using its icons will fall back to fetched logos or the letter avatar.</string>
+    <string name="icon_packs_delete_confirm">Remove</string>
 
     <string name="security">Security</string>
     <string name="section_vault">Vault</string>

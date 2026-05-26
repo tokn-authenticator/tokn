@@ -1,25 +1,37 @@
 package me.diamondforge.tokn.add
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import me.diamondforge.tokn.domain.model.OtpAccount
-import me.diamondforge.tokn.domain.model.OtpAlgorithm
-import me.diamondforge.tokn.domain.model.OtpType
-import me.diamondforge.tokn.security.LockManager
-import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.diamondforge.tokn.data.icon.IconImageUtil
+import me.diamondforge.tokn.data.icon.IconPackManager
+import me.diamondforge.tokn.data.icon.InstalledIconPack
+import me.diamondforge.tokn.domain.model.OtpAccount
+import me.diamondforge.tokn.domain.model.OtpAlgorithm
+import me.diamondforge.tokn.domain.model.OtpType
+import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
+import me.diamondforge.tokn.security.LockManager
 import javax.inject.Inject
 
 @HiltViewModel
 class AddAccountViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val addAccountUseCase: AddAccountUseCase,
     private val lockManager: LockManager,
+    private val iconPackManager: IconPackManager,
 ) : ViewModel() {
+
+    val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackManager.installed
 
     private val _uiState = MutableStateFlow(AddAccountUiState())
     val uiState: StateFlow<AddAccountUiState> = _uiState.asStateFlow()
@@ -40,6 +52,31 @@ class AddAccountViewModel @Inject constructor(
     fun updatePeriod(value: Int) = _uiState.update { it.copy(period = value) }
     fun updateType(value: OtpType) = _uiState.update { it.copy(type = value) }
     fun updateGroup(value: String) = _uiState.update { it.copy(group = value) }
+
+    fun pickCustomIcon(uri: Uri) {
+        viewModelScope.launch {
+            val bytes = withContext(Dispatchers.IO) { IconImageUtil.loadAndResize(context, uri) }
+            if (bytes != null) _uiState.update {
+                it.copy(customIconBytes = bytes, iconPackId = null, iconPackFile = null, packIconPath = null)
+            }
+        }
+    }
+
+    fun pickPackIcon(packUuid: String, filename: String) {
+        val path = iconPackManager.iconFile(packUuid, filename)?.absolutePath ?: return
+        _uiState.update {
+            it.copy(
+                customIconBytes = null,
+                iconPackId = packUuid,
+                iconPackFile = filename,
+                packIconPath = path,
+            )
+        }
+    }
+
+    fun clearIcon() = _uiState.update {
+        it.copy(customIconBytes = null, iconPackId = null, iconPackFile = null, packIconPath = null)
+    }
 
     fun saveAccount(onSuccess: () -> Unit) {
         val state = _uiState.value
@@ -70,6 +107,9 @@ class AddAccountViewModel @Inject constructor(
                         period = state.period,
                         type = state.type,
                         group = state.group.trim().ifBlank { null },
+                        customIconBytes = state.customIconBytes,
+                        iconPackId = state.iconPackId,
+                        iconPackFile = state.iconPackFile,
                     ),
                 )
             }.onSuccess { onSuccess() }
@@ -110,4 +150,10 @@ data class AddAccountUiState(
     val parsedAccount: OtpAccount? = null,
     val error: String? = null,
     val isSaving: Boolean = false,
-)
+    val customIconBytes: ByteArray? = null,
+    val iconPackId: String? = null,
+    val iconPackFile: String? = null,
+    val packIconPath: String? = null,
+) {
+    val hasIcon: Boolean get() = customIconBytes != null || packIconPath != null
+}
