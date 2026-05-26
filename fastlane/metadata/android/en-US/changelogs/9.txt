@@ -1,0 +1,5 @@
+* New: Add navigation bar insets to HomeScreen FABs by @fthomys in https://github.com/fthomys/tokn/pull/23 to fix a issue
+* New: tap-to-reveal for OTP codes. Codes stay masked until you tap them (enable in Settings).
+* Fix: the system navigation bar no longer overlaps the "Add account" floating button on the home screen.
+* Fix: floating button padding on larger devices (tablets / foldables).
+* Hardening: sensitive cryptographic data is now cleared from memory after use.
