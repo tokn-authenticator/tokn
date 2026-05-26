@@ -203,7 +203,6 @@ fun AppearanceScreen(
                     },
                 )
             }
-            item { HorizontalDivider() }
             item {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.icon_packs_section)) },
