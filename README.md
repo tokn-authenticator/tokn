@@ -81,6 +81,16 @@ src="fastlane/metadata/android/en-US/images/phoneScreenshots/sync-send-receive.p
 src="fastlane/metadata/android/en-US/images/phoneScreenshots/sync-methods.png?raw=true">
 </p>
 
+## Icon packs
+
+Accounts can use a custom PNG you pick from your gallery, or an icon from an
+imported pack. Packs are `.zip` files containing a `pack.json` manifest plus
+the icon images. Import them from **Settings > Appearance > Icon packs**.
+
+Tokn uses the same pack format as Aegis, so existing Aegis icon packs work
+without conversion. A good ready-made source is
+[aegis-icons](https://aegis-icons.github.io/).
+
 ## Permissions, in plain English
 
 | Permission | What it's for |
