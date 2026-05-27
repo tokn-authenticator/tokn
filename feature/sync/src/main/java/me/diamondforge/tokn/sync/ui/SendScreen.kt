@@ -40,8 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -326,13 +326,11 @@ private fun AnimatedQr(
     onReset: () -> Unit,
 ) {
     val frames = state.qrFrames
-    val configuration = LocalConfiguration.current
+    val containerSize = LocalWindowInfo.current.containerSize
     val density = LocalDensity.current
-    val sizePx = remember(configuration) {
-        with(density) {
-            (minOf(configuration.screenWidthDp, configuration.screenHeightDp).dp.toPx() * 0.85f)
-                .toInt().coerceAtLeast(320)
-        }
+    val sizePx = remember(containerSize) {
+        (minOf(containerSize.width, containerSize.height) * 0.85f)
+            .toInt().coerceAtLeast(320)
     }
     val current = state.currentFrame.coerceIn(0, frames.lastIndex)
     val bitmap = remember(current, frames) { QrRenderer.render(frames[current], sizePx) }
