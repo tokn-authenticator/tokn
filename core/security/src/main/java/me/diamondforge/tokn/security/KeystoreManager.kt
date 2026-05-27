@@ -14,14 +14,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class KeystoreManager @Inject constructor(
+open class KeystoreManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
 ) {
-    private val keystore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+    private val keystore: KeyStore by lazy { KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) } }
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     @Synchronized
-    fun getDatabasePassphrase(): ByteArray {
+    open fun getDatabasePassphrase(): ByteArray {
         val stored = prefs.getString(KEY_DB_PASSPHRASE, null)
         if (stored != null) {
             return decrypt(stored)
@@ -32,7 +32,7 @@ class KeystoreManager @Inject constructor(
         return passphrase
     }
 
-    fun encrypt(data: ByteArray): String {
+    open fun encrypt(data: ByteArray): String {
         val key = getOrCreateKey()
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, key)
@@ -42,7 +42,7 @@ class KeystoreManager @Inject constructor(
         return Base64.encodeToString(combined, Base64.NO_WRAP)
     }
 
-    fun decrypt(encoded: String): ByteArray {
+    open fun decrypt(encoded: String): ByteArray {
         val combined = Base64.decode(encoded, Base64.NO_WRAP)
         val iv = combined.copyOfRange(0, GCM_IV_LENGTH)
         val encrypted = combined.copyOfRange(GCM_IV_LENGTH, combined.size)

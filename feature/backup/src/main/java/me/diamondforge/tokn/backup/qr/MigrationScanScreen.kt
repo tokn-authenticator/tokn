@@ -106,7 +106,7 @@ fun MigrationScanScreen(
 
     var showPartialWarning by remember { mutableStateOf(false) }
     val onCommitRequested: () -> Unit = {
-        if (uiState.expectedTotal > 0 && uiState.scanned < uiState.expectedTotal) {
+        if (uiState.isPartial) {
             showPartialWarning = true
         } else {
             viewModel.commit()

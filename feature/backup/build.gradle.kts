@@ -71,6 +71,8 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.org.json)
     testImplementation(libs.androidx.test.core)
+    testImplementation(libs.coroutines.test)
+    testImplementation(testFixtures(project(":core:domain")))
 
     debugImplementation(libs.compose.ui.tooling)
 }

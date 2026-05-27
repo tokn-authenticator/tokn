@@ -17,40 +17,40 @@ import javax.inject.Singleton
 private val Context.userPrefsDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 @Singleton
-class UserPreferencesRepository @Inject constructor(
+open class UserPreferencesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     private val dataStore = context.userPrefsDataStore
 
-    val themeMode: Flow<ThemeMode> = dataStore.data.map { prefs ->
+    open val themeMode: Flow<ThemeMode> = dataStore.data.map { prefs ->
         ThemeMode.valueOf(prefs[Keys.THEME_MODE] ?: ThemeMode.SYSTEM.name)
     }
 
-    val autoLockTimeoutSeconds: Flow<Int> = dataStore.data.map { prefs ->
+    open val autoLockTimeoutSeconds: Flow<Int> = dataStore.data.map { prefs ->
         prefs[Keys.AUTO_LOCK_TIMEOUT] ?: 60
     }
 
-    val biometricEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+    open val biometricEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.BIOMETRIC_ENABLED] ?: true
     }
 
-    val screenshotsEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+    open val screenshotsEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.SCREENSHOTS_ENABLED] ?: false
     }
 
-    val encryptionEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+    open val encryptionEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.ENCRYPTION_ENABLED] ?: false
     }
 
-    val tapToRevealEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+    open val tapToRevealEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.TAP_TO_REVEAL_ENABLED] ?: false
     }
 
-    val onboardingDone: Flow<Boolean> = dataStore.data.map { prefs ->
+    open val onboardingDone: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.ONBOARDING_DONE] ?: false
     }
 
-    val lastSyncMethod: Flow<SyncMethod> = dataStore.data.map { prefs ->
+    open val lastSyncMethod: Flow<SyncMethod> = dataStore.data.map { prefs ->
         prefs[Keys.LAST_SYNC_METHOD]
             ?.let { runCatching { SyncMethod.valueOf(it) }.getOrNull() }
             ?: SyncMethod.LAN

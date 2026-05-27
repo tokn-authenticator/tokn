@@ -30,7 +30,13 @@ data class MigrationScanUiState(
     val invalidScan: Long = 0L,                   // bumps on each non-migration QR
     val result: ImportResult? = null,
     val errorMalformed: Boolean = false,
-)
+) {
+    /**
+     * True when at least one batch has been scanned but the full set isn't complete yet.
+     * The UI uses this to warn before committing a partial Google Authenticator export.
+     */
+    val isPartial: Boolean get() = expectedTotal > 0 && scanned < expectedTotal
+}
 
 @HiltViewModel
 class MigrationScanViewModel @Inject constructor(
