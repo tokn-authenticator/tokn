@@ -19,12 +19,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,7 +42,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -63,6 +68,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.backup.R
 import java.util.concurrent.Executors
 
@@ -76,14 +84,32 @@ fun MigrationScanScreen(
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val imageLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent(),
-    ) { uri ->
-        if (uri != null) {
-            val decoded = decodeQrFromUri(context, uri)
-            if (decoded != null) viewModel.onScanned(decoded)
-            else viewModel.onScanned("")  // triggers invalid bump in state
+        ActivityResultContracts.GetMultipleContents(),
+    ) { uris ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        scope.launch {
+            uris.forEach { uri ->
+                val decoded = withContext(Dispatchers.IO) { decodeQrFromUri(context, uri) }
+                if (decoded != null) viewModel.onScanned(decoded)
+                else viewModel.onScanned("")  // triggers invalid bump in state
+            }
+        }
+    }
+
+    val onPickImages: () -> Unit = {
+        viewModel.suppressLock()
+        imageLauncher.launch("image/*")
+    }
+
+    var showPartialWarning by remember { mutableStateOf(false) }
+    val onCommitRequested: () -> Unit = {
+        if (uiState.expectedTotal > 0 && uiState.scanned < uiState.expectedTotal) {
+            showPartialWarning = true
+        } else {
+            viewModel.commit()
         }
     }
 
@@ -155,6 +181,35 @@ fun MigrationScanScreen(
         )
     }
 
+    if (showPartialWarning) {
+        AlertDialog(
+            onDismissRequest = { showPartialWarning = false },
+            title = { Text(stringResource(R.string.migration_partial_warning_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.migration_partial_warning_body,
+                        uiState.scanned,
+                        uiState.expectedTotal,
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPartialWarning = false
+                    viewModel.commit()
+                }) {
+                    Text(stringResource(R.string.migration_partial_warning_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPartialWarning = false }) {
+                    Text(stringResource(R.string.migration_partial_warning_keep_scanning))
+                }
+            },
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -164,18 +219,9 @@ fun MigrationScanScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.suppressLock()
-                        imageLauncher.launch("image/*")
-                    }) {
-                        Icon(Icons.Default.Image, contentDescription = stringResource(R.string.migration_from_image))
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White,
                     titleContentColor = Color.White,
                 ),
             )
@@ -201,6 +247,20 @@ fun MigrationScanScreen(
                     Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
                         Text(stringResource(R.string.grant_permission))
                     }
+                    Spacer(Modifier.height(12.dp))
+                    Button(
+                        onClick = onPickImages,
+                        modifier = Modifier.height(52.dp),
+                        shape = RoundedCornerShape(26.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Black.copy(alpha = 0.7f),
+                            contentColor = Color.White,
+                        ),
+                    ) {
+                        Icon(Icons.Default.Image, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.migration_pick_images))
+                    }
                 }
             } else {
                 CameraPreview(
@@ -218,8 +278,10 @@ fun MigrationScanScreen(
                 CommitBar(
                     isComplete = uiState.isComplete,
                     isLoading = uiState.isLoading,
-                    enabled = uiState.scanned > 0 && !uiState.isLoading,
-                    onClick = viewModel::commit,
+                    hasScans = uiState.scanned > 0,
+                    commitEnabled = uiState.scanned > 0 && !uiState.isLoading,
+                    onCommit = onCommitRequested,
+                    onPickImages = onPickImages,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
@@ -344,32 +406,57 @@ private fun ProgressChip(scanned: Int, total: Int, modifier: Modifier = Modifier
 private fun CommitBar(
     isComplete: Boolean,
     isLoading: Boolean,
-    enabled: Boolean,
-    onClick: () -> Unit,
+    hasScans: Boolean,
+    commitEnabled: Boolean,
+    onCommit: () -> Unit,
+    onPickImages: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    Column(
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
-        color = Color.Black.copy(alpha = 0.6f),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            if (isComplete) {
+        if (isComplete) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = Color.Black.copy(alpha = 0.6f),
+            ) {
                 Text(
                     stringResource(R.string.migration_all_codes_scanned),
                     color = Color.White,
                     style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
-                Spacer(Modifier.height(8.dp))
             }
+        }
+        if (hasScans) {
             Button(
-                onClick = onClick,
-                enabled = enabled,
-                modifier = Modifier.fillMaxWidth().height(48.dp),
+                onClick = onCommit,
+                enabled = commitEnabled,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(26.dp),
             ) {
-                if (isLoading) CircularProgressIndicator(modifier = Modifier.height(24.dp))
+                if (isLoading) CircularProgressIndicator(
+                    modifier = Modifier.height(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
                 else Text(stringResource(R.string.migration_import_now))
             }
+        }
+        Button(
+            onClick = onPickImages,
+            enabled = !isLoading,
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            shape = RoundedCornerShape(26.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black.copy(alpha = 0.7f),
+                contentColor = Color.White,
+            ),
+        ) {
+            Icon(Icons.Default.Image, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.migration_pick_images))
         }
     }
 }

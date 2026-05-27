@@ -170,6 +170,11 @@ fun BackupScreen(
     }
 
     if (showSourcePicker) {
+        val selectedOption = pickerOptions.firstOrNull { it.id == selectedImporterId }
+        val confirmLabelRes = when (selectedOption) {
+            is ImportPickerOption.MigrationQr -> R.string.other_import_action_scan_qr
+            is ImportPickerOption.File, null -> R.string.other_import_action_select_file
+        }
         AlertDialog(
             onDismissRequest = { showSourcePicker = false },
             title = { Text(stringResource(R.string.other_import_select_app)) },
@@ -205,11 +210,11 @@ fun BackupScreen(
                     onClick = {
                         showSourcePicker = false
                         viewModel.suppressLock()
-                        when (val selected = pickerOptions.firstOrNull { it.id == selectedImporterId }) {
+                        when (selectedOption) {
                             is ImportPickerOption.File ->
                                 externalLauncher.launch(
                                     viewModel.externalImporters
-                                        .first { it.id == selected.id }
+                                        .first { it.id == selectedOption.id }
                                         .acceptedMimeTypes,
                                 )
                             is ImportPickerOption.MigrationQr -> onScanMigration()
@@ -218,7 +223,7 @@ fun BackupScreen(
                     },
                     enabled = selectedImporterId.isNotEmpty(),
                 ) {
-                    Text(stringResource(R.string.other_import_button))
+                    Text(stringResource(confirmLabelRes))
                 }
             },
             dismissButton = {
