@@ -54,6 +54,7 @@ class WfdManager(private val context: Context) {
                     val state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1)
                     _enabled.value = state == WifiP2pManager.WIFI_P2P_STATE_ENABLED
                 }
+
                 WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
                     if (!hasNearbyPermission()) return
                     @SuppressLint("MissingPermission")
@@ -61,6 +62,7 @@ class WfdManager(private val context: Context) {
                         _peers.value = devices.deviceList.toList()
                     }
                 }
+
                 WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
                     mgr.requestConnectionInfo(ch) { info -> _connectionInfo.value = info }
                 }
@@ -77,7 +79,12 @@ class WfdManager(private val context: Context) {
             addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)
             addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)
         }
-        ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+        ContextCompat.registerReceiver(
+            context,
+            receiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         registered = true
     }
 
@@ -133,8 +140,13 @@ class WfdManager(private val context: Context) {
 
     private fun actionListener(cont: kotlinx.coroutines.CancellableContinuation<Boolean>) =
         object : WifiP2pManager.ActionListener {
-            override fun onSuccess() { if (cont.isActive) cont.resume(true) }
-            override fun onFailure(reason: Int) { if (cont.isActive) cont.resume(false) }
+            override fun onSuccess() {
+                if (cont.isActive) cont.resume(true)
+            }
+
+            override fun onFailure(reason: Int) {
+                if (cont.isActive) cont.resume(false)
+            }
         }
 
     private fun hasNearbyPermission(): Boolean {

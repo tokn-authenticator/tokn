@@ -2,6 +2,7 @@ package me.diamondforge.tokn.security
 
 import android.content.Context
 import android.util.Base64
+import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.security.SecureRandom
 import javax.crypto.Cipher
@@ -11,7 +12,6 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.content.edit
 
 @Singleton
 class VaultPasswordManager @Inject constructor(

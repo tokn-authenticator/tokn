@@ -74,7 +74,8 @@ fun SelectAccountsScreen(
                 },
                 actions = {
                     TextButton(onClick = {
-                        selectedIds = if (allSelected) emptySet() else accounts.map { it.id }.toSet()
+                        selectedIds =
+                            if (allSelected) emptySet() else accounts.map { it.id }.toSet()
                     }) {
                         Text(
                             if (allSelected) stringResource(R.string.sync_select_none)
@@ -92,7 +93,9 @@ fun SelectAccountsScreen(
             ) {
                 HorizontalDivider()
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -115,7 +118,9 @@ fun SelectAccountsScreen(
             }
         },
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)) {
             if (!initialized && accounts.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -126,7 +131,9 @@ fun SelectAccountsScreen(
                 }
             } else if (accounts.isEmpty()) {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {

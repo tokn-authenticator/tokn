@@ -71,7 +71,8 @@ fun AppearanceScreen(
             "de" to "Deutsch",
         )
     }
-    val currentLangLabel = languages.firstOrNull { it.first == currentLangTag }?.second ?: systemDefaultLabel
+    val currentLangLabel =
+        languages.firstOrNull { it.first == currentLangTag }?.second ?: systemDefaultLabel
 
     if (showLangDialog) {
         AlertDialog(

@@ -6,8 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import me.diamondforge.tokn.data.db.entity.OtpAccountEntity
 import kotlinx.coroutines.flow.Flow
+import me.diamondforge.tokn.data.db.entity.OtpAccountEntity
 
 @Dao
 interface OtpAccountDao {

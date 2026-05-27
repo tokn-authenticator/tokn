@@ -40,7 +40,9 @@ fun SyncErrorCard(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         color = MaterialTheme.colorScheme.errorContainer,
         contentColor = MaterialTheme.colorScheme.onErrorContainer,
         shape = RoundedCornerShape(16.dp),
@@ -52,7 +54,9 @@ fun SyncErrorCard(
             Icon(
                 imageVector = Icons.Default.ErrorOutline,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp).padding(top = 2.dp),
+                modifier = Modifier
+                    .size(20.dp)
+                    .padding(top = 2.dp),
             )
             Spacer(Modifier.size(12.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -68,7 +72,10 @@ fun SyncErrorCard(
                 )
             }
             IconButton(onClick = onDismiss) {
-                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.sync_error_dismiss))
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = stringResource(R.string.sync_error_dismiss)
+                )
             }
         }
     }

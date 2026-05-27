@@ -18,7 +18,12 @@ class IconSuggestionTest {
     }
 
     private fun icon(filename: String, vararg issuers: String) =
-        IconPackIcon(filename = filename, displayName = filename, category = null, issuerMatches = issuers.toList())
+        IconPackIcon(
+            filename = filename,
+            displayName = filename,
+            category = null,
+            issuerMatches = issuers.toList()
+        )
 
     @Test
     fun `blank issuer yields empty list`() {
@@ -39,7 +44,10 @@ class IconSuggestionTest {
     fun `normal match (icon contains query) sorts before inverse match (query contains icon)`() {
         val pack = installed(
             icon("normal.svg", "GitHub Actions"),  // candidate contains query "GitHub" — NORMAL
-            icon("inverse.svg", "Git"),            // query "GitHub" contains candidate "Git" — INVERSE
+            icon(
+                "inverse.svg",
+                "Git"
+            ),            // query "GitHub" contains candidate "Git" — INVERSE
         )
         val result = pack.suggestionsFor("GitHub")
         assertEquals(2, result.size)

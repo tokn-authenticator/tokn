@@ -23,7 +23,8 @@ class FakeAccountRepository(
     override fun getAccounts(): Flow<List<OtpAccount>> = state.asStateFlow()
 
     override suspend fun addAccount(account: OtpAccount): Long {
-        val assigned = if (account.id == 0L) nextId++ else account.id.also { nextId = maxOf(nextId, it + 1) }
+        val assigned =
+            if (account.id == 0L) nextId++ else account.id.also { nextId = maxOf(nextId, it + 1) }
         state.value = state.value + account.copy(id = assigned)
         return assigned
     }

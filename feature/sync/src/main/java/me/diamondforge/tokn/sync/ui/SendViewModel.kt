@@ -110,6 +110,7 @@ class SendViewModel @Inject constructor(
                 when (result) {
                     LanSyncServer.SendResult.Ok ->
                         _uiState.update { it.copy(status = SendUiState.Status.Done) }
+
                     LanSyncServer.SendResult.BadCode ->
                         _uiState.update {
                             it.copy(
@@ -117,11 +118,15 @@ class SendViewModel @Inject constructor(
                                 errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_bad_code),
                             )
                         }
+
                     is LanSyncServer.SendResult.VersionMismatch ->
                         _uiState.update {
                             it.copy(
                                 status = SendUiState.Status.Idle,
-                                versionMismatch = versionMismatchInfo(result.peerApp, result.peerBuild),
+                                versionMismatch = versionMismatchInfo(
+                                    result.peerApp,
+                                    result.peerBuild
+                                ),
                             )
                         }
                 }
@@ -130,7 +135,8 @@ class SendViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
-                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_transfer),
+                        errorMessage = e.message
+                            ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_transfer),
                     )
                 }
             }
@@ -175,6 +181,7 @@ class SendViewModel @Inject constructor(
                 when (result) {
                     WfdSyncTransport.SendResult.Ok ->
                         _uiState.update { it.copy(status = SendUiState.Status.Done) }
+
                     WfdSyncTransport.SendResult.BadCode ->
                         _uiState.update {
                             it.copy(
@@ -182,11 +189,15 @@ class SendViewModel @Inject constructor(
                                 errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_bad_code),
                             )
                         }
+
                     is WfdSyncTransport.SendResult.VersionMismatch ->
                         _uiState.update {
                             it.copy(
                                 status = SendUiState.Status.Idle,
-                                versionMismatch = versionMismatchInfo(result.peerApp, result.peerBuild),
+                                versionMismatch = versionMismatchInfo(
+                                    result.peerApp,
+                                    result.peerBuild
+                                ),
                             )
                         }
                 }
@@ -195,7 +206,8 @@ class SendViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
-                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_transfer),
+                        errorMessage = e.message
+                            ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_transfer),
                     )
                 }
             }
@@ -216,11 +228,17 @@ class SendViewModel @Inject constructor(
 
     fun prepareQr(passphrase: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(status = SendUiState.Status.Transferring, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    status = SendUiState.Status.Transferring,
+                    errorMessage = null
+                )
+            }
             runCatching {
                 withContext(Dispatchers.Default) {
                     val plain = SyncPayload.serialize(selectedAccounts())
-                    val payload = encryptionManager.encrypt(plain.toByteArray(Charsets.UTF_8), passphrase)
+                    val payload =
+                        encryptionManager.encrypt(plain.toByteArray(Charsets.UTF_8), passphrase)
                     val wrapper = JSONObject().apply {
                         put("ciphertext", payload.ciphertext)
                         put("iv", payload.iv)
@@ -245,7 +263,8 @@ class SendViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         status = SendUiState.Status.Idle,
-                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_encrypt),
+                        errorMessage = e.message
+                            ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_encrypt),
                     )
                 }
             }

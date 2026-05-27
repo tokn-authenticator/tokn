@@ -1,7 +1,7 @@
 package me.diamondforge.tokn.domain.repository
 
-import me.diamondforge.tokn.domain.model.OtpAccount
 import kotlinx.coroutines.flow.Flow
+import me.diamondforge.tokn.domain.model.OtpAccount
 
 interface AccountRepository {
     fun getAccounts(): Flow<List<OtpAccount>>

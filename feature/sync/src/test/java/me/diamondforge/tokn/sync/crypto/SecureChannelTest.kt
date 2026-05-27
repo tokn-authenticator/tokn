@@ -140,7 +140,10 @@ class SecureChannelTest {
             respKeys,
         )
         val ex = assertThrows(IllegalArgumentException::class.java) { respChan.receive() }
-        assertTrue("expected bad frame error, got ${ex.message}", ex.message?.contains("bad frame size") == true)
+        assertTrue(
+            "expected bad frame error, got ${ex.message}",
+            ex.message?.contains("bad frame size") == true
+        )
     }
 
     @Test
@@ -215,7 +218,7 @@ class SecureChannelTest {
 
     private fun readInt(bytes: ByteArray, offset: Int): Int =
         ((bytes[offset].toInt() and 0xff) shl 24) or
-            ((bytes[offset + 1].toInt() and 0xff) shl 16) or
-            ((bytes[offset + 2].toInt() and 0xff) shl 8) or
-            (bytes[offset + 3].toInt() and 0xff)
+                ((bytes[offset + 1].toInt() and 0xff) shl 16) or
+                ((bytes[offset + 2].toInt() and 0xff) shl 8) or
+                (bytes[offset + 3].toInt() and 0xff)
 }

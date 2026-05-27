@@ -88,7 +88,13 @@ class ReceiveViewModel @Inject constructor(
                 client.receivePayload(peer, code, appInfo.versionName, appInfo.versionCode)
             }.onSuccess { result ->
                 when (result) {
-                    is LanSyncClient.ReceiveResult.Ok -> applyJsonPayload(String(result.payload, Charsets.UTF_8))
+                    is LanSyncClient.ReceiveResult.Ok -> applyJsonPayload(
+                        String(
+                            result.payload,
+                            Charsets.UTF_8
+                        )
+                    )
+
                     LanSyncClient.ReceiveResult.BadCode ->
                         _uiState.update {
                             it.copy(
@@ -97,12 +103,16 @@ class ReceiveViewModel @Inject constructor(
                                 errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_bad_code),
                             )
                         }
+
                     is LanSyncClient.ReceiveResult.VersionMismatch ->
                         _uiState.update {
                             it.copy(
                                 status = ReceiveUiState.Status.Idle,
                                 activePeer = null,
-                                versionMismatch = versionMismatchInfo(result.peerApp, result.peerBuild),
+                                versionMismatch = versionMismatchInfo(
+                                    result.peerApp,
+                                    result.peerBuild
+                                ),
                             )
                         }
                 }
@@ -112,7 +122,8 @@ class ReceiveViewModel @Inject constructor(
                     it.copy(
                         status = ReceiveUiState.Status.Idle,
                         activePeer = null,
-                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_connection),
+                        errorMessage = e.message
+                            ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_connection),
                     )
                 }
             }
@@ -137,7 +148,11 @@ class ReceiveViewModel @Inject constructor(
         val assembled = QrChunkCodec.assemble(qrChunks, chunk.total)
         if (assembled == null) {
             _uiState.update {
-                it.copy(qrSeen = qrChunks.size, qrTotal = chunk.total, errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_error_qr_reassemble))
+                it.copy(
+                    qrSeen = qrChunks.size,
+                    qrTotal = chunk.total,
+                    errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_error_qr_reassemble)
+                )
             }
             return
         }
@@ -197,6 +212,7 @@ class ReceiveViewModel @Inject constructor(
                 val msg = when (e) {
                     is AEADBadTagException, is BadPaddingException ->
                         context.getString(me.diamondforge.tokn.sync.R.string.sync_qr_wrong_passphrase)
+
                     else -> e.message
                         ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_decrypt)
                 }
@@ -241,7 +257,8 @@ class ReceiveViewModel @Inject constructor(
                 if (!ok) error(context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_connect))
                 val info = withTimeoutOrNull(45_000) {
                     wfdManager.connectionInfo.first { it != null && it.groupFormed && it.groupOwnerAddress != null }
-                } ?: error(context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_group_form))
+                }
+                    ?: error(context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_group_form))
                 WfdSyncTransport.receiveOverWfd(
                     groupOwner = info.groupOwnerAddress!!,
                     code = code,
@@ -252,6 +269,7 @@ class ReceiveViewModel @Inject constructor(
                 when (result) {
                     is WfdSyncTransport.ReceiveResult.Ok ->
                         applyJsonPayload(String(result.payload, Charsets.UTF_8))
+
                     WfdSyncTransport.ReceiveResult.BadCode ->
                         _uiState.update {
                             it.copy(
@@ -259,11 +277,15 @@ class ReceiveViewModel @Inject constructor(
                                 errorMessage = context.getString(me.diamondforge.tokn.sync.R.string.sync_bad_code),
                             )
                         }
+
                     is WfdSyncTransport.ReceiveResult.VersionMismatch ->
                         _uiState.update {
                             it.copy(
                                 status = ReceiveUiState.Status.Idle,
-                                versionMismatch = versionMismatchInfo(result.peerApp, result.peerBuild),
+                                versionMismatch = versionMismatchInfo(
+                                    result.peerApp,
+                                    result.peerBuild
+                                ),
                             )
                         }
                 }
@@ -272,7 +294,8 @@ class ReceiveViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         status = ReceiveUiState.Status.Idle,
-                        errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_connect),
+                        errorMessage = e.message
+                            ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_connect),
                     )
                 }
             }
@@ -318,7 +341,8 @@ class ReceiveViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     status = ReceiveUiState.Status.Idle,
-                    errorMessage = e.message ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_parse),
+                    errorMessage = e.message
+                        ?: context.getString(me.diamondforge.tokn.sync.R.string.sync_error_parse),
                 )
             }
         }

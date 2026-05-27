@@ -5,9 +5,13 @@ import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+
 class GenerateOtpUseCase {
 
-    operator fun invoke(account: OtpAccount, timeMillis: Long = System.currentTimeMillis()): OtpResult {
+    operator fun invoke(
+        account: OtpAccount,
+        timeMillis: Long = System.currentTimeMillis()
+    ): OtpResult {
         val counter = when (account.type) {
             OtpType.TOTP -> timeMillis / 1000 / account.period
             OtpType.HOTP -> account.counter
@@ -20,6 +24,7 @@ class GenerateOtpUseCase {
                 val periodMillis = account.period * 1000L
                 periodMillis - (timeMillis % periodMillis)
             }
+
             OtpType.HOTP -> -1L
         }
         return OtpResult(code, remainingMillis, account.period * 1000L)
@@ -51,9 +56,9 @@ class GenerateOtpUseCase {
 
         val offset = hmac.last().toInt() and 0x0f
         val binary = ((hmac[offset].toInt() and 0x7f) shl 24) or
-            ((hmac[offset + 1].toInt() and 0xff) shl 16) or
-            ((hmac[offset + 2].toInt() and 0xff) shl 8) or
-            (hmac[offset + 3].toInt() and 0xff)
+                ((hmac[offset + 1].toInt() and 0xff) shl 16) or
+                ((hmac[offset + 2].toInt() and 0xff) shl 8) or
+                (hmac[offset + 3].toInt() and 0xff)
 
         val modulus = intPow10(digits)
         val otp = binary % modulus

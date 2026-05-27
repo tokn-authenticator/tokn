@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -116,7 +115,8 @@ class IconPackManager @Inject constructor(
                     val bytes = zis.readBytes()
                     outFile.writeBytes(bytes)
                     if (name.equals("pack.json", ignoreCase = true) ||
-                        name.endsWith("/pack.json", ignoreCase = true)) {
+                        name.endsWith("/pack.json", ignoreCase = true)
+                    ) {
                         packJsonBytes = bytes
                     }
                     zis.closeEntry()

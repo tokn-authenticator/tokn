@@ -107,6 +107,7 @@ fun FromImageScreen(
                         )
                     }
                 }
+
                 error != null -> {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,

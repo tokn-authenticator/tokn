@@ -48,6 +48,7 @@ class AegisImporter @Inject constructor() : ExternalImporter {
                 if (password.isNullOrEmpty()) ImportOutcome.NeedsPassword
                 else decryptAndRead(root, password)
             }
+
             else -> ImportOutcome.Malformed()
         }
     }

@@ -83,7 +83,8 @@ class EncryptionManagerTest {
         val idx = indexOfFirst { it.isLetter() }
         require(idx >= 0)
         val sb = StringBuilder(this)
-        sb[idx] = if (this[idx].isUpperCase()) this[idx].lowercaseChar() else this[idx].uppercaseChar()
+        sb[idx] =
+            if (this[idx].isUpperCase()) this[idx].lowercaseChar() else this[idx].uppercaseChar()
         return sb.toString()
     }
 }

@@ -2,6 +2,12 @@ package me.diamondforge.tokn.data.di
 
 import android.content.Context
 import androidx.room.Room
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import me.diamondforge.tokn.data.db.AppDatabase
 import me.diamondforge.tokn.data.db.dao.OtpAccountDao
 import me.diamondforge.tokn.data.repository.AccountRepositoryImpl
@@ -10,18 +16,12 @@ import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
-import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
-import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
+import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
+import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import me.diamondforge.tokn.security.KeystoreManager
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import javax.inject.Singleton
 
@@ -69,7 +69,8 @@ object DataModule {
     fun provideGetAccountByIdUseCase(repo: AccountRepository) = GetAccountByIdUseCase(repo)
 
     @Provides
-    fun provideIncrementHotpCounterUseCase(repo: AccountRepository) = IncrementHotpCounterUseCase(repo)
+    fun provideIncrementHotpCounterUseCase(repo: AccountRepository) =
+        IncrementHotpCounterUseCase(repo)
 
     @Provides
     fun provideGenerateOtpUseCase() = GenerateOtpUseCase()

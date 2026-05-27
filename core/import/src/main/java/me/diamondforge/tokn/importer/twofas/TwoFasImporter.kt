@@ -60,7 +60,8 @@ class TwoFasImporter @Inject constructor() : ExternalImporter {
         val iv = runCatching { Base64.decode(parts[2], Base64.DEFAULT) }
             .getOrElse { return ImportOutcome.Malformed(it) }
 
-        val key = Pbkdf2AesGcm.deriveKey(password.toCharArray(), salt, PBKDF2_ITERATIONS, AES_KEY_BITS)
+        val key =
+            Pbkdf2AesGcm.deriveKey(password.toCharArray(), salt, PBKDF2_ITERATIONS, AES_KEY_BITS)
         val plaintext = runCatching { Pbkdf2AesGcm.decrypt(key, iv, ciphertext) }
             .getOrElse { e ->
                 return if (e is AEADBadTagException || e is BadPaddingException)

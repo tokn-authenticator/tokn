@@ -58,7 +58,10 @@ class TwoFasRealBackupTest {
     fun `real encrypted backup with wrong password returns WrongPassword`() {
         val raw = loadResource("importers/twofas/sample_encrypted_v4.2fas")
         val outcome = importer.parse(raw, password = "nope")
-        assertTrue("expected WrongPassword but was $outcome", outcome is ImportOutcome.WrongPassword)
+        assertTrue(
+            "expected WrongPassword but was $outcome",
+            outcome is ImportOutcome.WrongPassword
+        )
     }
 
     private fun loadResource(path: String): ByteArray =

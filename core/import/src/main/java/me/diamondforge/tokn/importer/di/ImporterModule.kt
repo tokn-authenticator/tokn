@@ -19,12 +19,15 @@ import me.diamondforge.tokn.importer.twofas.TwoFasImporter
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ImporterModule {
-    @Binds @IntoSet
+    @Binds
+    @IntoSet
     abstract fun bindAegis(impl: AegisImporter): ExternalImporter
 
-    @Binds @IntoSet
+    @Binds
+    @IntoSet
     abstract fun bindTwoFas(impl: TwoFasImporter): ExternalImporter
 
-    @Binds @IntoSet
+    @Binds
+    @IntoSet
     abstract fun bindOtpAuthUri(impl: OtpAuthUriImporter): ExternalImporter
 }

@@ -60,9 +60,30 @@ class MigrationScanViewModelTest {
     fun `scanning all batches of one vault reaches completion`() = runTest(dispatcher) {
         val vm = newVm()
         val batchId = 77
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("AAAA", "a")), batchIndex = 0, batchSize = 3, batchId = batchId))
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("BBBB", "b")), batchIndex = 1, batchSize = 3, batchId = batchId))
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("CCCC", "c")), batchIndex = 2, batchSize = 3, batchId = batchId))
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("AAAA", "a")),
+                batchIndex = 0,
+                batchSize = 3,
+                batchId = batchId
+            )
+        )
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("BBBB", "b")),
+                batchIndex = 1,
+                batchSize = 3,
+                batchId = batchId
+            )
+        )
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("CCCC", "c")),
+                batchIndex = 2,
+                batchSize = 3,
+                batchId = batchId
+            )
+        )
 
         val state = vm.uiState.value
         assertEquals(3, state.scanned)
@@ -74,7 +95,14 @@ class MigrationScanViewModelTest {
     @Test
     fun `isPartial is true while batches are missing`() = runTest(dispatcher) {
         val vm = newVm()
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("AAAA", "a")), batchIndex = 0, batchSize = 2, batchId = 1))
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("AAAA", "a")),
+                batchIndex = 0,
+                batchSize = 2,
+                batchId = 1
+            )
+        )
         val state = vm.uiState.value
         assertEquals(1, state.scanned)
         assertEquals(2, state.expectedTotal)
@@ -85,7 +113,12 @@ class MigrationScanViewModelTest {
     @Test
     fun `duplicate batch index does not advance the count`() = runTest(dispatcher) {
         val vm = newVm()
-        val uri = MigrationFixture.buildUri(listOf(entry("AAAA", "a")), batchIndex = 0, batchSize = 2, batchId = 1)
+        val uri = MigrationFixture.buildUri(
+            listOf(entry("AAAA", "a")),
+            batchIndex = 0,
+            batchSize = 2,
+            batchId = 1
+        )
         vm.onScanned(uri)
         val firstDup = vm.uiState.value.justDuplicate
         vm.onScanned(uri)
@@ -94,22 +127,47 @@ class MigrationScanViewModelTest {
     }
 
     @Test
-    fun `scanning a different vault surfaces a cross-vault prompt without losing progress`() = runTest(dispatcher) {
-        val vm = newVm()
-        val first = MigrationFixture.buildUri(listOf(entry("AAAA", "a")), batchIndex = 0, batchSize = 2, batchId = 100)
-        val other = MigrationFixture.buildUri(listOf(entry("BBBB", "b")), batchIndex = 0, batchSize = 2, batchId = 200)
-        vm.onScanned(first)
-        vm.onScanned(other)
+    fun `scanning a different vault surfaces a cross-vault prompt without losing progress`() =
+        runTest(dispatcher) {
+            val vm = newVm()
+            val first = MigrationFixture.buildUri(
+                listOf(entry("AAAA", "a")),
+                batchIndex = 0,
+                batchSize = 2,
+                batchId = 100
+            )
+            val other = MigrationFixture.buildUri(
+                listOf(entry("BBBB", "b")),
+                batchIndex = 0,
+                batchSize = 2,
+                batchId = 200
+            )
+            vm.onScanned(first)
+            vm.onScanned(other)
 
-        assertNotNull(vm.uiState.value.crossVaultPending)
-        assertEquals(1, vm.uiState.value.scanned)  // unchanged
-    }
+            assertNotNull(vm.uiState.value.crossVaultPending)
+            assertEquals(1, vm.uiState.value.scanned)  // unchanged
+        }
 
     @Test
     fun `confirmCrossVault replaces the session with the new vault`() = runTest(dispatcher) {
         val vm = newVm()
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("AAAA", "a")), batchIndex = 0, batchSize = 2, batchId = 100))
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("BBBB", "b")), batchIndex = 0, batchSize = 3, batchId = 200))
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("AAAA", "a")),
+                batchIndex = 0,
+                batchSize = 2,
+                batchId = 100
+            )
+        )
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("BBBB", "b")),
+                batchIndex = 0,
+                batchSize = 3,
+                batchId = 200
+            )
+        )
         vm.confirmCrossVault()
 
         val state = vm.uiState.value
@@ -121,14 +179,35 @@ class MigrationScanViewModelTest {
     @Test
     fun `dismissCrossVault clears the prompt and keeps original progress`() = runTest(dispatcher) {
         val vm = newVm()
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("AAAA", "a")), batchIndex = 0, batchSize = 2, batchId = 100))
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("BBBB", "b")), batchIndex = 0, batchSize = 2, batchId = 200))
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("AAAA", "a")),
+                batchIndex = 0,
+                batchSize = 2,
+                batchId = 100
+            )
+        )
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("BBBB", "b")),
+                batchIndex = 0,
+                batchSize = 2,
+                batchId = 200
+            )
+        )
         vm.dismissCrossVault()
 
         assertNull(vm.uiState.value.crossVaultPending)
         assertEquals(1, vm.uiState.value.scanned)
         // The original vault is still active: a second batch of id 100 is accepted.
-        vm.onScanned(MigrationFixture.buildUri(listOf(entry("AAAA2", "a2")), batchIndex = 1, batchSize = 2, batchId = 100))
+        vm.onScanned(
+            MigrationFixture.buildUri(
+                listOf(entry("AAAA2", "a2")),
+                batchIndex = 1,
+                batchSize = 2,
+                batchId = 100
+            )
+        )
         assertEquals(2, vm.uiState.value.scanned)
     }
 
@@ -142,31 +221,32 @@ class MigrationScanViewModelTest {
     }
 
     @Test
-    fun `commit imports scanned accounts and deduplicates against existing secrets`() = runTest(dispatcher) {
-        // Pre-seed an account whose secret matches one we will scan; it should be skipped.
-        val sharedSecret = "AAAA"
-        runBlocking {
-            // The importer base32-encodes raw secret bytes, so seed the repo with that form.
-            repo.addAccount(existing(base32Of(sharedSecret)))
-        }
-        val vm = newVm()
-        vm.onScanned(
-            MigrationFixture.buildUri(
-                listOf(entry(sharedSecret, "dup"), entry("BBBB", "fresh")),
-                batchIndex = 0,
-                batchSize = 1,
-                batchId = 1,
-            ),
-        )
-        vm.commit()
-        advanceUntilIdle()
+    fun `commit imports scanned accounts and deduplicates against existing secrets`() =
+        runTest(dispatcher) {
+            // Pre-seed an account whose secret matches one we will scan; it should be skipped.
+            val sharedSecret = "AAAA"
+            runBlocking {
+                // The importer base32-encodes raw secret bytes, so seed the repo with that form.
+                repo.addAccount(existing(base32Of(sharedSecret)))
+            }
+            val vm = newVm()
+            vm.onScanned(
+                MigrationFixture.buildUri(
+                    listOf(entry(sharedSecret, "dup"), entry("BBBB", "fresh")),
+                    batchIndex = 0,
+                    batchSize = 1,
+                    batchId = 1,
+                ),
+            )
+            vm.commit()
+            advanceUntilIdle()
 
-        val result = vm.uiState.first { it.result != null }.result!!
-        assertEquals(2, result.found)
-        assertEquals(1, result.imported)  // the duplicate is skipped
-        // Repo now holds the pre-seeded one plus the single fresh import.
-        assertEquals(2, repo.snapshot.size)
-    }
+            val result = vm.uiState.first { it.result != null }.result!!
+            assertEquals(2, result.found)
+            assertEquals(1, result.imported)  // the duplicate is skipped
+            // Repo now holds the pre-seeded one plus the single fresh import.
+            assertEquals(2, repo.snapshot.size)
+        }
 
     @Test
     fun `commit on an empty session is a no-op`() = runTest(dispatcher) {

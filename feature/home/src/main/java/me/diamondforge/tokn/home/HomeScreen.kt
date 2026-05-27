@@ -17,6 +17,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,15 +37,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.runtime.collectAsState
-import coil3.compose.AsyncImage
-import coil3.compose.AsyncImagePainter
-import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.SubcomposeAsyncImageContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -75,9 +69,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -87,6 +81,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -97,16 +92,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -114,9 +110,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import me.diamondforge.tokn.domain.model.OtpType
+import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.diamondforge.tokn.domain.model.OtpType
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -166,122 +166,122 @@ fun HomeScreen(
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            HomeTopBar(
-                selectionMode = selectionMode,
-                selectedCount = uiState.selectedIds.size,
-                showSearch = showSearch,
-                searchQuery = uiState.searchQuery,
-                onSearchQueryChange = viewModel::updateSearchQuery,
-                onToggleSearch = {
-                    showSearch = !showSearch
-                    if (!showSearch) viewModel.updateSearchQuery("")
-                },
-                onSettings = onSettings,
-                onClearSelection = { viewModel.clearSelection() },
-                onEditSelected = {
-                    val id = uiState.selectedIds.singleOrNull() ?: return@HomeTopBar
-                    viewModel.clearSelection()
-                    onEditAccount(id)
-                },
-                onDeleteSelected = { showBulkDeleteConfirm = true },
-                onSelectAll = { viewModel.selectAll() },
-                scrollBehavior = scrollBehavior,
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-        ) {
-            if (uiState.availableGroups.isNotEmpty()) {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(vertical = 4.dp),
-                ) {
-                    item {
-                        FilterChip(
-                            selected = uiState.selectedGroup == null,
-                            onClick = { viewModel.selectGroup(null) },
-                            label = { Text(stringResource(R.string.group_all)) },
-                        )
-                    }
-                    items(uiState.availableGroups) { group ->
-                        FilterChip(
-                            selected = uiState.selectedGroup == group,
-                            onClick = { viewModel.selectGroup(group) },
-                            label = { Text(group) },
-                        )
-                    }
-                }
-            }
-
-            if (uiState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else if (listItems.isEmpty()) {
-                EmptyState(
-                    modifier = Modifier.fillMaxSize(),
-                    isFiltered = uiState.searchQuery.isNotBlank() || uiState.selectedGroup != null,
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                HomeTopBar(
+                    selectionMode = selectionMode,
+                    selectedCount = uiState.selectedIds.size,
+                    showSearch = showSearch,
+                    searchQuery = uiState.searchQuery,
+                    onSearchQueryChange = viewModel::updateSearchQuery,
+                    onToggleSearch = {
+                        showSearch = !showSearch
+                        if (!showSearch) viewModel.updateSearchQuery("")
+                    },
+                    onSettings = onSettings,
+                    onClearSelection = { viewModel.clearSelection() },
+                    onEditSelected = {
+                        val id = uiState.selectedIds.singleOrNull() ?: return@HomeTopBar
+                        viewModel.clearSelection()
+                        onEditAccount(id)
+                    },
+                    onDeleteSelected = { showBulkDeleteConfirm = true },
+                    onSelectAll = { viewModel.selectAll() },
+                    scrollBehavior = scrollBehavior,
                 )
-            } else {
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(listItems, key = { it.account.id }) { item ->
-                        ReorderableItem(reorderableState, key = item.account.id) { isDragging ->
-                            val copiedMessage = stringResource(R.string.code_copied)
-                            val isSelected = item.account.id in uiState.selectedIds
-                            val canReorder = uiState.selectedIds.size == 1
-                            val isMasked = uiState.tapToRevealEnabled &&
-                                item.account.id !in uiState.revealedIds
-                            AccountCard(
-                                item = item,
-                                isDragging = isDragging,
-                                iconFetchEnabled = uiState.iconFetchEnabled,
-                                inSelectionMode = selectionMode,
-                                isSelected = isSelected,
-                                canReorder = canReorder,
-                                isMasked = isMasked,
-                                onTap = {
-                                    if (selectionMode) {
-                                        viewModel.toggleSelection(item.account.id)
-                                    } else if (isMasked) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        viewModel.reveal(item)
-                                    } else {
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        viewModel.copyToClipboard(item)
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(copiedMessage)
-                                        }
-                                    }
-                                },
-                                onLongPress = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    if (selectionMode) {
-                                        viewModel.toggleSelection(item.account.id)
-                                    } else {
-                                        viewModel.startSelection(item.account.id)
-                                    }
-                                },
-                                onIncrementCounter = { viewModel.incrementHotpCounter(item.account.id) },
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+            ) {
+                if (uiState.availableGroups.isNotEmpty()) {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(vertical = 4.dp),
+                    ) {
+                        item {
+                            FilterChip(
+                                selected = uiState.selectedGroup == null,
+                                onClick = { viewModel.selectGroup(null) },
+                                label = { Text(stringResource(R.string.group_all)) },
                             )
+                        }
+                        items(uiState.availableGroups) { group ->
+                            FilterChip(
+                                selected = uiState.selectedGroup == group,
+                                onClick = { viewModel.selectGroup(group) },
+                                label = { Text(group) },
+                            )
+                        }
+                    }
+                }
+
+                if (uiState.isLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else if (listItems.isEmpty()) {
+                    EmptyState(
+                        modifier = Modifier.fillMaxSize(),
+                        isFiltered = uiState.searchQuery.isNotBlank() || uiState.selectedGroup != null,
+                    )
+                } else {
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(listItems, key = { it.account.id }) { item ->
+                            ReorderableItem(reorderableState, key = item.account.id) { isDragging ->
+                                val copiedMessage = stringResource(R.string.code_copied)
+                                val isSelected = item.account.id in uiState.selectedIds
+                                val canReorder = uiState.selectedIds.size == 1
+                                val isMasked = uiState.tapToRevealEnabled &&
+                                        item.account.id !in uiState.revealedIds
+                                AccountCard(
+                                    item = item,
+                                    isDragging = isDragging,
+                                    iconFetchEnabled = uiState.iconFetchEnabled,
+                                    inSelectionMode = selectionMode,
+                                    isSelected = isSelected,
+                                    canReorder = canReorder,
+                                    isMasked = isMasked,
+                                    onTap = {
+                                        if (selectionMode) {
+                                            viewModel.toggleSelection(item.account.id)
+                                        } else if (isMasked) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            viewModel.reveal(item)
+                                        } else {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            viewModel.copyToClipboard(item)
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(copiedMessage)
+                                            }
+                                        }
+                                    },
+                                    onLongPress = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        if (selectionMode) {
+                                            viewModel.toggleSelection(item.account.id)
+                                        } else {
+                                            viewModel.startSelection(item.account.id)
+                                        }
+                                    },
+                                    onIncrementCounter = { viewModel.incrementHotpCounter(item.account.id) },
+                                )
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
         AnimatedVisibility(
             visible = fabMenuOpen,
@@ -412,7 +412,10 @@ fun HomeScreen(
                     viewModel.deleteSelected()
                     showBulkDeleteConfirm = false
                 }) {
-                    Text(text = stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = stringResource(R.string.delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             },
             dismissButton = {
@@ -674,7 +677,7 @@ private fun ReorderableCollectionItemScope.AccountCard(
                     OtpType.TOTP -> {
                         val progress by animateFloatAsState(
                             targetValue = item.otpResult.remainingMillis.toFloat() /
-                                item.otpResult.periodMillis.toFloat(),
+                                    item.otpResult.periodMillis.toFloat(),
                             label = "countdown",
                         )
                         val secondsRemaining = (item.otpResult.remainingMillis / 1000).toInt()
@@ -696,6 +699,7 @@ private fun ReorderableCollectionItemScope.AccountCard(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                     }
+
                     OtpType.HOTP -> {
                         IconButton(onClick = onIncrementCounter) {
                             Icon(
@@ -753,7 +757,11 @@ private fun IssuerAvatar(
 ) {
     when {
         customIconBytes != null -> AsyncIconBox(model = customIconBytes, modifier = modifier)
-        packIconPath != null -> AsyncIconBox(model = java.io.File(packIconPath), modifier = modifier)
+        packIconPath != null -> AsyncIconBox(
+            model = java.io.File(packIconPath),
+            modifier = modifier
+        )
+
         iconFetchEnabled -> {
             val url = remember(issuer) {
                 val slug = issuer.lowercase().replace(Regex("[^a-z0-9]"), "")
@@ -773,6 +781,7 @@ private fun IssuerAvatar(
                 }
             }
         }
+
         else -> LetterAvatarBox(issuer, modifier)
     }
 }
@@ -801,7 +810,8 @@ private fun LetterAvatarBox(issuer: String, modifier: Modifier = Modifier) {
         Color(0xFF00796B),
         Color(0xFFC62828),
     )
-    val color = remember(issuer) { avatarColors[issuer.hashCode().absoluteValue % avatarColors.size] }
+    val color =
+        remember(issuer) { avatarColors[issuer.hashCode().absoluteValue % avatarColors.size] }
     val letter = issuer.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
 
     Box(

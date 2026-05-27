@@ -76,7 +76,11 @@ class OnboardingViewModel @Inject constructor(
             val result = withContext(Dispatchers.IO) { parseImport(uri) }
             _uiState.update {
                 when (result) {
-                    is ImportResult.Success -> it.copy(importedCount = result.count, importError = null)
+                    is ImportResult.Success -> it.copy(
+                        importedCount = result.count,
+                        importError = null
+                    )
+
                     ImportResult.Redirect -> it.copy(importError = ImportError.Redirect)
                     ImportResult.Invalid -> it.copy(importError = ImportError.Invalid)
                 }

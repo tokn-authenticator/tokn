@@ -41,7 +41,8 @@ class OtpAuthMigrationImporterTest {
 
     @Test
     fun `parse handles multiple URIs across lines`() {
-        val one = MigrationFixtureWriter.buildUri(listOf(rfcVector()), batchIndex = 0, batchSize = 2)
+        val one =
+            MigrationFixtureWriter.buildUri(listOf(rfcVector()), batchIndex = 0, batchSize = 2)
         val two = MigrationFixtureWriter.buildUri(
             listOf(
                 MigrationEntry(
@@ -57,7 +58,8 @@ class OtpAuthMigrationImporterTest {
             batchIndex = 1,
             batchSize = 2,
         )
-        val accounts = (importer.parse("$one\n$two".toByteArray(), null) as ImportOutcome.Success).accounts
+        val accounts =
+            (importer.parse("$one\n$two".toByteArray(), null) as ImportOutcome.Success).accounts
         assertEquals(2, accounts.size)
         val hotp = accounts.first { it.type == OtpType.HOTP }
         assertEquals(OtpAlgorithm.SHA512, hotp.algorithm)

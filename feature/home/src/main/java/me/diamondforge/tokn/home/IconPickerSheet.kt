@@ -92,7 +92,7 @@ fun IconPickerSheet(
                 pack.pack.icons.asSequence()
                     .filter { icon ->
                         icon.displayName.lowercase().contains(q) ||
-                            icon.issuerMatches.any { it.lowercase().contains(q) }
+                                icon.issuerMatches.any { it.lowercase().contains(q) }
                     }
                     .map { pack to it }
                     .toList()

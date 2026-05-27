@@ -14,6 +14,7 @@ object QrChunkCodec {
     data class Chunk(val seq: Int, val total: Int, val data: ByteArray) {
         override fun equals(other: Any?) =
             other is Chunk && seq == other.seq && total == other.total && data.contentEquals(other.data)
+
         override fun hashCode(): Int = seq * 31 + total
     }
 

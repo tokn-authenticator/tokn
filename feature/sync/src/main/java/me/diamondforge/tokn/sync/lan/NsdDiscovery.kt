@@ -38,11 +38,14 @@ class NsdDiscovery(context: Context) {
                 override fun onServiceRegistered(serviceInfo: NsdServiceInfo) {
                     cont.resume(Registration(manager, this))
                 }
+
                 override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
                     cont.resumeWithException(IllegalStateException("NSD registration failed: $errorCode"))
                 }
+
                 override fun onServiceUnregistered(serviceInfo: NsdServiceInfo) = Unit
-                override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) = Unit
+                override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) =
+                    Unit
             }
             manager.registerService(info, NsdManager.PROTOCOL_DNS_SD, listener)
             cont.invokeOnCancellation {
@@ -92,6 +95,7 @@ class NsdDiscovery(context: Context) {
                     resolving = false
                     resolveNext()
                 }
+
                 override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
                     resolving = false
                     resolveNext()
@@ -105,12 +109,14 @@ class NsdDiscovery(context: Context) {
             override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) {
                 close(IllegalStateException("Discovery start failed: $errorCode"))
             }
+
             override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) = Unit
             override fun onServiceFound(serviceInfo: NsdServiceInfo) {
                 if (serviceInfo.serviceType.trimEnd('.') != SERVICE_TYPE.trimEnd('.')) return
                 pendingResolves.addLast(serviceInfo)
                 resolveNext()
             }
+
             override fun onServiceLost(serviceInfo: NsdServiceInfo) {
                 peers.remove(serviceInfo.serviceName)
                 emit()

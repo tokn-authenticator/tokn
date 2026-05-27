@@ -41,7 +41,10 @@ internal class ProtoReader(private val buf: ByteArray, private val end: Int = bu
         when (tag and 0x7) {
             0 -> readVarint()
             1 -> pos += 8
-            2 -> { val len = readVarint().toInt(); pos += len }
+            2 -> {
+                val len = readVarint().toInt(); pos += len
+            }
+
             5 -> pos += 4
             else -> error("unsupported wire type ${tag and 0x7}")
         }

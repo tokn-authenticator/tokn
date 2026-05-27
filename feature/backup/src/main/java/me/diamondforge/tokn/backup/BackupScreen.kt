@@ -31,10 +31,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -155,9 +155,21 @@ fun BackupScreen(
                 Text(
                     when {
                         result.found == 0 -> stringResource(R.string.import_result_empty)
-                        result.imported == 0 -> stringResource(R.string.import_result_all_duplicates, result.found)
-                        result.skipped == 0 -> stringResource(R.string.import_result_all_imported, result.imported)
-                        else -> stringResource(R.string.import_result_partial, result.imported, result.skipped)
+                        result.imported == 0 -> stringResource(
+                            R.string.import_result_all_duplicates,
+                            result.found
+                        )
+
+                        result.skipped == 0 -> stringResource(
+                            R.string.import_result_all_imported,
+                            result.imported
+                        )
+
+                        else -> stringResource(
+                            R.string.import_result_partial,
+                            result.imported,
+                            result.skipped
+                        )
                     },
                 )
             },
@@ -217,6 +229,7 @@ fun BackupScreen(
                                         .first { it.id == selectedOption.id }
                                         .acceptedMimeTypes,
                                 )
+
                             is ImportPickerOption.MigrationQr -> onScanMigration()
                             null -> Unit
                         }
@@ -253,7 +266,9 @@ fun BackupScreen(
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = if (externalPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { externalPasswordVisible = !externalPasswordVisible }) {
+                        IconButton(onClick = {
+                            externalPasswordVisible = !externalPasswordVisible
+                        }) {
                             Icon(
                                 if (externalPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                 contentDescription = null,
@@ -348,7 +363,9 @@ fun BackupScreen(
     ) { padding ->
         if (uiState.isLoading) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
@@ -405,7 +422,9 @@ fun BackupScreen(
                         singleLine = true,
                         visualTransformation = if (exportPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
-                            IconButton(onClick = { exportPasswordVisible = !exportPasswordVisible }) {
+                            IconButton(onClick = {
+                                exportPasswordVisible = !exportPasswordVisible
+                            }) {
                                 Icon(
                                     if (exportPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                     contentDescription = null,
@@ -423,7 +442,8 @@ fun BackupScreen(
                         viewModel.suppressLock()
                         val ts = java.time.LocalDateTime.now()
                             .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"))
-                        val filename = if (exportUnencrypted) "tokn_backup_$ts.kv" else "tokn_backup_$ts.enc.kv"
+                        val filename =
+                            if (exportUnencrypted) "tokn_backup_$ts.kv" else "tokn_backup_$ts.enc.kv"
                         exportLauncher.launch(filename)
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -468,7 +488,13 @@ fun BackupScreen(
                 OutlinedButton(
                     onClick = {
                         viewModel.suppressLock()
-                        importLauncher.launch(arrayOf("application/octet-stream", "application/json", "*/*"))
+                        importLauncher.launch(
+                            arrayOf(
+                                "application/octet-stream",
+                                "application/json",
+                                "*/*"
+                            )
+                        )
                     },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -507,7 +533,10 @@ private sealed class ImportPickerOption(
     val displayName: String,
     val noteRes: Int,
 ) {
-    class File(id: String, displayName: String, noteRes: Int) : ImportPickerOption(id, displayName, noteRes)
-    class MigrationQr(displayName: String, noteRes: Int) : ImportPickerOption("migration_qr", displayName, noteRes)
+    class File(id: String, displayName: String, noteRes: Int) :
+        ImportPickerOption(id, displayName, noteRes)
+
+    class MigrationQr(displayName: String, noteRes: Int) :
+        ImportPickerOption("migration_qr", displayName, noteRes)
 }
 

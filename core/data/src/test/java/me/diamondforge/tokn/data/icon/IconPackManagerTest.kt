@@ -44,28 +44,33 @@ class IconPackManagerTest {
     }
 
     @Test
-    fun `install succeeds for a well-formed zip and surfaces the pack on the installed flow`() = runBlocking {
-        val uuid = "11111111-2222-3333-4444-555555555555"
-        val zip = makeZip(
-            "test.zip",
-            "pack.json" to packJson(uuid, name = "Cool Pack", iconFilenames = listOf("a.svg", "b.svg")),
-            "a.svg" to "<svg/>".toByteArray(),
-            "b.svg" to "<svg/>".toByteArray(),
-        )
+    fun `install succeeds for a well-formed zip and surfaces the pack on the installed flow`() =
+        runBlocking {
+            val uuid = "11111111-2222-3333-4444-555555555555"
+            val zip = makeZip(
+                "test.zip",
+                "pack.json" to packJson(
+                    uuid,
+                    name = "Cool Pack",
+                    iconFilenames = listOf("a.svg", "b.svg")
+                ),
+                "a.svg" to "<svg/>".toByteArray(),
+                "b.svg" to "<svg/>".toByteArray(),
+            )
 
-        val result = manager.install(Uri.fromFile(zip))
+            val result = manager.install(Uri.fromFile(zip))
 
-        assertTrue("expected Success, got $result", result is InstallResult.Success)
-        val installed = (result as InstallResult.Success).pack
-        assertEquals("Cool Pack", installed.pack.name)
-        assertEquals(uuid, installed.pack.uuid)
-        assertEquals(2, installed.iconCount)
+            assertTrue("expected Success, got $result", result is InstallResult.Success)
+            val installed = (result as InstallResult.Success).pack
+            assertEquals("Cool Pack", installed.pack.name)
+            assertEquals(uuid, installed.pack.uuid)
+            assertEquals(2, installed.iconCount)
 
-        // installed flow reflects it
-        val all = manager.installed.value
-        assertEquals(1, all.size)
-        assertEquals(uuid, all.single().pack.uuid)
-    }
+            // installed flow reflects it
+            val all = manager.installed.value
+            assertEquals(1, all.size)
+            assertEquals(uuid, all.single().pack.uuid)
+        }
 
     @Test
     fun `missing pack json yields MissingPackJson`() = runBlocking {
@@ -103,7 +108,10 @@ class IconPackManagerTest {
         val result = manager.install(Uri.fromFile(zip))
         assertTrue("expected Failed, got $result", result is InstallResult.Failed)
         val reason = (result as InstallResult.Failed).reason
-        assertTrue("reason should mention escape: $reason", reason.contains("escapes target", ignoreCase = true))
+        assertTrue(
+            "reason should mention escape: $reason",
+            reason.contains("escapes target", ignoreCase = true)
+        )
     }
 
     @Test

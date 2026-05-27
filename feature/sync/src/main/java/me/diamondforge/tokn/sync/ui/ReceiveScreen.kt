@@ -74,6 +74,7 @@ fun LanReceiveScreen(
         when (state.status) {
             ReceiveUiState.Status.Connecting,
             ReceiveUiState.Status.Importing -> ConnectingView(state)
+
             ReceiveUiState.Status.Done -> ImportSuccessView(state) { viewModel.reset() }
             ReceiveUiState.Status.Idle -> {
                 if (peers.isEmpty()) {
@@ -84,7 +85,12 @@ fun LanReceiveScreen(
                             ListItem(
                                 headlineContent = { Text(peer.name) },
                                 supportingContent = { Text("${peer.host.hostAddress}:${peer.port}") },
-                                leadingContent = { Icon(Icons.Default.PhoneAndroid, contentDescription = null) },
+                                leadingContent = {
+                                    Icon(
+                                        Icons.Default.PhoneAndroid,
+                                        contentDescription = null
+                                    )
+                                },
                                 modifier = Modifier.clickable {
                                     pendingPeer = peer
                                     code = ""
@@ -137,14 +143,21 @@ fun WfdReceiveScreen(
                 button = stringResource(R.string.sync_wfd_grant),
                 onGrant = { permissionState.launchPermissionRequest() },
             )
+
             state.status == ReceiveUiState.Status.Connecting ||
-                state.status == ReceiveUiState.Status.Importing -> ConnectingView(state)
+                    state.status == ReceiveUiState.Status.Importing -> ConnectingView(state)
+
             state.status == ReceiveUiState.Status.Done -> ImportSuccessView(state) { viewModel.reset() }
             else -> {
                 LaunchedEffect(Unit) { viewModel.startWfdDiscovery() }
                 DisposableEffect(Unit) { onDispose { viewModel.stopWfdDiscovery() } }
-                Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                    Text(stringResource(R.string.sync_wfd_intro), style = MaterialTheme.typography.bodySmall)
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)) {
+                    Text(
+                        stringResource(R.string.sync_wfd_intro),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     Spacer(Modifier.height(12.dp))
                     if (wfdPeers.isEmpty()) {
                         LookingView(stringResource(R.string.sync_wfd_no_peers))
@@ -208,11 +221,14 @@ fun QrReceiveScreen(
                 button = stringResource(R.string.sync_wfd_grant),
                 onGrant = { cameraPermission.launchPermissionRequest() },
             )
+
             state.status == ReceiveUiState.Status.Done -> ImportSuccessView(state) { viewModel.reset() }
             state.qrComplete -> {
                 var passphrase by rememberSaveable { mutableStateOf("") }
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
                     verticalArrangement = Arrangement.Top,
                 ) {
                     Text(
@@ -235,27 +251,36 @@ fun QrReceiveScreen(
                     Button(
                         onClick = { viewModel.decryptAndImport(passphrase) },
                         enabled = passphrase.isNotEmpty() &&
-                            state.status != ReceiveUiState.Status.Importing,
+                                state.status != ReceiveUiState.Status.Importing,
                         modifier = Modifier.fillMaxWidth(),
                     ) { Text(stringResource(R.string.sync_qr_decrypt)) }
                 }
             }
+
             else -> {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)) {
                         QrSyncScannerPreview(
                             onRawDetected = viewModel::onQrFrameScanned,
                             modifier = Modifier.fillMaxSize(),
                         )
                     }
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         val label = if (state.qrTotal == 0) {
                             stringResource(R.string.sync_qr_aim_hint)
                         } else {
-                            stringResource(R.string.sync_qr_scan_progress, state.qrSeen, state.qrTotal)
+                            stringResource(
+                                R.string.sync_qr_scan_progress,
+                                state.qrSeen,
+                                state.qrTotal
+                            )
                         }
                         Text(label, style = MaterialTheme.typography.bodyMedium)
                     }
@@ -287,7 +312,9 @@ private fun ReceiveScaffold(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)) {
             state.errorMessage?.let { msg ->
                 SyncErrorCard(message = msg, onDismiss = onDismissError)
             }
@@ -302,7 +329,9 @@ private fun ReceiveScaffold(
 @Composable
 private fun ConnectingView(state: ReceiveUiState) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -318,7 +347,9 @@ private fun ConnectingView(state: ReceiveUiState) {
 @Composable
 private fun LookingView(message: String) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -336,7 +367,9 @@ private fun PermissionRequestView(
     onGrant: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -349,7 +382,9 @@ private fun PermissionRequestView(
 @Composable
 private fun CenteredText(text: String) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         contentAlignment = Alignment.Center,
     ) { Text(text) }
 }
@@ -393,7 +428,9 @@ private fun CodeDialog(
 private fun ImportSuccessView(state: ReceiveUiState, onDone: () -> Unit) {
     val summary = state.importSummary
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {

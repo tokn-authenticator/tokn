@@ -32,9 +32,19 @@ internal object AegisFixtureWriter {
         val keyNonce = ByteArray(12).also(rng::nextBytes)
         val dbNonce = ByteArray(12).also(rng::nextBytes)
 
-        val derived = ScryptAesGcm.deriveKey(password.toByteArray(Charsets.UTF_8), slotSalt, SCRYPT_N, SCRYPT_R, SCRYPT_P)
+        val derived = ScryptAesGcm.deriveKey(
+            password.toByteArray(Charsets.UTF_8),
+            slotSalt,
+            SCRYPT_N,
+            SCRYPT_R,
+            SCRYPT_P
+        )
         val (wrappedKey, wrappedKeyTag) = ScryptAesGcm.encrypt(derived, keyNonce, masterKey)
-        val (dbCipher, dbTag) = ScryptAesGcm.encrypt(masterKey, dbNonce, db.toString().toByteArray(Charsets.UTF_8))
+        val (dbCipher, dbTag) = ScryptAesGcm.encrypt(
+            masterKey,
+            dbNonce,
+            db.toString().toByteArray(Charsets.UTF_8)
+        )
 
         val slot = JSONObject().apply {
             put("type", 1)

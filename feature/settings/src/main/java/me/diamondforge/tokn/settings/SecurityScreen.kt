@@ -176,7 +176,12 @@ fun SecurityScreen(
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.biometric_unlock)) },
                         supportingContent = { Text(stringResource(R.string.biometric_unlock_desc)) },
-                        leadingContent = { Icon(Icons.Default.Fingerprint, contentDescription = null) },
+                        leadingContent = {
+                            Icon(
+                                Icons.Default.Fingerprint,
+                                contentDescription = null
+                            )
+                        },
                         trailingContent = {
                             Switch(
                                 checked = uiState.biometricEnabled,

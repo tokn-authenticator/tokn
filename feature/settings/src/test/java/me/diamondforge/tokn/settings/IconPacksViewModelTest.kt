@@ -71,7 +71,12 @@ class IconPacksViewModelTest {
         runTest(dispatcher) {
             runBlocking {
                 repo.addAccount(account(issuer = "GitHub"))                                  // should match
-                repo.addAccount(account(issuer = "GitHub", custom = byteArrayOf(1)))         // excluded: has custom icon
+                repo.addAccount(
+                    account(
+                        issuer = "GitHub",
+                        custom = byteArrayOf(1)
+                    )
+                )         // excluded: has custom icon
                 repo.addAccount(account(issuer = "Unmatched Co"))                            // excluded: no suggestion
             }
             val vm = newVm()

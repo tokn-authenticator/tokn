@@ -24,7 +24,8 @@ object OtpAuthParser {
 
         val label = Uri.decode(uri.path?.removePrefix("/") ?: "")
         val issuerFromLabel = if (label.contains(":")) label.substringBefore(":").trim() else ""
-        val accountNameFromLabel = if (label.contains(":")) label.substringAfter(":").trim() else label
+        val accountNameFromLabel =
+            if (label.contains(":")) label.substringAfter(":").trim() else label
 
         val secret = uri.getQueryParameter("secret") ?: error("Missing secret")
         val issuer = uri.getQueryParameter("issuer") ?: issuerFromLabel

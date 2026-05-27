@@ -88,6 +88,7 @@ class MigrationScanViewModel @Inject constructor(
                     }
                     _uiState.update { it.copy(isLoading = false, result = result) }
                 }
+
                 else -> {
                     // Migration parser only returns Success or Malformed. Treat anything
                     // that isn't Success as a "scanner picked up gibberish" hint.

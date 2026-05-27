@@ -61,10 +61,13 @@ fun WelcomeSlide(
         val feedback = when {
             state.importedCount != null ->
                 stringResource(R.string.onboarding_import_success, state.importedCount)
+
             state.importError == ImportError.Redirect ->
                 stringResource(R.string.onboarding_import_redirect_hint)
+
             state.importError == ImportError.Invalid ->
                 stringResource(R.string.onboarding_import_invalid)
+
             else -> null
         }
         if (feedback != null) {
@@ -87,7 +90,13 @@ fun WelcomeSlide(
             onClick = {
                 onClearImportFeedback()
                 onSuppressLock()
-                importLauncher.launch(arrayOf("application/json", "application/octet-stream", "*/*"))
+                importLauncher.launch(
+                    arrayOf(
+                        "application/json",
+                        "application/octet-stream",
+                        "*/*"
+                    )
+                )
             },
             modifier = Modifier.fillMaxWidth(),
         ) {

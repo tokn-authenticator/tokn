@@ -40,19 +40,19 @@ class OtpAccount(
         if (this === other) return true
         if (other !is OtpAccount) return false
         return id == other.id &&
-            issuer == other.issuer &&
-            accountName == other.accountName &&
-            secret == other.secret &&
-            algorithm == other.algorithm &&
-            digits == other.digits &&
-            period == other.period &&
-            counter == other.counter &&
-            type == other.type &&
-            sortOrder == other.sortOrder &&
-            group == other.group &&
-            customIconBytes.contentEqualsOrBothNull(other.customIconBytes) &&
-            iconPackId == other.iconPackId &&
-            iconPackFile == other.iconPackFile
+                issuer == other.issuer &&
+                accountName == other.accountName &&
+                secret == other.secret &&
+                algorithm == other.algorithm &&
+                digits == other.digits &&
+                period == other.period &&
+                counter == other.counter &&
+                type == other.type &&
+                sortOrder == other.sortOrder &&
+                group == other.group &&
+                customIconBytes.contentEqualsOrBothNull(other.customIconBytes) &&
+                iconPackId == other.iconPackId &&
+                iconPackFile == other.iconPackFile
     }
 
     override fun hashCode(): Int {

@@ -12,13 +12,16 @@ class LockManager @Inject constructor() {
     private val _isLocked = MutableStateFlow<Boolean?>(null)
     val isLocked: StateFlow<Boolean?> = _isLocked.asStateFlow()
 
-    @Volatile private var backgroundedAt: Long = -1L
+    @Volatile
+    private var backgroundedAt: Long = -1L
+
     // Holds the absolute deadline (millis since epoch) until which the next
     // foreground transition should be suppressed. The TTL guards against
     // stranded flags: if the suppression was set but the user never returned
     // (Activity destroyed, OS killed the process), the flag auto-expires
     // instead of silently bypassing the lock on the next lifecycle.
-    @Volatile private var suppressUntil: Long = -1L
+    @Volatile
+    private var suppressUntil: Long = -1L
 
     /** Call before launching any system UI (file picker, share sheet, etc.) */
     fun suppressNextForeground() {

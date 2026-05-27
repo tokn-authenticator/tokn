@@ -10,7 +10,6 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -155,9 +154,21 @@ fun MigrationScanScreen(
                 Text(
                     when {
                         result.found == 0 -> stringResource(R.string.import_result_empty)
-                        result.imported == 0 -> stringResource(R.string.import_result_all_duplicates, result.found)
-                        result.skipped == 0 -> stringResource(R.string.import_result_all_imported, result.imported)
-                        else -> stringResource(R.string.import_result_partial, result.imported, result.skipped)
+                        result.imported == 0 -> stringResource(
+                            R.string.import_result_all_duplicates,
+                            result.found
+                        )
+
+                        result.skipped == 0 -> stringResource(
+                            R.string.import_result_all_imported,
+                            result.imported
+                        )
+
+                        else -> stringResource(
+                            R.string.import_result_partial,
+                            result.imported,
+                            result.skipped
+                        )
                     },
                 )
             },
@@ -228,10 +239,14 @@ fun MigrationScanScreen(
         },
         containerColor = Color.Black,
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)) {
             if (!cameraPermissionState.status.isGranted) {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
@@ -434,7 +449,9 @@ private fun CommitBar(
             Button(
                 onClick = onCommit,
                 enabled = commitEnabled,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
                 shape = RoundedCornerShape(26.dp),
             ) {
                 if (isLoading) CircularProgressIndicator(
@@ -447,7 +464,9 @@ private fun CommitBar(
         Button(
             onClick = onPickImages,
             enabled = !isLoading,
-            modifier = Modifier.fillMaxWidth().height(52.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
             shape = RoundedCornerShape(26.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Black.copy(alpha = 0.7f),

@@ -30,12 +30,20 @@ private data class Dep(val name: String, val license: String, val url: String)
 private val DEPENDENCIES = listOf(
     Dep("Jetpack Compose", "Apache 2.0", "https://developer.android.com/jetpack/compose"),
     Dep("AndroidX Jetpack libraries", "Apache 2.0", "https://developer.android.com/jetpack"),
-    Dep("Material Components for Android", "Apache 2.0", "https://github.com/material-components/material-components-android"),
+    Dep(
+        "Material Components for Android",
+        "Apache 2.0",
+        "https://github.com/material-components/material-components-android"
+    ),
     Dep("Material Icons", "Apache 2.0", "https://fonts.google.com/icons"),
     Dep("Hilt (Dagger)", "Apache 2.0", "https://dagger.dev/hilt/"),
     Dep("Kotlin Coroutines", "Apache 2.0", "https://github.com/Kotlin/kotlinx.coroutines"),
     Dep("Coil", "Apache 2.0", "https://github.com/coil-kt/coil"),
-    Dep("SQLCipher for Android", "BSD-style (Zetetic)", "https://github.com/sqlcipher/sqlcipher-android"),
+    Dep(
+        "SQLCipher for Android",
+        "BSD-style (Zetetic)",
+        "https://github.com/sqlcipher/sqlcipher-android"
+    ),
     Dep("Reorderable", "Apache 2.0", "https://github.com/Calvin-LL/Reorderable"),
     Dep("Accompanist", "Apache 2.0", "https://github.com/google/accompanist"),
     Dep("Bouncy Castle", "MIT", "https://www.bouncycastle.org/"),

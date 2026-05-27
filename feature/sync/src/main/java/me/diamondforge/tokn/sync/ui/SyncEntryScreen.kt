@@ -45,7 +45,9 @@ fun SyncEntryScreen(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)) {
             Text(
                 text = stringResource(R.string.sync_desc),
                 style = MaterialTheme.typography.bodyMedium,
@@ -59,7 +61,10 @@ fun SyncEntryScreen(
                         supportingContent = { Text(stringResource(R.string.sync_send_intro)) },
                         leadingContent = { Icon(Icons.Default.Wifi, contentDescription = null) },
                         trailingContent = {
-                            Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowForwardIos,
+                                contentDescription = null
+                            )
                         },
                         modifier = Modifier.clickable(onClick = onSend),
                     )
@@ -70,7 +75,10 @@ fun SyncEntryScreen(
                         supportingContent = { Text(stringResource(R.string.sync_receive_intro)) },
                         leadingContent = { Icon(Icons.Default.QrCode2, contentDescription = null) },
                         trailingContent = {
-                            Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowForwardIos,
+                                contentDescription = null
+                            )
                         },
                         modifier = Modifier.clickable(onClick = onReceive),
                     )

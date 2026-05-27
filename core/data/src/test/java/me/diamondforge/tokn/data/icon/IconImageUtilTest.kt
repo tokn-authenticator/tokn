@@ -56,10 +56,14 @@ class IconImageUtilTest {
         val bytes = IconImageUtil.loadAndResize(context, uri)
         assertNotNull(bytes)
         val decoded = BitmapFactory.decodeByteArray(bytes, 0, bytes!!.size)
-        assertTrue("expected max dimension <= 256, got ${decoded.width}x${decoded.height}",
-            decoded.width <= 256 && decoded.height <= 256)
-        assertTrue("expected close to 256 on the long side, got ${decoded.width}x${decoded.height}",
-            decoded.width >= 128 && decoded.height >= 128)
+        assertTrue(
+            "expected max dimension <= 256, got ${decoded.width}x${decoded.height}",
+            decoded.width <= 256 && decoded.height <= 256
+        )
+        assertTrue(
+            "expected close to 256 on the long side, got ${decoded.width}x${decoded.height}",
+            decoded.width >= 128 && decoded.height >= 128
+        )
     }
 
     @Test

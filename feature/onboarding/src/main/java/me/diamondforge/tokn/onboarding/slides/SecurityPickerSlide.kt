@@ -125,7 +125,12 @@ private fun SecurityOption(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             RadioButton(selected = selected, onClick = onClick, enabled = enabled)
-            Icon(icon, contentDescription = null, modifier = Modifier.size(28.dp), tint = content.copy(alpha = alpha))
+            Icon(
+                icon,
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+                tint = content.copy(alpha = alpha)
+            )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,

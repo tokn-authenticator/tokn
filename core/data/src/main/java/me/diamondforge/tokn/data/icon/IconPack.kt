@@ -54,5 +54,5 @@ fun InstalledIconPack.suggestionsFor(issuer: String): List<IconSuggestion> {
         else if (inverseMatched) inverse += icon
     }
     return normal.map { IconSuggestion(it, IconMatchType.NORMAL) } +
-        inverse.map { IconSuggestion(it, IconMatchType.INVERSE) }
+            inverse.map { IconSuggestion(it, IconMatchType.INVERSE) }
 }

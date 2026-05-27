@@ -70,10 +70,18 @@ class IconPacksViewModel @Inject constructor(
                         )
                     }
                 }
+
                 InstallResult.MissingPackJson ->
-                    _ephemeral.update { it.copy(isImporting = false, importError = "pack.json missing") }
+                    _ephemeral.update {
+                        it.copy(
+                            isImporting = false,
+                            importError = "pack.json missing"
+                        )
+                    }
+
                 is InstallResult.InvalidPackJson ->
                     _ephemeral.update { it.copy(isImporting = false, importError = result.reason) }
+
                 is InstallResult.Failed ->
                     _ephemeral.update { it.copy(isImporting = false, importError = result.reason) }
             }
@@ -113,9 +121,11 @@ class IconPacksViewModel @Inject constructor(
             getAccountsUseCase().map { list -> list }.first()
         }
         val assignments = accounts.mapNotNull { account ->
-            val best = installed.suggestionsFor(account.issuer).firstOrNull() ?: return@mapNotNull null
+            val best =
+                installed.suggestionsFor(account.issuer).firstOrNull() ?: return@mapNotNull null
             if (account.iconPackId == installed.pack.uuid &&
-                account.iconPackFile == best.icon.filename) return@mapNotNull null
+                account.iconPackFile == best.icon.filename
+            ) return@mapNotNull null
             if (account.customIconBytes != null) return@mapNotNull null
             account to best.icon.filename
         }

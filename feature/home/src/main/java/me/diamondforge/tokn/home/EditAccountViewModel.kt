@@ -71,7 +71,9 @@ class EditAccountViewModel @Inject constructor(
     fun updatePeriod(value: Int) = _uiState.update { it.copy(period = value) }
     fun updateType(value: OtpType) = _uiState.update { it.copy(type = value) }
     fun updateGroup(value: String) = _uiState.update { it.copy(group = value) }
-    fun updateCounter(value: String) = _uiState.update { it.copy(counter = value.filter { c -> c.isDigit() }) }
+    fun updateCounter(value: String) =
+        _uiState.update { it.copy(counter = value.filter { c -> c.isDigit() }) }
+
     fun clearError() = _uiState.update { it.copy(error = null) }
 
     fun pickCustomIcon(uri: Uri) {
@@ -153,14 +155,22 @@ class EditAccountViewModel @Inject constructor(
                         period = state.period,
                         type = state.type,
                         group = state.group.trim().ifBlank { null },
-                        counter = if (state.type == OtpType.HOTP) parsedCounter ?: current.counter else current.counter,
+                        counter = if (state.type == OtpType.HOTP) parsedCounter
+                            ?: current.counter else current.counter,
                         customIconBytes = state.customIconBytes,
                         iconPackId = state.iconPackId,
                         iconPackFile = state.iconPackFile,
                     ),
                 )
             }.onSuccess { onSuccess() }
-                .onFailure { e -> _uiState.update { it.copy(error = e.message ?: "Failed to save", isSaving = false) } }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message ?: "Failed to save",
+                            isSaving = false
+                        )
+                    }
+                }
         }
     }
 }

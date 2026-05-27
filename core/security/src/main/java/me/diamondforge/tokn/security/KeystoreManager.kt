@@ -17,7 +17,9 @@ import javax.inject.Singleton
 open class KeystoreManager @Inject constructor(
     @param:ApplicationContext private val context: Context,
 ) {
-    private val keystore: KeyStore by lazy { KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) } }
+    private val keystore: KeyStore by lazy {
+        KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
+    }
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     @Synchronized

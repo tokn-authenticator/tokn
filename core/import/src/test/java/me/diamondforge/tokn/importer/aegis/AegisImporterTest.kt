@@ -77,7 +77,10 @@ class AegisImporterTest {
     fun `parse encrypted with wrong password returns WrongPassword`() {
         val raw = AegisFixtureWriter.encrypted(sampleDb(), password = "right").toByteArray()
         val outcome = importer.parse(raw, password = "wrong")
-        assertTrue("expected WrongPassword but was $outcome", outcome is ImportOutcome.WrongPassword)
+        assertTrue(
+            "expected WrongPassword but was $outcome",
+            outcome is ImportOutcome.WrongPassword
+        )
     }
 
     @Test

@@ -4,6 +4,16 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
@@ -13,16 +23,6 @@ import me.diamondforge.tokn.importer.ExternalImporter
 import me.diamondforge.tokn.importer.ImportOutcome
 import me.diamondforge.tokn.importer.ImporterRegistry
 import me.diamondforge.tokn.security.LockManager
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
@@ -56,7 +56,15 @@ class BackupViewModel @Inject constructor(
             }.onSuccess {
                 _uiState.update { it.copy(isLoading = false, exportSuccess = true) }
             }.onFailure {
-                _uiState.update { it.copy(isLoading = false, error = BackupError(R.string.export_error_title, R.string.error_file_not_writable)) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = BackupError(
+                            R.string.export_error_title,
+                            R.string.error_file_not_writable
+                        )
+                    )
+                }
             }
         }
     }
@@ -76,6 +84,7 @@ class BackupViewModel @Inject constructor(
                 val error = when {
                     e.message?.contains("output stream") == true ->
                         BackupError(R.string.export_error_title, R.string.error_file_not_writable)
+
                     else ->
                         BackupError(R.string.export_error_title, R.string.error_generic, e.message)
                 }
@@ -89,8 +98,9 @@ class BackupViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
             runCatching {
                 withContext(Dispatchers.IO) {
-                    val raw = context.contentResolver.openInputStream(uri)?.bufferedReader()?.readText()
-                        ?: throw BackupException(R.string.error_file_not_readable)
+                    val raw =
+                        context.contentResolver.openInputStream(uri)?.bufferedReader()?.readText()
+                            ?: throw BackupException(R.string.error_file_not_readable)
                     if (isUnencryptedToknBackup(raw)) {
                         val accounts = runCatching { deserializeAccounts(raw) }
                             .getOrElse { throw BackupException(R.string.error_not_tokn_backup) }
@@ -98,13 +108,14 @@ class BackupViewModel @Inject constructor(
                     }
                     if (password.isEmpty())
                         throw BackupException(R.string.error_password_required)
-                    val json = runCatching { encryptedBackupManager.importFromUri(context, uri, password) }
-                        .getOrElse { e ->
-                            throw if (e is javax.crypto.AEADBadTagException || e is javax.crypto.BadPaddingException)
-                                BackupException(R.string.error_wrong_password)
-                            else
-                                BackupException(R.string.error_not_tokn_backup)
-                        }
+                    val json =
+                        runCatching { encryptedBackupManager.importFromUri(context, uri, password) }
+                            .getOrElse { e ->
+                                throw if (e is javax.crypto.AEADBadTagException || e is javax.crypto.BadPaddingException)
+                                    BackupException(R.string.error_wrong_password)
+                                else
+                                    BackupException(R.string.error_not_tokn_backup)
+                            }
                     val accounts = runCatching { deserializeAccounts(json) }
                         .getOrElse { throw BackupException(R.string.error_not_tokn_backup) }
                     importDeduplicated(accounts)
@@ -114,7 +125,11 @@ class BackupViewModel @Inject constructor(
             }.onFailure { e ->
                 val error = when (e) {
                     is BackupException -> BackupError(R.string.import_error_title, e.messageRes)
-                    else -> BackupError(R.string.import_error_title, R.string.error_generic, e.message)
+                    else -> BackupError(
+                        R.string.import_error_title,
+                        R.string.error_generic,
+                        e.message
+                    )
                 }
                 _uiState.update { it.copy(isLoading = false, error = error) }
             }
@@ -145,7 +160,11 @@ class BackupViewModel @Inject constructor(
             }.onFailure { e ->
                 val error = when (e) {
                     is BackupException -> BackupError(R.string.import_error_title, e.messageRes)
-                    else -> BackupError(R.string.import_error_title, R.string.error_generic, e.message)
+                    else -> BackupError(
+                        R.string.import_error_title,
+                        R.string.error_generic,
+                        e.message
+                    )
                 }
                 _uiState.update { it.copy(isLoading = false, error = error) }
             }
@@ -156,7 +175,8 @@ class BackupViewModel @Inject constructor(
         when (outcome) {
             is ImportOutcome.Success -> {
                 viewModelScope.launch {
-                    val result = withContext(Dispatchers.IO) { importDeduplicated(outcome.accounts) }
+                    val result =
+                        withContext(Dispatchers.IO) { importDeduplicated(outcome.accounts) }
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -166,38 +186,59 @@ class BackupViewModel @Inject constructor(
                     }
                 }
             }
+
             ImportOutcome.NeedsPassword -> {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        pendingExternal = PendingExternalImport(uri, importer.id, importer.displayName),
+                        pendingExternal = PendingExternalImport(
+                            uri,
+                            importer.id,
+                            importer.displayName
+                        ),
                     )
                 }
             }
+
             is ImportOutcome.WrongPassword -> {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        pendingExternal = PendingExternalImport(uri, importer.id, importer.displayName),
-                        error = BackupError(R.string.import_error_title, R.string.error_wrong_password),
+                        pendingExternal = PendingExternalImport(
+                            uri,
+                            importer.id,
+                            importer.displayName
+                        ),
+                        error = BackupError(
+                            R.string.import_error_title,
+                            R.string.error_wrong_password
+                        ),
                     )
                 }
             }
+
             ImportOutcome.Unsupported -> {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         pendingExternal = null,
-                        error = BackupError(R.string.import_error_title, R.string.error_external_unsupported),
+                        error = BackupError(
+                            R.string.import_error_title,
+                            R.string.error_external_unsupported
+                        ),
                     )
                 }
             }
+
             is ImportOutcome.Malformed -> {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         pendingExternal = null,
-                        error = BackupError(R.string.import_error_title, R.string.error_external_malformed),
+                        error = BackupError(
+                            R.string.import_error_title,
+                            R.string.error_external_malformed
+                        ),
                     )
                 }
             }
@@ -232,12 +273,15 @@ class BackupViewModel @Inject constructor(
 
     fun suppressLock() = lockManager.suppressNextForeground()
 
-    fun clearMessages() = _uiState.update { it.copy(error = null, exportSuccess = false, importResult = null) }
+    fun clearMessages() =
+        _uiState.update { it.copy(error = null, exportSuccess = false, importResult = null) }
 
     private class BackupException(val messageRes: Int) : Exception()
 
     private fun isUnencryptedToknBackup(raw: String): Boolean =
-        runCatching { JSONObject(raw).let { it.has("accounts") && it.has("version") } }.getOrDefault(false)
+        runCatching { JSONObject(raw).let { it.has("accounts") && it.has("version") } }.getOrDefault(
+            false
+        )
 
     private fun serializeAccounts(accounts: List<OtpAccount>): String {
         val array = JSONArray()
@@ -255,7 +299,10 @@ class BackupViewModel @Inject constructor(
                     put("sortOrder", account.sortOrder)
                     account.group?.let { put("group", it) }
                     account.customIconBytes?.let {
-                        put("customIconPng", android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP))
+                        put(
+                            "customIconPng",
+                            android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP)
+                        )
                     }
                     account.iconPackId?.let { put("iconPackId", it) }
                     account.iconPackFile?.let { put("iconPackFile", it) }
@@ -272,7 +319,10 @@ class BackupViewModel @Inject constructor(
             val obj = array.getJSONObject(i)
             val customIcon = if (obj.has("customIconPng") && !obj.isNull("customIconPng")) {
                 runCatching {
-                    android.util.Base64.decode(obj.getString("customIconPng"), android.util.Base64.DEFAULT)
+                    android.util.Base64.decode(
+                        obj.getString("customIconPng"),
+                        android.util.Base64.DEFAULT
+                    )
                 }.getOrNull()
             } else null
             OtpAccount(

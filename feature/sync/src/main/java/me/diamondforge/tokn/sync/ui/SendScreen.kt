@@ -78,7 +78,9 @@ fun LanSendScreen(
         onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (state.status) {
@@ -92,8 +94,13 @@ fun LanSendScreen(
                         Text(stringResource(R.string.sync_start))
                     }
                 }
+
                 SendUiState.Status.Waiting,
-                SendUiState.Status.Transferring -> PairingCodeView(state, onCancel = viewModel::cancelLan)
+                SendUiState.Status.Transferring -> PairingCodeView(
+                    state,
+                    onCancel = viewModel::cancelLan
+                )
+
                 SendUiState.Status.Done -> DoneView(onBack = viewModel::cancelLan)
             }
         }
@@ -121,35 +128,53 @@ fun WfdSendScreen(
     ) {
         if (!viewModel.wfdSupported) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(24.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) { Text(stringResource(R.string.sync_wfd_unsupported)) }
             return@SendScaffold
         }
         Column(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (state.status) {
                 SendUiState.Status.Idle -> {
-                    Text(stringResource(R.string.sync_wfd_intro), style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        stringResource(R.string.sync_wfd_intro),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     Spacer(Modifier.height(24.dp))
                     if (!permissionState.status.isGranted) {
-                        Text(stringResource(R.string.sync_wfd_permission), style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            stringResource(R.string.sync_wfd_permission),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                         Spacer(Modifier.height(12.dp))
                         Button(
                             onClick = { permissionState.launchPermissionRequest() },
                             modifier = Modifier.fillMaxWidth(),
                         ) { Text(stringResource(R.string.sync_wfd_grant)) }
                     } else {
-                        Button(onClick = viewModel::startWfdSend, modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = viewModel::startWfdSend,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             Text(stringResource(R.string.sync_wfd_start))
                         }
                     }
                 }
+
                 SendUiState.Status.Waiting,
-                SendUiState.Status.Transferring -> PairingCodeView(state, onCancel = viewModel::cancelWfd)
+                SendUiState.Status.Transferring -> PairingCodeView(
+                    state,
+                    onCancel = viewModel::cancelWfd
+                )
+
                 SendUiState.Status.Done -> DoneView(onBack = viewModel::cancelWfd)
             }
         }
@@ -176,8 +201,13 @@ fun QrSendScreen(
         onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         if (state.qrFrames.isEmpty()) {
-            Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-                Text(stringResource(R.string.sync_qr_passphrase_hint), style = MaterialTheme.typography.bodyMedium)
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)) {
+                Text(
+                    stringResource(R.string.sync_qr_passphrase_hint),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 Spacer(Modifier.height(16.dp))
                 OutlinedTextField(
                     value = passphrase,
@@ -233,7 +263,9 @@ private fun SendScaffold(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)) {
             state.errorMessage?.let { msg ->
                 SyncErrorCard(message = msg, onDismiss = onDismissError)
             }
@@ -263,7 +295,10 @@ private fun PairingCodeView(state: SendUiState, onCancel: () -> Unit) {
         fontWeight = FontWeight.Bold,
     )
     Spacer(Modifier.height(8.dp))
-    Text(stringResource(R.string.sync_pairing_code_hint), style = MaterialTheme.typography.bodySmall)
+    Text(
+        stringResource(R.string.sync_pairing_code_hint),
+        style = MaterialTheme.typography.bodySmall
+    )
     Spacer(Modifier.height(32.dp))
     CircularProgressIndicator()
     Spacer(Modifier.height(16.dp))
@@ -312,7 +347,9 @@ private fun AnimatedQr(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(

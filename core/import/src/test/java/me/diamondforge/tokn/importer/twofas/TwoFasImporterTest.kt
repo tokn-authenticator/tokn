@@ -57,7 +57,8 @@ class TwoFasImporterTest {
 
     @Test
     fun `parse encrypted with correct password returns Success`() {
-        val raw = TwoFasFixtureWriter.encrypted(sampleServices(), password = "correct").toByteArray()
+        val raw =
+            TwoFasFixtureWriter.encrypted(sampleServices(), password = "correct").toByteArray()
         val accounts = (importer.parse(raw, password = "correct") as ImportOutcome.Success).accounts
         assertEquals(3, accounts.size)
     }
@@ -66,7 +67,10 @@ class TwoFasImporterTest {
     fun `parse encrypted with wrong password returns WrongPassword`() {
         val raw = TwoFasFixtureWriter.encrypted(sampleServices(), password = "right").toByteArray()
         val outcome = importer.parse(raw, password = "wrong")
-        assertTrue("expected WrongPassword but was $outcome", outcome is ImportOutcome.WrongPassword)
+        assertTrue(
+            "expected WrongPassword but was $outcome",
+            outcome is ImportOutcome.WrongPassword
+        )
     }
 
     @Test

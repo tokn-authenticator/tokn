@@ -28,6 +28,7 @@ fun SimpleOTPTheme(
             if (darkTheme) dynamicDarkColorScheme(context)
             else dynamicLightColorScheme(context)
         }
+
         darkTheme -> darkColorScheme()
         else -> lightColorScheme()
     }

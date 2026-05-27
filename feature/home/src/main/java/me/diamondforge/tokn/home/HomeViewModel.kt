@@ -9,6 +9,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
@@ -21,16 +31,7 @@ import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
 import me.diamondforge.tokn.domain.usecase.OtpResult
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import me.diamondforge.tokn.home.HomeViewModel.Companion.CLIPBOARD_CLEAR_DELAY_MS
 import javax.inject.Inject
 
 @HiltViewModel
@@ -69,8 +70,8 @@ class HomeViewModel @Inject constructor(
         val filtered = accounts
             .filter { account ->
                 query.isBlank() ||
-                    account.issuer.contains(query, ignoreCase = true) ||
-                    account.accountName.contains(query, ignoreCase = true)
+                        account.issuer.contains(query, ignoreCase = true) ||
+                        account.accountName.contains(query, ignoreCase = true)
             }
             .filter { account ->
                 selectedGroup == null || account.group == selectedGroup

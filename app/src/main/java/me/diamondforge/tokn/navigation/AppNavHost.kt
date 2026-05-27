@@ -60,6 +60,7 @@ import me.diamondforge.tokn.add.ManualEntryScreen
 import me.diamondforge.tokn.add.QrScannerScreen
 import me.diamondforge.tokn.backup.BackupScreen
 import me.diamondforge.tokn.backup.qr.MigrationScanScreen
+import me.diamondforge.tokn.data.preferences.SyncMethod
 import me.diamondforge.tokn.home.EditAccountScreen
 import me.diamondforge.tokn.home.HomeScreen
 import me.diamondforge.tokn.onboarding.OnboardingScreen
@@ -69,7 +70,6 @@ import me.diamondforge.tokn.settings.IconPacksScreen
 import me.diamondforge.tokn.settings.SecurityScreen
 import me.diamondforge.tokn.settings.SettingsScreen
 import me.diamondforge.tokn.settings.ThirdPartyLicensesScreen
-import me.diamondforge.tokn.data.preferences.SyncMethod
 import me.diamondforge.tokn.sync.ui.ChooseMethodScreen
 import me.diamondforge.tokn.sync.ui.LanReceiveScreen
 import me.diamondforge.tokn.sync.ui.LanSendScreen
@@ -127,7 +127,12 @@ fun AppNavHost(
                 onManualEntry = { entry.navigateOnce(navController, Screen.ManualEntry.route) },
                 onSettings = { entry.navigateOnce(navController, Screen.Settings.route) },
                 onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
-                onEditAccount = { id -> entry.navigateOnce(navController, Screen.EditAccount.createRoute(id)) },
+                onEditAccount = { id ->
+                    entry.navigateOnce(
+                        navController,
+                        Screen.EditAccount.createRoute(id)
+                    )
+                },
             )
         }
         composable(
@@ -494,6 +499,7 @@ sealed class Screen(val route: String) {
             SyncMethod.QR -> SyncReceiveQr.route
         }
     }
+
     data object EditAccount : Screen("edit/{accountId}") {
         fun createRoute(accountId: Long) = "edit/$accountId"
     }

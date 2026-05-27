@@ -1,7 +1,6 @@
 package me.diamondforge.tokn.sync
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

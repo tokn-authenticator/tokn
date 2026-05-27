@@ -16,7 +16,12 @@ internal object ScryptAesGcm {
      * Decrypts ciphertext that was produced with AES-256-GCM where the auth tag is stored
      * separately (Aegis-style). Throws [javax.crypto.AEADBadTagException] on wrong key/data.
      */
-    fun decrypt(key: ByteArray, nonce: ByteArray, tag: ByteArray, ciphertext: ByteArray): ByteArray {
+    fun decrypt(
+        key: ByteArray,
+        nonce: ByteArray,
+        tag: ByteArray,
+        ciphertext: ByteArray
+    ): ByteArray {
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(
             Cipher.DECRYPT_MODE,
@@ -29,7 +34,11 @@ internal object ScryptAesGcm {
     /**
      * Encrypts with AES-256-GCM and splits the result into (ciphertext, tag). Used by tests.
      */
-    fun encrypt(key: ByteArray, nonce: ByteArray, plaintext: ByteArray): Pair<ByteArray, ByteArray> {
+    fun encrypt(
+        key: ByteArray,
+        nonce: ByteArray,
+        plaintext: ByteArray
+    ): Pair<ByteArray, ByteArray> {
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(
             Cipher.ENCRYPT_MODE,

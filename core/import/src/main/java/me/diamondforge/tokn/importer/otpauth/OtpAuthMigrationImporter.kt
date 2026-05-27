@@ -102,6 +102,7 @@ class OtpAuthMigrationImporter @Inject constructor() : ExternalImporter {
                     val sub = reader.readBytes()
                     decodeOtpParameters(sub)?.let(accounts::add)
                 }
+
                 else -> reader.skipValue(tag)
             }
         }
@@ -129,14 +130,17 @@ class OtpAuthMigrationImporter @Inject constructor() : ExternalImporter {
                     3 -> OtpAlgorithm.SHA512
                     else -> OtpAlgorithm.SHA1
                 }
+
                 5 -> digits = when (reader.readVarint().toInt()) {
                     2 -> 8
                     else -> 6
                 }
+
                 6 -> type = when (reader.readVarint().toInt()) {
                     1 -> OtpType.HOTP
                     else -> OtpType.TOTP
                 }
+
                 7 -> counter = reader.readVarint()
                 else -> reader.skipValue(tag)
             }

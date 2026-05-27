@@ -25,6 +25,7 @@ data class PairingKeys(
 ) {
     override fun equals(other: Any?): Boolean =
         other is PairingKeys && sendKey.contentEquals(other.sendKey) && recvKey.contentEquals(other.recvKey)
+
     override fun hashCode(): Int = sendKey.contentHashCode() * 31 + recvKey.contentHashCode()
 }
 

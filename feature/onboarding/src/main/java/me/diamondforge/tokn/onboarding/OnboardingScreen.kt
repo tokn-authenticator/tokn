@@ -80,23 +80,27 @@ fun OnboardingScreen(
                         onSuppressLock = viewModel::suppressLock,
                         onClearImportFeedback = viewModel::clearImportFeedback,
                     )
+
                     Slide.SecurityPicker -> SecurityPickerSlide(
                         selected = state.cryptType,
                         biometricAvailable = state.biometricAvailable,
                         onSelect = viewModel::setCryptType,
                     )
+
                     Slide.SecuritySetup -> SecuritySetupSlide(
                         password = state.password,
                         passwordConfirm = state.passwordConfirm,
                         onPasswordChange = viewModel::setPassword,
                         onPasswordConfirmChange = viewModel::setPasswordConfirm,
                     )
+
                     Slide.Done -> DoneSlide()
                 }
             }
 
             // Visible (effective) slide count for the indicator — SecuritySetup is hidden when NONE.
-            val visibleCount = if (state.cryptType == CryptType.NONE) SLIDES.size - 1 else SLIDES.size
+            val visibleCount =
+                if (state.cryptType == CryptType.NONE) SLIDES.size - 1 else SLIDES.size
             val visibleIndex = effectiveIndex(pagerState.currentPage, state.cryptType)
 
             PagerControls(
@@ -106,7 +110,7 @@ fun OnboardingScreen(
                 canGoNext = canAdvance(pagerState.currentPage, state),
                 isFinishing = state.isFinishing,
                 showPrevious = pagerState.currentPage != 0 &&
-                    SLIDES[pagerState.currentPage] != Slide.Done,
+                        SLIDES[pagerState.currentPage] != Slide.Done,
                 onPrevious = {
                     scope.launch {
                         val target = previousPage(pagerState.currentPage, state.cryptType)
@@ -187,7 +191,10 @@ private fun PagerControls(
                     onClick = onPrevious,
                     modifier = Modifier.size(56.dp),
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.onboarding_previous))
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.onboarding_previous)
+                    )
                 }
             }
         }

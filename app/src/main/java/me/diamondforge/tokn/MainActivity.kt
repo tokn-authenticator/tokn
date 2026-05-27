@@ -9,30 +9,35 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.diamondforge.tokn.data.preferences.ThemeMode
+import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
+import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.navigation.AppNavHost
 import me.diamondforge.tokn.security.BiometricHelper
 import me.diamondforge.tokn.security.LockManager
 import me.diamondforge.tokn.security.VaultPasswordManager
-import me.diamondforge.tokn.data.preferences.ThemeMode
-import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
-import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.ui.theme.SimpleOTPTheme
-import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject lateinit var lockManager: LockManager
-    @Inject lateinit var biometricHelper: BiometricHelper
-    @Inject lateinit var userPreferencesRepository: UserPreferencesRepository
-    @Inject lateinit var vaultPasswordManager: VaultPasswordManager
-    @Inject lateinit var getAccountsUseCase: GetAccountsUseCase
+    @Inject
+    lateinit var lockManager: LockManager
+    @Inject
+    lateinit var biometricHelper: BiometricHelper
+    @Inject
+    lateinit var userPreferencesRepository: UserPreferencesRepository
+    @Inject
+    lateinit var vaultPasswordManager: VaultPasswordManager
+    @Inject
+    lateinit var getAccountsUseCase: GetAccountsUseCase
 
     // Set to true once the pre-OOBE migration check has run.
     // The UI must not render the onboarding flow before this is true; otherwise
@@ -50,12 +55,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            val themeMode by userPreferencesRepository.themeMode.collectAsStateWithLifecycle(ThemeMode.SYSTEM)
+            val themeMode by userPreferencesRepository.themeMode.collectAsStateWithLifecycle(
+                ThemeMode.SYSTEM
+            )
             val isLocked by lockManager.isLocked.collectAsStateWithLifecycle()
-            val screenshotsEnabled by userPreferencesRepository.screenshotsEnabled.collectAsStateWithLifecycle(false)
-            val encryptionEnabled by userPreferencesRepository.encryptionEnabled.collectAsStateWithLifecycle(false)
-            val biometricEnabled by userPreferencesRepository.biometricEnabled.collectAsStateWithLifecycle(true)
-            val onboardingDoneRaw by userPreferencesRepository.onboardingDone.collectAsStateWithLifecycle(initialValue = null)
+            val screenshotsEnabled by userPreferencesRepository.screenshotsEnabled.collectAsStateWithLifecycle(
+                false
+            )
+            val encryptionEnabled by userPreferencesRepository.encryptionEnabled.collectAsStateWithLifecycle(
+                false
+            )
+            val biometricEnabled by userPreferencesRepository.biometricEnabled.collectAsStateWithLifecycle(
+                true
+            )
+            val onboardingDoneRaw by userPreferencesRepository.onboardingDone.collectAsStateWithLifecycle(
+                initialValue = null
+            )
             val migrated by migrationComplete.collectAsStateWithLifecycle()
             // Hold the UI at the "loading" state (null) until migration finishes,
             // so old-install upgrades never briefly render the OOBE flow.
@@ -126,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         if (userPreferencesRepository.onboardingDone.first()) return
         val hasExistingData = withContext(Dispatchers.IO) {
             vaultPasswordManager.hasPassword() ||
-                getAccountsUseCase().first().isNotEmpty()
+                    getAccountsUseCase().first().isNotEmpty()
         }
         if (hasExistingData) {
             userPreferencesRepository.setOnboardingDone(true)

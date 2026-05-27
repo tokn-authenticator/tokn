@@ -30,7 +30,10 @@ object SyncPayload {
                     put("sortOrder", account.sortOrder)
                     account.group?.let { put("group", it) }
                     account.customIconBytes?.let {
-                        put("customIconPng", android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP))
+                        put(
+                            "customIconPng",
+                            android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP)
+                        )
                     }
                     account.iconPackId?.let { put("iconPackId", it) }
                     account.iconPackFile?.let { put("iconPackFile", it) }
@@ -50,7 +53,10 @@ object SyncPayload {
             val o = arr.getJSONObject(i)
             val customIcon = if (o.has("customIconPng") && !o.isNull("customIconPng")) {
                 runCatching {
-                    android.util.Base64.decode(o.getString("customIconPng"), android.util.Base64.DEFAULT)
+                    android.util.Base64.decode(
+                        o.getString("customIconPng"),
+                        android.util.Base64.DEFAULT
+                    )
                 }.getOrNull()
             } else null
             OtpAccount(

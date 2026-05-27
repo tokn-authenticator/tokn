@@ -13,7 +13,12 @@ internal data class MigrationEntry(
 )
 
 internal object MigrationFixtureWriter {
-    fun buildUri(entries: List<MigrationEntry>, batchIndex: Int = 0, batchSize: Int = 1, batchId: Int = 1): String {
+    fun buildUri(
+        entries: List<MigrationEntry>,
+        batchIndex: Int = 0,
+        batchSize: Int = 1,
+        batchId: Int = 1
+    ): String {
         val outer = ProtoWriter()
         for (e in entries) {
             val inner = ProtoWriter()

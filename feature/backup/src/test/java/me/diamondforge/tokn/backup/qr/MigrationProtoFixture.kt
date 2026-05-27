@@ -24,7 +24,8 @@ internal class ProtoWriter {
         }
     }
 
-    private fun tag(field: Int, wireType: Int): ProtoWriter = varint(((field shl 3) or wireType).toLong())
+    private fun tag(field: Int, wireType: Int): ProtoWriter =
+        varint(((field shl 3) or wireType).toLong())
 
     fun varintField(field: Int, value: Long): ProtoWriter = apply { tag(field, 0).varint(value) }
 
@@ -33,7 +34,8 @@ internal class ProtoWriter {
         out.write(value)
     }
 
-    fun stringField(field: Int, value: String): ProtoWriter = bytesField(field, value.toByteArray(Charsets.UTF_8))
+    fun stringField(field: Int, value: String): ProtoWriter =
+        bytesField(field, value.toByteArray(Charsets.UTF_8))
 
     fun messageField(field: Int, body: ByteArray): ProtoWriter = bytesField(field, body)
 

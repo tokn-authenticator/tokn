@@ -40,7 +40,14 @@ class AddAccountViewModel @Inject constructor(
 
     fun onQrScanned(rawValue: String) {
         runCatching { OtpAuthParser.parse(rawValue) }
-            .onSuccess { account -> _uiState.update { it.copy(parsedAccount = account, error = null) } }
+            .onSuccess { account ->
+                _uiState.update {
+                    it.copy(
+                        parsedAccount = account,
+                        error = null
+                    )
+                }
+            }
             .onFailure { _uiState.update { it.copy(error = "Invalid QR code") } }
     }
 
@@ -57,7 +64,12 @@ class AddAccountViewModel @Inject constructor(
         viewModelScope.launch {
             val bytes = withContext(Dispatchers.IO) { IconImageUtil.loadAndResize(context, uri) }
             if (bytes != null) _uiState.update {
-                it.copy(customIconBytes = bytes, iconPackId = null, iconPackFile = null, packIconPath = null)
+                it.copy(
+                    customIconBytes = bytes,
+                    iconPackId = null,
+                    iconPackFile = null,
+                    packIconPath = null
+                )
             }
         }
     }
@@ -114,7 +126,12 @@ class AddAccountViewModel @Inject constructor(
                 )
             }.onSuccess { onSuccess() }
                 .onFailure { throwable ->
-                    _uiState.update { it.copy(error = throwable.message ?: "Failed to save account", isSaving = false) }
+                    _uiState.update {
+                        it.copy(
+                            error = throwable.message ?: "Failed to save account",
+                            isSaving = false
+                        )
+                    }
                 }
         }
     }

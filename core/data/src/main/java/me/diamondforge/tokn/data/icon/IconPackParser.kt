@@ -9,11 +9,15 @@ object IconPackParser {
 
     @Throws(IconPackParseException::class)
     fun parse(json: String): IconPack {
-        val obj = try { JSONObject(json) } catch (e: JSONException) {
+        val obj = try {
+            JSONObject(json)
+        } catch (e: JSONException) {
             throw IconPackParseException("pack.json is not valid JSON", e)
         }
         val uuid = obj.optString("uuid").also {
-            try { UUID.fromString(it) } catch (e: IllegalArgumentException) {
+            try {
+                UUID.fromString(it)
+            } catch (e: IllegalArgumentException) {
                 throw IconPackParseException("Bad UUID: $it", e)
             }
         }
