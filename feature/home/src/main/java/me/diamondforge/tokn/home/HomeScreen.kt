@@ -60,6 +60,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -130,7 +131,6 @@ fun HomeScreen(
     onFromImage: () -> Unit,
     onManualEntry: () -> Unit,
     onSettings: () -> Unit,
-    onAbout: () -> Unit,
     onBackup: () -> Unit,
     onEditAccount: (Long) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
@@ -180,7 +180,6 @@ fun HomeScreen(
                     if (!showSearch) viewModel.updateSearchQuery("")
                 },
                 onSettings = onSettings,
-                onAbout = onAbout,
                 onClearSelection = { viewModel.clearSelection() },
                 onEditSelected = {
                     val id = uiState.selectedIds.singleOrNull() ?: return@HomeTopBar
@@ -436,7 +435,6 @@ private fun HomeTopBar(
     onSearchQueryChange: (String) -> Unit,
     onToggleSearch: () -> Unit,
     onSettings: () -> Unit,
-    onAbout: () -> Unit,
     onClearSelection: () -> Unit,
     onEditSelected: () -> Unit,
     onDeleteSelected: () -> Unit,
@@ -549,7 +547,6 @@ private fun HomeTopBar(
                         scrollBehavior = scrollBehavior,
                     )
                 } else {
-                    var overflowOpen by remember { mutableStateOf(false) }
                     TopAppBar(
                         title = { Text(stringResource(R.string.app_name)) },
                         actions = {
@@ -559,29 +556,10 @@ private fun HomeTopBar(
                                     contentDescription = stringResource(R.string.search),
                                 )
                             }
-                            IconButton(onClick = { overflowOpen = true }) {
+                            IconButton(onClick = onSettings) {
                                 Icon(
-                                    Icons.Default.MoreVert,
-                                    contentDescription = stringResource(R.string.more_options),
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = overflowOpen,
-                                onDismissRequest = { overflowOpen = false },
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.settings)) },
-                                    onClick = {
-                                        overflowOpen = false
-                                        onSettings()
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.about)) },
-                                    onClick = {
-                                        overflowOpen = false
-                                        onAbout()
-                                    },
+                                    Icons.Default.Settings,
+                                    contentDescription = stringResource(R.string.settings),
                                 )
                             }
                         },

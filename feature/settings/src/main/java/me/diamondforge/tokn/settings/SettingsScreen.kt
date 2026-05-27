@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Sync
@@ -30,6 +31,7 @@ fun SettingsScreen(
     onSecurity: () -> Unit,
     onBackup: () -> Unit,
     onSync: () -> Unit,
+    onAbout: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -90,6 +92,17 @@ fun SettingsScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
                     },
                     modifier = Modifier.clickable(onClick = onSync),
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.about_title)) },
+                    supportingContent = { Text(stringResource(R.string.about_desc)) },
+                    leadingContent = { Icon(Icons.Default.Info, contentDescription = null) },
+                    trailingContent = {
+                        Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
+                    },
+                    modifier = Modifier.clickable(onClick = onAbout),
                 )
             }
         }

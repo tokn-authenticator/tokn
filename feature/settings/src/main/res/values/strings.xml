@@ -7,6 +7,7 @@
     <string name="backup_desc">Export and import your accounts</string>
     <string name="sync_menu_title">Sync to another device</string>
     <string name="sync_menu_desc">Transfer accounts over Wi-Fi or QR code</string>
+    <string name="about_desc">Version, source code, licenses</string>
 
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>

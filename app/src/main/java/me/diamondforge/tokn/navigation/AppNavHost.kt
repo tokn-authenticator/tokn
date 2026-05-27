@@ -126,7 +126,6 @@ fun AppNavHost(
                 onFromImage = { entry.navigateOnce(navController, Screen.FromImage.route) },
                 onManualEntry = { entry.navigateOnce(navController, Screen.ManualEntry.route) },
                 onSettings = { entry.navigateOnce(navController, Screen.Settings.route) },
-                onAbout = { entry.navigateOnce(navController, Screen.About.route) },
                 onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
                 onEditAccount = { id -> entry.navigateOnce(navController, Screen.EditAccount.createRoute(id)) },
             )
@@ -196,6 +195,7 @@ fun AppNavHost(
                 onSecurity = { entry.navigateOnce(navController, Screen.SecuritySettings.route) },
                 onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
                 onSync = { entry.navigateOnce(navController, Screen.Sync.route) },
+                onAbout = { entry.navigateOnce(navController, Screen.About.route) },
             )
         }
         composable(Screen.Sync.route) { entry ->
