@@ -36,6 +36,15 @@
     <string name="cd_exit_search">Suche schließen</string>
     <string name="cd_clear_search">Suche leeren</string>
     <string name="cd_drag_handle">Zum Verschieben halten</string>
+    <string name="sort">Sortierung</string>
+    <string name="cd_sort">Konten sortieren</string>
+    <string name="sort_custom">Benutzerdefiniert</string>
+    <string name="sort_issuer_asc">Aussteller (A → Z)</string>
+    <string name="sort_issuer_desc">Aussteller (Z → A)</string>
+    <string name="sort_name_asc">Name (A → Z)</string>
+    <string name="sort_name_desc">Name (Z → A)</string>
+    <string name="sort_most_used">Häufig genutzt</string>
+    <string name="sort_recently_used">Zuletzt genutzt</string>
     <string name="icon_picker_title">Icon wählen</string>
     <string name="icon_picker_gallery">Aus Galerie</string>
     <string name="icon_picker_remove">Entfernen</string>

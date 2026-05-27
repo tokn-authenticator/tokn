@@ -15,6 +15,8 @@ class OtpAccount(
     val customIconBytes: ByteArray? = null,
     val iconPackId: String? = null,
     val iconPackFile: String? = null,
+    val usageCount: Int = 0,
+    val lastUsedAt: Long = 0L,
 ) {
     fun copy(
         id: Long = this.id,
@@ -31,9 +33,12 @@ class OtpAccount(
         customIconBytes: ByteArray? = this.customIconBytes,
         iconPackId: String? = this.iconPackId,
         iconPackFile: String? = this.iconPackFile,
+        usageCount: Int = this.usageCount,
+        lastUsedAt: Long = this.lastUsedAt,
     ): OtpAccount = OtpAccount(
         id, issuer, accountName, secret, algorithm, digits, period, counter,
         type, sortOrder, group, customIconBytes, iconPackId, iconPackFile,
+        usageCount, lastUsedAt,
     )
 
     override fun equals(other: Any?): Boolean {
@@ -52,7 +57,9 @@ class OtpAccount(
                 group == other.group &&
                 customIconBytes.contentEqualsOrBothNull(other.customIconBytes) &&
                 iconPackId == other.iconPackId &&
-                iconPackFile == other.iconPackFile
+                iconPackFile == other.iconPackFile &&
+                usageCount == other.usageCount &&
+                lastUsedAt == other.lastUsedAt
     }
 
     override fun hashCode(): Int {
@@ -70,6 +77,8 @@ class OtpAccount(
         result = 31 * result + (customIconBytes?.contentHashCode() ?: 0)
         result = 31 * result + (iconPackId?.hashCode() ?: 0)
         result = 31 * result + (iconPackFile?.hashCode() ?: 0)
+        result = 31 * result + usageCount
+        result = 31 * result + lastUsedAt.hashCode()
         return result
     }
 }

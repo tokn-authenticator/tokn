@@ -41,6 +41,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -116,6 +117,7 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.OtpType
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
@@ -155,15 +157,30 @@ fun HomeScreen(
 
     val items = uiState.items
     var listItems by remember(items) { mutableStateOf(items) }
+    val canDrag = uiState.sort == AccountSort.CUSTOM
 
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(
         lazyListState = lazyListState,
         onMove = { from, to ->
+            // Only honour drags in CUSTOM. Any other sort is derived from
+            // account fields and persisting a manual order would silently
+            // overwrite the user's saved CUSTOM ordering.
+            if (!canDrag) return@rememberReorderableLazyListState
             listItems = listItems.toMutableList().apply { add(to.index, removeAt(from.index)) }
             viewModel.reorderAccounts(listItems.map { it.account })
         },
     )
+
+    // Sort changes are a "tell me where the new winners are" gesture, not a
+    // "preserve my reading position" gesture. Without this, keyed LazyColumn
+    // keeps the previously-focused item in view, which hides the actual new
+    // top item the user just sorted to.
+    LaunchedEffect(uiState.sort) {
+        if (uiState.sort != AccountSort.CUSTOM) {
+            lazyListState.scrollToItem(0)
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -188,6 +205,8 @@ fun HomeScreen(
                     },
                     onDeleteSelected = { showBulkDeleteConfirm = true },
                     onSelectAll = { viewModel.selectAll() },
+                    sort = uiState.sort,
+                    onSetSort = viewModel::setSort,
                     scrollBehavior = scrollBehavior,
                 )
             },
@@ -241,7 +260,7 @@ fun HomeScreen(
                             ReorderableItem(reorderableState, key = item.account.id) { isDragging ->
                                 val copiedMessage = stringResource(R.string.code_copied)
                                 val isSelected = item.account.id in uiState.selectedIds
-                                val canReorder = uiState.selectedIds.size == 1
+                                val canReorder = canDrag && uiState.selectedIds.size == 1
                                 val isMasked = uiState.tapToRevealEnabled &&
                                         item.account.id !in uiState.revealedIds
                                 AccountCard(
@@ -442,6 +461,8 @@ private fun HomeTopBar(
     onEditSelected: () -> Unit,
     onDeleteSelected: () -> Unit,
     onSelectAll: () -> Unit,
+    sort: AccountSort,
+    onSetSort: (AccountSort) -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
     AnimatedContent(
@@ -559,6 +580,7 @@ private fun HomeTopBar(
                                     contentDescription = stringResource(R.string.search),
                                 )
                             }
+                            SortMenu(sort = sort, onSetSort = onSetSort)
                             IconButton(onClick = onSettings) {
                                 Icon(
                                     Icons.Default.Settings,
@@ -572,6 +594,54 @@ private fun HomeTopBar(
             }
         }
     }
+}
+
+@Composable
+private fun SortMenu(
+    sort: AccountSort,
+    onSetSort: (AccountSort) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    IconButton(onClick = { expanded = true }) {
+        Icon(
+            Icons.AutoMirrored.Filled.Sort,
+            contentDescription = stringResource(R.string.cd_sort),
+        )
+    }
+    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        AccountSort.entries.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(stringResource(option.labelRes())) },
+                leadingIcon = {
+                    if (option == sort) {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    } else {
+                        // Keeps every row's leading slot the same width so the
+                        // active row doesn't shift its label sideways.
+                        Spacer(modifier = Modifier.size(24.dp))
+                    }
+                },
+                onClick = {
+                    expanded = false
+                    onSetSort(option)
+                },
+            )
+        }
+    }
+}
+
+private fun AccountSort.labelRes(): Int = when (this) {
+    AccountSort.CUSTOM -> R.string.sort_custom
+    AccountSort.ISSUER_ASC -> R.string.sort_issuer_asc
+    AccountSort.ISSUER_DESC -> R.string.sort_issuer_desc
+    AccountSort.NAME_ASC -> R.string.sort_name_asc
+    AccountSort.NAME_DESC -> R.string.sort_name_desc
+    AccountSort.USAGE_COUNT -> R.string.sort_most_used
+    AccountSort.LAST_USED -> R.string.sort_recently_used
 }
 
 @Composable

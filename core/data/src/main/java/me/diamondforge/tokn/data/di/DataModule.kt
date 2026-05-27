@@ -19,6 +19,7 @@ import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
+import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import me.diamondforge.tokn.security.KeystoreManager
@@ -40,7 +41,11 @@ object DataModule {
         val factory = SupportOpenHelperFactory(passphrase)
         return Room.databaseBuilder(context, AppDatabase::class.java, "otp_database")
             .openHelperFactory(factory)
-            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
+            .addMigrations(
+                AppDatabase.MIGRATION_1_2,
+                AppDatabase.MIGRATION_2_3,
+                AppDatabase.MIGRATION_3_4,
+            )
             .build()
     }
 
@@ -71,6 +76,9 @@ object DataModule {
     @Provides
     fun provideIncrementHotpCounterUseCase(repo: AccountRepository) =
         IncrementHotpCounterUseCase(repo)
+
+    @Provides
+    fun provideRecordUsageUseCase(repo: AccountRepository) = RecordUsageUseCase(repo)
 
     @Provides
     fun provideGenerateOtpUseCase() = GenerateOtpUseCase()

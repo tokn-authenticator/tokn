@@ -38,6 +38,9 @@ class AccountRepositoryImpl @Inject constructor(
     override suspend fun incrementCounter(id: Long) =
         dao.incrementCounter(id)
 
+    override suspend fun recordUsage(id: Long, timestamp: Long) =
+        dao.recordUsage(id, timestamp)
+
     override suspend fun getAccountById(id: Long): OtpAccount? =
         dao.getAccountById(id)?.toDomain()
 }

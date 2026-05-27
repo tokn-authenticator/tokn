@@ -37,6 +37,10 @@ object SyncPayload {
                     }
                     account.iconPackId?.let { put("iconPackId", it) }
                     account.iconPackFile?.let { put("iconPackFile", it) }
+                    // usageCount and lastUsedAt are intentionally not
+                    // transferred: they reflect per-device behaviour, not
+                    // account identity, and rebuild themselves on the
+                    // receiving device as the user works there.
                 },
             )
         }

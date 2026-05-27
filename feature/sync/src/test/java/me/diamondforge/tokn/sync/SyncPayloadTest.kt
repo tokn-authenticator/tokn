@@ -112,4 +112,26 @@ class SyncPayloadTest {
             assertEquals(algo, restored.algorithm)
         }
     }
+
+    @Test
+    fun `usageCount and lastUsedAt are not transferred`() {
+        // Per-device behavioural data should not roam across the wire.
+        // The receiving device builds up its own usage profile.
+        val account = OtpAccount(
+            issuer = "GitHub",
+            accountName = "alice",
+            secret = "JBSWY3DPEHPK3PXP",
+            usageCount = 42,
+            lastUsedAt = 1_700_000_000_000L,
+        )
+        val json = JSONObject(SyncPayload.serialize(listOf(account)))
+        val emitted = json.getJSONArray("accounts").getJSONObject(0)
+        assert(!emitted.has("usageCount")) { "usageCount leaked into sync payload" }
+        assert(!emitted.has("lastUsedAt")) { "lastUsedAt leaked into sync payload" }
+
+        // And a roundtrip lands at defaults.
+        val restored = SyncPayload.deserialize(json.toString())[0]
+        assertEquals(0, restored.usageCount)
+        assertEquals(0L, restored.lastUsedAt)
+    }
 }

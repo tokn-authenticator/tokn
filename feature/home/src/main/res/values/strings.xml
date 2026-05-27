@@ -36,6 +36,15 @@
     <string name="cd_exit_search">Close search</string>
     <string name="cd_clear_search">Clear search</string>
     <string name="cd_drag_handle">Drag to reorder</string>
+    <string name="sort">Sort</string>
+    <string name="cd_sort">Sort accounts</string>
+    <string name="sort_custom">Custom</string>
+    <string name="sort_issuer_asc">Issuer (A → Z)</string>
+    <string name="sort_issuer_desc">Issuer (Z → A)</string>
+    <string name="sort_name_asc">Name (A → Z)</string>
+    <string name="sort_name_desc">Name (Z → A)</string>
+    <string name="sort_most_used">Most used</string>
+    <string name="sort_recently_used">Recently used</string>
     <string name="icon_picker_title">Choose an icon</string>
     <string name="icon_picker_gallery">From gallery</string>
     <string name="icon_picker_remove">Remove</string>

@@ -11,6 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import me.diamondforge.tokn.domain.model.AccountSort
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -56,6 +57,12 @@ open class UserPreferencesRepository @Inject constructor(
             ?: SyncMethod.LAN
     }
 
+    open val accountSort: Flow<AccountSort> = dataStore.data.map { prefs ->
+        prefs[Keys.ACCOUNT_SORT]
+            ?.let { runCatching { AccountSort.valueOf(it) }.getOrNull() }
+            ?: AccountSort.CUSTOM
+    }
+
     suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     }
@@ -88,6 +95,10 @@ open class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.LAST_SYNC_METHOD] = method.name }
     }
 
+    suspend fun setAccountSort(sort: AccountSort) {
+        dataStore.edit { it[Keys.ACCOUNT_SORT] = sort.name }
+    }
+
     private object Keys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val AUTO_LOCK_TIMEOUT = intPreferencesKey("auto_lock_timeout")
@@ -97,6 +108,7 @@ open class UserPreferencesRepository @Inject constructor(
         val TAP_TO_REVEAL_ENABLED = booleanPreferencesKey("tap_to_reveal_enabled")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")
+        val ACCOUNT_SORT = stringPreferencesKey("account_sort")
     }
 }
 

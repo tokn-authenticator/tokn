@@ -306,6 +306,9 @@ class BackupViewModel @Inject constructor(
                     }
                     account.iconPackId?.let { put("iconPackId", it) }
                     account.iconPackFile?.let { put("iconPackFile", it) }
+                    // usageCount / lastUsedAt deliberately omitted: those
+                    // are per-device behavioural signals, not part of the
+                    // account identity, and shouldn't roam with a backup.
                 },
             )
         }

@@ -7,7 +7,6 @@ import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -17,8 +16,6 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.diamondforge.tokn.data.icon.IconPackManager
-import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
-import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
@@ -27,6 +24,7 @@ import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
+import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -90,6 +88,7 @@ class HomeViewModelRevealTest {
         reorderAccountsUseCase = ReorderAccountsUseCase(repo),
         generateOtpUseCase = GenerateOtpUseCase(),
         incrementHotpCounterUseCase = IncrementHotpCounterUseCase(repo),
+        recordUsageUseCase = RecordUsageUseCase(repo),
         appPreferences = appPrefs,
         userPreferences = userPrefs,
         iconPackManager = iconPackManager,
@@ -182,13 +181,3 @@ private fun hotp(counter: Long): OtpAccount = OtpAccount(
     type = OtpType.HOTP,
     counter = counter,
 )
-
-private class FakeAppPreferences(context: Context) : AppPreferencesRepository(context) {
-    val fetch = MutableStateFlow(false)
-    override val iconFetchEnabled = fetch
-}
-
-private class FakeUserPreferences(context: Context) : UserPreferencesRepository(context) {
-    val tap = MutableStateFlow(false)
-    override val tapToRevealEnabled = tap
-}

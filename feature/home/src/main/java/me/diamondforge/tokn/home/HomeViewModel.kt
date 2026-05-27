@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
+import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
@@ -30,6 +32,7 @@ import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
 import me.diamondforge.tokn.domain.usecase.OtpResult
+import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
 import me.diamondforge.tokn.home.HomeViewModel.Companion.CLIPBOARD_CLEAR_DELAY_MS
 import javax.inject.Inject
@@ -43,6 +46,7 @@ class HomeViewModel @Inject constructor(
     private val reorderAccountsUseCase: ReorderAccountsUseCase,
     private val generateOtpUseCase: GenerateOtpUseCase,
     private val incrementHotpCounterUseCase: IncrementHotpCounterUseCase,
+    private val recordUsageUseCase: RecordUsageUseCase,
     private val appPreferences: AppPreferencesRepository,
     private val userPreferences: UserPreferencesRepository,
     private val iconPackManager: IconPackManager,
@@ -60,8 +64,18 @@ class HomeViewModel @Inject constructor(
     private val _selectedIds = MutableStateFlow<Set<Long>>(emptySet())
     private val _reveals = MutableStateFlow<Map<Long, RevealRecord>>(emptyMap())
 
+    // Cached mirror of the persisted sort so reorderAccounts() can check
+    // synchronously without re-reading the DataStore on every drag tick.
+    private val _accountSort: StateFlow<AccountSort> = userPreferences.accountSort
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AccountSort.CUSTOM)
+
+    // Sort once whenever accounts or sort change. The per-tick uiState combine
+    // below then leaves order alone, only the OTP codes refresh each second.
+    private val sortedAccounts: Flow<List<OtpAccount>> =
+        combine(_accounts, _accountSort) { accounts, sort -> accounts.sortedFor(sort) }
+
     val uiState: StateFlow<HomeUiState> = combine(
-        combine(_accounts, _currentTimeMillis, _searchQuery, _selectedGroup, _selectedIds, ::Quint),
+        combine(sortedAccounts, _currentTimeMillis, _searchQuery, _selectedGroup, _selectedIds, ::Quint),
         appPreferences.iconFetchEnabled,
     ) { quint, iconFetchEnabled ->
         val (accounts, time, query, selectedGroup, selectedIds) = quint
@@ -120,6 +134,10 @@ class HomeViewModel @Inject constructor(
             }
             .toSet()
         state.copy(revealedIds = revealed)
+    }.combine(_accountSort) { state, sort ->
+        // sortedAccounts has already applied the sort upstream; this combine
+        // exists only to surface the current value in the UI state.
+        state.copy(sort = sort)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
@@ -160,12 +178,22 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch { deleteAccountsUseCase(ids) }
     }
 
+    /**
+     * Persists a new manual order. No-op outside [AccountSort.CUSTOM] so a
+     * stray onMove from the reorderable LazyList during a sort transition
+     * can't corrupt the user's saved custom order.
+     */
     fun reorderAccounts(accounts: List<OtpAccount>) {
+        if (_accountSort.value != AccountSort.CUSTOM) return
         viewModelScope.launch { reorderAccountsUseCase(accounts) }
     }
 
     fun incrementHotpCounter(id: Long) {
         viewModelScope.launch { incrementHotpCounterUseCase(id) }
+    }
+
+    fun setSort(sort: AccountSort) {
+        viewModelScope.launch { userPreferences.setAccountSort(sort) }
     }
 
     /**
@@ -188,6 +216,7 @@ class HomeViewModel @Inject constructor(
         _reveals.update {
             it + (item.account.id to RevealRecord(item.otpResult.code, expiresAt))
         }
+        recordUsage(item.account.id)
     }
 
     fun copyToClipboard(item: AccountItem) {
@@ -198,6 +227,7 @@ class HomeViewModel @Inject constructor(
             }
         }
         clipboard.setPrimaryClip(clip)
+        recordUsage(item.account.id)
 
         if (item.account.type == OtpType.HOTP) {
             // Drop the reveal so the freshly generated code never
@@ -227,6 +257,16 @@ class HomeViewModel @Inject constructor(
         _selectedGroup.value = group
     }
 
+    /**
+     * Records a usage event. Every interaction (reveal, copy) counts on its
+     * own so spam-tapping bumps the count predictably; without that the
+     * "most used" sort can't reflect intent in real time.
+     */
+    private fun recordUsage(id: Long) {
+        val now = System.currentTimeMillis()
+        viewModelScope.launch { recordUsageUseCase(id, now) }
+    }
+
     companion object {
         private const val CLIPBOARD_CLEAR_DELAY_MS = 30_000L
         private const val REVEAL_HOTP_MS = 15_000L
@@ -243,6 +283,7 @@ data class HomeUiState(
     val selectedIds: Set<Long> = emptySet(),
     val tapToRevealEnabled: Boolean = false,
     val revealedIds: Set<Long> = emptySet(),
+    val sort: AccountSort = AccountSort.CUSTOM,
 ) {
     val selectionMode: Boolean get() = selectedIds.isNotEmpty()
 }
@@ -265,3 +306,38 @@ private data class RevealRecord(
     val code: String,
     val expiresAt: Long,
 )
+
+/**
+ * Stable sort with consistent tiebreakers:
+ * - String comparisons are case-insensitive.
+ * - sortOrder is the universal tiebreaker (matches CUSTOM ordering).
+ * - lastUsedAt = 0L means "never used" and naturally sinks to the bottom
+ *   under LAST_USED (descending) without null-special-casing.
+ */
+internal fun List<OtpAccount>.sortedFor(sort: AccountSort): List<OtpAccount> = when (sort) {
+    AccountSort.CUSTOM -> this
+    AccountSort.ISSUER_ASC -> sortedWith(
+        compareBy<OtpAccount, String>(String.CASE_INSENSITIVE_ORDER) { it.issuer }
+            .thenBy { it.sortOrder },
+    )
+    AccountSort.ISSUER_DESC -> sortedWith(
+        Comparator<OtpAccount> { a, b ->
+            String.CASE_INSENSITIVE_ORDER.compare(b.issuer, a.issuer)
+        }.thenBy { it.sortOrder },
+    )
+    AccountSort.NAME_ASC -> sortedWith(
+        compareBy<OtpAccount, String>(String.CASE_INSENSITIVE_ORDER) { it.accountName }
+            .thenBy { it.sortOrder },
+    )
+    AccountSort.NAME_DESC -> sortedWith(
+        Comparator<OtpAccount> { a, b ->
+            String.CASE_INSENSITIVE_ORDER.compare(b.accountName, a.accountName)
+        }.thenBy { it.sortOrder },
+    )
+    AccountSort.USAGE_COUNT -> sortedWith(
+        compareByDescending<OtpAccount> { it.usageCount }.thenBy { it.sortOrder },
+    )
+    AccountSort.LAST_USED -> sortedWith(
+        compareByDescending<OtpAccount> { it.lastUsedAt }.thenBy { it.sortOrder },
+    )
+}

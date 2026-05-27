@@ -23,6 +23,8 @@ data class OtpAccountEntity(
     @ColumnInfo(name = "custom_icon_blob") val customIconBlob: ByteArray? = null,
     @ColumnInfo(name = "icon_pack_id") val iconPackId: String? = null,
     @ColumnInfo(name = "icon_pack_file") val iconPackFile: String? = null,
+    @ColumnInfo(name = "usage_count", defaultValue = "0") val usageCount: Int = 0,
+    @ColumnInfo(name = "last_used_at", defaultValue = "0") val lastUsedAt: Long = 0L,
 )
 
 fun OtpAccountEntity.toDomain(): OtpAccount = OtpAccount(
@@ -40,6 +42,8 @@ fun OtpAccountEntity.toDomain(): OtpAccount = OtpAccount(
     customIconBytes = customIconBlob,
     iconPackId = iconPackId,
     iconPackFile = iconPackFile,
+    usageCount = usageCount,
+    lastUsedAt = lastUsedAt,
 )
 
 fun OtpAccount.toEntity(): OtpAccountEntity = OtpAccountEntity(
@@ -57,4 +61,6 @@ fun OtpAccount.toEntity(): OtpAccountEntity = OtpAccountEntity(
     customIconBlob = customIconBytes,
     iconPackId = iconPackId,
     iconPackFile = iconPackFile,
+    usageCount = usageCount,
+    lastUsedAt = lastUsedAt,
 )

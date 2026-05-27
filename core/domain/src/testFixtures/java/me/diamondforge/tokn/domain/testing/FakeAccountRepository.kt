@@ -53,6 +53,12 @@ class FakeAccountRepository(
         state.value = state.value.map { if (it.id == id) it.copy(counter = it.counter + 1) else it }
     }
 
+    override suspend fun recordUsage(id: Long, timestamp: Long) {
+        state.value = state.value.map {
+            if (it.id == id) it.copy(usageCount = it.usageCount + 1, lastUsedAt = timestamp) else it
+        }
+    }
+
     override suspend fun getAccountById(id: Long): OtpAccount? =
         state.value.firstOrNull { it.id == id }
 }

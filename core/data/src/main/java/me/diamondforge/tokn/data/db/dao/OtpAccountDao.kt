@@ -36,6 +36,12 @@ interface OtpAccountDao {
     @Query("UPDATE otp_accounts SET counter = counter + 1 WHERE id = :id")
     suspend fun incrementCounter(id: Long)
 
+    @Query(
+        "UPDATE otp_accounts SET usage_count = usage_count + 1, last_used_at = :timestamp " +
+                "WHERE id = :id"
+    )
+    suspend fun recordUsage(id: Long, timestamp: Long)
+
     @Query("UPDATE otp_accounts SET sortOrder = :order WHERE id = :id")
     suspend fun updateSortOrder(id: Long, order: Int)
 }
