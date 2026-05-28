@@ -26,9 +26,13 @@ class EncryptedBackupManager @Inject constructor(
 
     fun importFromUri(context: Context, uri: Uri, password: String): String {
         val raw = context.contentResolver.openInputStream(uri)?.use { stream ->
-            stream.readBytes().toString(Charsets.UTF_8)
+            stream.readBytes()
         } ?: error("Cannot open input stream")
-        val wrapper = JSONObject(raw)
+        return decryptBytes(raw, password)
+    }
+
+    fun decryptBytes(raw: ByteArray, password: String): String {
+        val wrapper = JSONObject(raw.toString(Charsets.UTF_8))
         val payload = EncryptedPayload(
             ciphertext = wrapper.getString("ciphertext"),
             iv = wrapper.getString("iv"),

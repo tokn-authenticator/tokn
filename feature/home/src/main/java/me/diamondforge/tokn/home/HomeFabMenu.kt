@@ -79,8 +79,8 @@ internal fun BoxScope.HomeFabMenu(
         )
     }
 
-    // Bottom-up reveal on open, top-down collapse on close.
-    // Aegis-style: items "expand from" / "collapse into" the FAB.
+    // Bottom-up reveal on open, top-down collapse on close so each item appears
+    // to expand from / collapse into the FAB underneath.
     var visibleFabItems by remember { mutableIntStateOf(0) }
     LaunchedEffect(open) {
         if (open) {

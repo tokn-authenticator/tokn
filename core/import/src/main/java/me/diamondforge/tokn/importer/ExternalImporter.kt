@@ -18,6 +18,13 @@ interface ExternalImporter {
     /** Single-line localized help blurb, surfaced under the radio in the source picker. */
     val noteRes: Int
 
+    /**
+     * Sort weight in the source picker. Lower values surface first; equal values
+     * fall back to alphabetical [displayName]. Override to pin a built-in source
+     * above the alphabetised brand list.
+     */
+    val pickerOrder: Int get() = 100
+
     /** MIME types passed to the system file picker. */
     val acceptedMimeTypes: Array<String>
 

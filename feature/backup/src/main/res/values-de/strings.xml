@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="backup_title">Sicherung &amp; Wiederherstellung</string>
-    <string name="export_section">Exportieren</string>
-    <string name="export_description">Alle Konten verschlüsseln und in eine Datei speichern. Verwende ein starkes Passwort, das ist der einzige Schutz für deine Schlüssel.</string>
+    <string name="backup_title">Importieren &amp; Exportieren</string>
+    <string name="import_from_file">Konten aus einer Datei lesen</string>
+    <string name="import_from_file_desc">Konten aus einem Backup oder einer anderen App importieren</string>
+    <string name="import_from_google_auth">Aus Google Authenticator migrieren</string>
+    <string name="import_from_google_auth_desc">Die Transfer-QR-Codes scannen, die Google Authenticator anzeigt</string>
+    <string name="export_vault">Tokn-Tresor exportieren</string>
+    <string name="export_vault_desc">Deine Konten in eine Datei schreiben</string>
+    <string name="export_dialog_body">Schreibt jedes Konto in eine Datei. Wähle unten ein Format und entscheide, ob die Datei mit einem Passwort gesichert werden soll.</string>
+    <string name="export_format_label">Dateiformat</string>
+    <string name="export_format_tokn">Tokn-Tresor (.kv)</string>
+    <string name="export_format_otpauth">otpauth-URI-Liste (.txt)</string>
+    <string name="export_format_plaintext">Klartext (.txt)</string>
+    <string name="export_encrypt_checkbox">Backup verschlüsseln</string>
+    <string name="export_risk_warning">Ohne Passwort landet jeder OTP-Schlüssel als Klartext in der Datei. Jeder, der die Datei öffnet, kann deine Konten klonen und Codes auf seinem Gerät erzeugen.</string>
+    <string name="export_risk_acknowledge">Die Risiken sind klar</string>
     <string name="backup_password">Backup-Passwort</string>
     <string name="export_password_hint">Min. 8 Zeichen</string>
-    <string name="export_backup">Backup exportieren</string>
-    <string name="export_unencrypted">Ohne Verschlüsselung exportieren</string>
-    <string name="export_unencrypted_hint">Warnung: OTP-Schlüssel werden als Klartext gespeichert.</string>
-    <string name="export_unencrypted_warning_title">Ohne Verschlüsselung exportieren?</string>
-    <string name="export_unencrypted_warning_body">Deine OTP-Schlüssel werden als Klartext gespeichert. Jeder mit Zugriff auf diese Datei kann alle Konten lesen und Codes generieren. Nur für vertrauenswürdige Übertragungen verwenden.</string>
-    <string name="export_unencrypted_confirm">Unverschlüsselt exportieren</string>
-    <string name="import_section">Importieren</string>
-    <string name="import_description">Konten aus einer zuvor exportierten Backup-Datei wiederherstellen.</string>
-    <string name="import_backup">Backup-Datei auswählen</string>
     <string name="export_success">Backup erfolgreich exportiert</string>
-    <string name="import_success">%d Konto(s) importiert</string>
-    <string name="other_import_section">Aus anderem Authenticator importieren</string>
-    <string name="other_import_description">Konten aus einer anderen Authenticator-App importieren.</string>
-    <string name="other_import_select_app">Quell-App auswählen</string>
-    <string name="other_import_button">Backup-Datei auswählen</string>
+    <string name="import_source_picker_title">Aus Datei importieren</string>
+    <string name="import_picker_tokn_label">Tokn-Tresor</string>
+    <string name="import_picker_tokn_note">Tokn-Backup (.kv oder .enc.kv).</string>
     <string name="other_import_action_select_file">Backup-Datei auswählen</string>
     <string name="other_import_action_scan_qr">QR-Codes scannen</string>
-    <string name="migration_picker_label">Google Authenticator (QR)</string>
-    <string name="migration_picker_note">Du brauchst ein zweites Gerät, das den Export zeigt, oder ein Foto davon. Scanne die QR-Codes aus Google Authenticator unter „Konten übertragen" → „Exportieren".</string>
     <string name="migration_scan_title">Migrations-Codes scannen</string>
     <string name="migration_from_image">Aus Bild</string>
     <string name="migration_pick_images">QR-Bilder auswählen</string>
@@ -43,6 +42,7 @@
     <string name="camera_permission_rationale_migration">Kamerazugriff wird benötigt, um die QR-Codes von Google Authenticator zu scannen.</string>
     <string name="grant_permission">Berechtigung erteilen</string>
     <string name="external_password_title">%1$s-Backup ist verschlüsselt</string>
+    <string name="external_password_import">Importieren</string>
     <string name="import_result_title">Import abgeschlossen</string>
     <string name="import_result_all_imported">%d Konto(s) importiert.</string>
     <string name="import_result_partial">%1$d Konto(s) importiert, %2$d waren schon in deiner Bibliothek.</string>
@@ -57,10 +57,8 @@
     <string name="error_file_not_readable">Datei konnte nicht geöffnet werden. Sie wurde möglicherweise verschoben oder gelöscht.</string>
     <string name="error_file_not_writable">Backup-Datei konnte nicht geschrieben werden. Speicherplatz prüfen.</string>
     <string name="error_wrong_password">Falsches Passwort.</string>
-    <string name="error_not_tokn_backup">Das sieht nicht wie eine Tokn-Backup-Datei aus.</string>
     <string name="error_external_not_recognized">Diese Datei wird von keinem unterstützten Importer erkannt.</string>
     <string name="error_external_unsupported">Dieses Backup verwendet Hardware- oder biometrischen Schutz und kann nicht mit einem Passwort importiert werden.</string>
     <string name="error_external_malformed">Die ausgewählte Datei ist unvollständig oder fehlerhaft.</string>
     <string name="error_generic">Fehler: %s</string>
-    <string name="error_password_required">Dieses Backup ist passwortgeschützt. Gib das Backup-Passwort ein, um es zu importieren.</string>
 </resources>

@@ -1,5 +1,3 @@
-// Selection action-mode and expanding FAB-menu UX inspired by Aegis Authenticator
-// (https://github.com/beemdevelopment/Aegis, GPL-3.0). Reimplemented in Compose.
 package me.diamondforge.tokn.home
 
 import androidx.activity.compose.BackHandler

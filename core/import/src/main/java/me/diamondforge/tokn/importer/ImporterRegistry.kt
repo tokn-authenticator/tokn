@@ -7,7 +7,9 @@ import javax.inject.Singleton
 class ImporterRegistry @Inject constructor(
     private val importers: Set<@JvmSuppressWildcards ExternalImporter>,
 ) {
-    fun all(): List<ExternalImporter> = importers.sortedBy { it.displayName.lowercase() }
+    fun all(): List<ExternalImporter> = importers.sortedWith(
+        compareBy<ExternalImporter> { it.pickerOrder }.thenBy { it.displayName.lowercase() },
+    )
 
     fun byId(id: String): ExternalImporter? = importers.firstOrNull { it.id == id }
 
