@@ -3,128 +3,47 @@
 package me.diamondforge.tokn.home
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DragHandle
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import coil3.compose.AsyncImagePainter
-import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.SubcomposeAsyncImageContent
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.diamondforge.tokn.domain.model.AccountSort
-import me.diamondforge.tokn.domain.model.OtpType
-import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import kotlin.math.absoluteValue
-
-private const val FAB_STAGGER_MS = 50L
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -302,600 +221,25 @@ fun HomeScreen(
             }
         }
 
-        AnimatedVisibility(
-            visible = fabMenuOpen,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { fabMenuOpen = false },
-                    ),
-            )
-        }
-
         if (!selectionMode) {
-            val totalFabItems = 3
-            // Bottom-up reveal on open, top-down collapse on close.
-            // Aegis-style: items "expand from" / "collapse into" the FAB.
-            var visibleFabItems by remember { mutableIntStateOf(0) }
-            LaunchedEffect(fabMenuOpen) {
-                if (fabMenuOpen) {
-                    for (c in 1..totalFabItems) {
-                        visibleFabItems = c
-                        delay(FAB_STAGGER_MS)
-                    }
-                } else {
-                    for (c in (totalFabItems - 1) downTo 0) {
-                        visibleFabItems = c
-                        delay(FAB_STAGGER_MS)
-                    }
-                }
-            }
-
-            val windowInfo = LocalWindowInfo.current
-            val density = LocalDensity.current
-            val widthDp = with(density) { windowInfo.containerSize.width.toDp() }
-
-            val fabPadding = when {
-                widthDp >= 840.dp -> 48.dp
-                widthDp >= 600.dp -> 32.dp
-                else -> 16.dp
-            }
-
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(fabPadding),
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                // Threshold per row: top item appears last on open / disappears first on close.
-                // Row index 0 (top) shows when count > 2; row 2 (bottom, closest to FAB) when count > 0.
-                AnimatedVisibility(
-                    visible = visibleFabItems > 2,
-                    enter = fadeIn() + scaleIn() + expandVertically(),
-                    exit = fadeOut() + scaleOut() + shrinkVertically(),
-                ) {
-                    FabMenuItem(
-                        label = stringResource(R.string.add_scan_qr),
-                        icon = Icons.Default.QrCodeScanner,
-                    ) {
-                        fabMenuOpen = false
-                        onScanQr()
-                    }
-                }
-                AnimatedVisibility(
-                    visible = visibleFabItems > 1,
-                    enter = fadeIn() + scaleIn() + expandVertically(),
-                    exit = fadeOut() + scaleOut() + shrinkVertically(),
-                ) {
-                    FabMenuItem(
-                        label = stringResource(R.string.add_from_image),
-                        icon = Icons.Default.Image,
-                    ) {
-                        fabMenuOpen = false
-                        onFromImage()
-                    }
-                }
-                AnimatedVisibility(
-                    visible = visibleFabItems > 0,
-                    enter = fadeIn() + scaleIn() + expandVertically(),
-                    exit = fadeOut() + scaleOut() + shrinkVertically(),
-                ) {
-                    FabMenuItem(
-                        label = stringResource(R.string.add_manually),
-                        icon = Icons.Default.Keyboard,
-                    ) {
-                        fabMenuOpen = false
-                        onManualEntry()
-                    }
-                }
-                val fabRotation by animateFloatAsState(
-                    targetValue = if (fabMenuOpen) 45f else 0f,
-                    label = "fab-rotation",
-                )
-                FloatingActionButton(onClick = { fabMenuOpen = !fabMenuOpen }) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = stringResource(R.string.add_account),
-                        modifier = Modifier.rotate(fabRotation),
-                    )
-                }
-            }
+            HomeFabMenu(
+                open = fabMenuOpen,
+                onOpenChange = { fabMenuOpen = it },
+                onScanQr = onScanQr,
+                onFromImage = onFromImage,
+                onManualEntry = onManualEntry,
+            )
         }
     }
 
     if (showBulkDeleteConfirm) {
-        val count = uiState.selectedIds.size
-        AlertDialog(
-            onDismissRequest = { showBulkDeleteConfirm = false },
-            title = {
-                Text(
-                    pluralStringResource(R.plurals.delete_count_confirm_title, count, count),
-                )
+        BulkDeleteDialog(
+            count = uiState.selectedIds.size,
+            onConfirm = {
+                viewModel.deleteSelected()
+                showBulkDeleteConfirm = false
             },
-            text = {
-                Text(
-                    pluralStringResource(R.plurals.delete_count_confirm_message, count, count),
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.deleteSelected()
-                    showBulkDeleteConfirm = false
-                }) {
-                    Text(
-                        text = stringResource(R.string.delete),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showBulkDeleteConfirm = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
-        )
-    }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HomeTopBar(
-    selectionMode: Boolean,
-    selectedCount: Int,
-    showSearch: Boolean,
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    onToggleSearch: () -> Unit,
-    onSettings: () -> Unit,
-    onClearSelection: () -> Unit,
-    onEditSelected: () -> Unit,
-    onDeleteSelected: () -> Unit,
-    onSelectAll: () -> Unit,
-    sort: AccountSort,
-    onSetSort: (AccountSort) -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior,
-) {
-    AnimatedContent(
-        targetState = selectionMode,
-        transitionSpec = { fadeIn() togetherWith fadeOut() },
-        label = "topbar",
-    ) { inSelection ->
-        if (inSelection) {
-            var overflowOpen by remember { mutableStateOf(false) }
-            TopAppBar(
-                title = { Text(selectedCount.toString()) },
-                navigationIcon = {
-                    IconButton(onClick = onClearSelection) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = stringResource(R.string.cd_exit_selection),
-                        )
-                    }
-                },
-                actions = {
-                    if (selectedCount == 1) {
-                        IconButton(onClick = onEditSelected) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = stringResource(R.string.edit),
-                            )
-                        }
-                    }
-                    IconButton(onClick = onDeleteSelected) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.delete),
-                        )
-                    }
-                    IconButton(onClick = { overflowOpen = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = null)
-                    }
-                    DropdownMenu(
-                        expanded = overflowOpen,
-                        onDismissRequest = { overflowOpen = false },
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.select_all)) },
-                            onClick = {
-                                overflowOpen = false
-                                onSelectAll()
-                            },
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        } else {
-            AnimatedContent(
-                targetState = showSearch,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "search-topbar",
-            ) { isSearching ->
-                if (isSearching) {
-                    val focusRequester = remember { FocusRequester() }
-                    val keyboardController = LocalSoftwareKeyboardController.current
-                    LaunchedEffect(Unit) {
-                        focusRequester.requestFocus()
-                        keyboardController?.show()
-                    }
-                    TopAppBar(
-                        navigationIcon = {
-                            IconButton(onClick = onToggleSearch) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = stringResource(R.string.cd_exit_search),
-                                )
-                            }
-                        },
-                        title = {
-                            TextField(
-                                value = searchQuery,
-                                onValueChange = onSearchQueryChange,
-                                singleLine = true,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .focusRequester(focusRequester),
-                                placeholder = {
-                                    Text(stringResource(R.string.search_placeholder))
-                                },
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    disabledContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    disabledIndicatorColor = Color.Transparent,
-                                ),
-                            )
-                        },
-                        actions = {
-                            if (searchQuery.isNotEmpty()) {
-                                IconButton(onClick = { onSearchQueryChange("") }) {
-                                    Icon(
-                                        Icons.Default.Close,
-                                        contentDescription = stringResource(R.string.cd_clear_search),
-                                    )
-                                }
-                            }
-                        },
-                        scrollBehavior = scrollBehavior,
-                    )
-                } else {
-                    TopAppBar(
-                        title = { Text(stringResource(R.string.app_name)) },
-                        actions = {
-                            IconButton(onClick = onToggleSearch) {
-                                Icon(
-                                    Icons.Default.Search,
-                                    contentDescription = stringResource(R.string.search),
-                                )
-                            }
-                            SortMenu(sort = sort, onSetSort = onSetSort)
-                            IconButton(onClick = onSettings) {
-                                Icon(
-                                    Icons.Default.Settings,
-                                    contentDescription = stringResource(R.string.settings),
-                                )
-                            }
-                        },
-                        scrollBehavior = scrollBehavior,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SortMenu(
-    sort: AccountSort,
-    onSetSort: (AccountSort) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    IconButton(onClick = { expanded = true }) {
-        Icon(
-            Icons.AutoMirrored.Filled.Sort,
-            contentDescription = stringResource(R.string.cd_sort),
-        )
-    }
-    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-        AccountSort.entries.forEach { option ->
-            DropdownMenuItem(
-                text = { Text(stringResource(option.labelRes())) },
-                leadingIcon = {
-                    if (option == sort) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    } else {
-                        // Keeps every row's leading slot the same width so the
-                        // active row doesn't shift its label sideways.
-                        Spacer(modifier = Modifier.size(24.dp))
-                    }
-                },
-                onClick = {
-                    expanded = false
-                    onSetSort(option)
-                },
-            )
-        }
-    }
-}
-
-private fun AccountSort.labelRes(): Int = when (this) {
-    AccountSort.CUSTOM -> R.string.sort_custom
-    AccountSort.ISSUER_ASC -> R.string.sort_issuer_asc
-    AccountSort.ISSUER_DESC -> R.string.sort_issuer_desc
-    AccountSort.NAME_ASC -> R.string.sort_name_asc
-    AccountSort.NAME_DESC -> R.string.sort_name_desc
-    AccountSort.USAGE_COUNT -> R.string.sort_most_used
-    AccountSort.LAST_USED -> R.string.sort_recently_used
-}
-
-@Composable
-private fun FabMenuItem(
-    label: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(28.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        tonalElevation = 6.dp,
-        shadowElevation = 6.dp,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface,
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@Composable
-private fun ReorderableCollectionItemScope.AccountCard(
-    item: AccountItem,
-    isDragging: Boolean,
-    iconFetchEnabled: Boolean,
-    inSelectionMode: Boolean,
-    isSelected: Boolean,
-    canReorder: Boolean,
-    isMasked: Boolean,
-    onTap: () -> Unit,
-    onLongPress: () -> Unit,
-    onIncrementCounter: () -> Unit,
-) {
-    val containerColor = when {
-        isSelected -> MaterialTheme.colorScheme.secondaryContainer
-        isDragging -> MaterialTheme.colorScheme.surfaceVariant
-        else -> MaterialTheme.colorScheme.surface
-    }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(onClick = onTap, onLongClick = onLongPress),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 1.dp),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (isSelected) {
-                SelectionCheckmark()
-            } else {
-                IssuerAvatar(
-                    issuer = item.account.issuer,
-                    customIconBytes = item.account.customIconBytes,
-                    packIconPath = item.packIconPath,
-                    iconFetchEnabled = iconFetchEnabled,
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.account.issuer,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = item.account.accountName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = if (isMasked) maskOtpCode(item.otpResult.code)
-                    else formatOtpCode(item.otpResult.code),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.SemiBold,
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            if (!inSelectionMode) {
-                when (item.account.type) {
-                    OtpType.TOTP -> {
-                        val progress by animateFloatAsState(
-                            targetValue = item.otpResult.remainingMillis.toFloat() /
-                                    item.otpResult.periodMillis.toFloat(),
-                            label = "countdown",
-                        )
-                        val secondsRemaining = (item.otpResult.remainingMillis / 1000).toInt()
-                        Box(contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
-                                progress = { progress },
-                                modifier = Modifier.size(40.dp),
-                                color = if (secondsRemaining <= 5)
-                                    MaterialTheme.colorScheme.error
-                                else
-                                    MaterialTheme.colorScheme.primary,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                            )
-                            Text(
-                                text = secondsRemaining.toString(),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-
-                    OtpType.HOTP -> {
-                        IconButton(onClick = onIncrementCounter) {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                }
-                IconButton(onClick = onTap) {
-                    Icon(
-                        if (isMasked) Icons.Default.Visibility else Icons.Default.ContentCopy,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            if (canReorder) {
-                Icon(
-                    Icons.Default.DragHandle,
-                    contentDescription = stringResource(R.string.cd_drag_handle),
-                    modifier = Modifier.draggableHandle(),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SelectionCheckmark() {
-    Box(
-        modifier = Modifier
-            .size(38.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            Icons.Default.Check,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimary,
-        )
-    }
-}
-
-@Composable
-private fun IssuerAvatar(
-    issuer: String,
-    customIconBytes: ByteArray?,
-    packIconPath: String?,
-    iconFetchEnabled: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    when {
-        customIconBytes != null -> AsyncIconBox(model = customIconBytes, modifier = modifier)
-        packIconPath != null -> AsyncIconBox(
-            model = java.io.File(packIconPath),
-            modifier = modifier
-        )
-
-        iconFetchEnabled -> {
-            val url = remember(issuer) {
-                val slug = issuer.lowercase().replace(Regex("[^a-z0-9]"), "")
-                "https://cdn.simpleicons.org/$slug"
-            }
-            SubcomposeAsyncImage(
-                model = url,
-                contentDescription = null,
-                modifier = modifier.size(38.dp),
-                contentScale = ContentScale.Fit,
-            ) {
-                val state = painter.state.collectAsState()
-                if (state.value is AsyncImagePainter.State.Success) {
-                    SubcomposeAsyncImageContent()
-                } else {
-                    LetterAvatarBox(issuer)
-                }
-            }
-        }
-
-        else -> LetterAvatarBox(issuer, modifier)
-    }
-}
-
-@Composable
-private fun AsyncIconBox(model: Any, modifier: Modifier = Modifier) {
-    AsyncImage(
-        model = model,
-        contentDescription = null,
-        modifier = modifier.size(38.dp),
-        contentScale = ContentScale.Fit,
-    )
-}
-
-@Composable
-private fun LetterAvatarBox(issuer: String, modifier: Modifier = Modifier) {
-    val avatarColors = listOf(
-        Color(0xFF1976D2),
-        Color(0xFF388E3C),
-        Color(0xFFF57C00),
-        Color(0xFF7B1FA2),
-        Color(0xFFD32F2F),
-        Color(0xFF0097A7),
-        Color(0xFF5D4037),
-        Color(0xFF455A64),
-        Color(0xFF00796B),
-        Color(0xFFC62828),
-    )
-    val color =
-        remember(issuer) { avatarColors[issuer.hashCode().absoluteValue % avatarColors.size] }
-    val letter = issuer.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
-
-    Box(
-        modifier = modifier
-            .size(38.dp)
-            .clip(CircleShape)
-            .background(color),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = letter,
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
+            onDismiss = { showBulkDeleteConfirm = false },
         )
     }
 }
@@ -920,11 +264,3 @@ private fun EmptyState(modifier: Modifier = Modifier, isFiltered: Boolean = fals
         }
     }
 }
-
-private fun formatOtpCode(code: String): String = when (code.length) {
-    6 -> "${code.substring(0, 3)} ${code.substring(3)}"
-    8 -> "${code.substring(0, 4)} ${code.substring(4)}"
-    else -> code
-}
-
-private fun maskOtpCode(code: String): String = formatOtpCode("•".repeat(code.length))

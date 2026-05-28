@@ -193,31 +193,14 @@ fun MigrationScanScreen(
     }
 
     if (showPartialWarning) {
-        AlertDialog(
-            onDismissRequest = { showPartialWarning = false },
-            title = { Text(stringResource(R.string.migration_partial_warning_title)) },
-            text = {
-                Text(
-                    stringResource(
-                        R.string.migration_partial_warning_body,
-                        uiState.scanned,
-                        uiState.expectedTotal,
-                    ),
-                )
+        PartialScanWarningDialog(
+            scanned = uiState.scanned,
+            expectedTotal = uiState.expectedTotal,
+            onConfirm = {
+                showPartialWarning = false
+                viewModel.commit()
             },
-            confirmButton = {
-                TextButton(onClick = {
-                    showPartialWarning = false
-                    viewModel.commit()
-                }) {
-                    Text(stringResource(R.string.migration_partial_warning_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPartialWarning = false }) {
-                    Text(stringResource(R.string.migration_partial_warning_keep_scanning))
-                }
-            },
+            onDismiss = { showPartialWarning = false },
         )
     }
 
@@ -341,15 +324,13 @@ private fun CameraPreview(
                     .build()
                     .also { analysis ->
                         analysis.setAnalyzer(executor) { imageProxy ->
-                            try {
+                            imageProxy.use { imageProxy ->
                                 val value = analyzer.decode(imageProxy)
                                 if (value != null) {
                                     androidx.core.os.HandlerCompat.createAsync(
                                         ctx.mainLooper,
                                     ).post { onDecoded(value) }
                                 }
-                            } finally {
-                                imageProxy.close()
                             }
                         }
                     }

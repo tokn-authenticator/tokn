@@ -1,12 +1,11 @@
 package me.diamondforge.tokn.domain.model
 
 /**
- * Display order for the account list. CUSTOM honours the user's manual
- * drag-to-reorder; any other value disables the drag handle and renders the
- * list in the chosen order without mutating [OtpAccount.sortOrder].
+ * Non-CUSTOM modes render in the chosen order without mutating
+ * [OtpAccount.sortOrder]; only CUSTOM honours manual drag-to-reorder.
  *
- * USAGE_COUNT and LAST_USED are descending only ("most used" / "recently
- * used")
+ * USAGE_COUNT and LAST_USED are descending only ("most used" /
+ * "recently used").
  */
 enum class AccountSort {
     CUSTOM,

@@ -32,12 +32,8 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL(
-                    "ALTER TABLE otp_accounts ADD COLUMN usage_count INTEGER NOT NULL DEFAULT 0"
-                )
-                db.execSQL(
-                    "ALTER TABLE otp_accounts ADD COLUMN last_used_at INTEGER NOT NULL DEFAULT 0"
-                )
+                db.execSQL("ALTER TABLE otp_accounts ADD COLUMN usage_count INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE otp_accounts ADD COLUMN last_used_at INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

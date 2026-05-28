@@ -71,14 +71,17 @@ class HomeViewModel @Inject constructor(
 
     // Sort once whenever accounts or sort change. The per-tick uiState combine
     // below then leaves order alone, only the OTP codes refresh each second.
-    private val sortedAccounts: Flow<List<OtpAccount>> =
-        combine(_accounts, _accountSort) { accounts, sort -> accounts.sortedFor(sort) }
+    private val sortedView: Flow<SortedView> =
+        combine(_accounts, _accountSort) { accounts, sort -> SortedView(accounts.sortedFor(sort), sort) }
 
-    val uiState: StateFlow<HomeUiState> = combine(
-        combine(sortedAccounts, _currentTimeMillis, _searchQuery, _selectedGroup, _selectedIds, ::Quint),
-        appPreferences.iconFetchEnabled,
-    ) { quint, iconFetchEnabled ->
-        val (accounts, time, query, selectedGroup, selectedIds) = quint
+    private val partialState: Flow<HomeUiState> = combine(
+        sortedView,
+        _currentTimeMillis,
+        _searchQuery,
+        _selectedGroup,
+        _selectedIds,
+    ) { sorted, time, query, selectedGroup, selectedIds ->
+        val accounts = sorted.accounts
         val availableGroups = accounts.mapNotNull { it.group }.distinct().sorted()
 
         val filtered = accounts
@@ -113,12 +116,17 @@ class HomeViewModel @Inject constructor(
             searchQuery = query,
             availableGroups = availableGroups,
             selectedGroup = selectedGroup,
-            iconFetchEnabled = iconFetchEnabled,
             selectedIds = sanitizedSelection,
+            sort = sorted.sort,
         )
-    }.combine(userPreferences.tapToRevealEnabled) { state, enabled ->
-        state.copy(tapToRevealEnabled = enabled)
-    }.combine(_reveals) { state, reveals ->
+    }
+
+    val uiState: StateFlow<HomeUiState> = combine(
+        partialState,
+        appPreferences.iconFetchEnabled,
+        userPreferences.tapToRevealEnabled,
+        _reveals,
+    ) { state, iconFetchEnabled, tapToReveal, reveals ->
         // A reveal is valid only while the displayed code matches the one
         // captured at reveal time AND the per-type timeout hasn't elapsed.
         // Keying on the code (not wall-clock expiry) means a TOTP rollover
@@ -133,11 +141,11 @@ class HomeViewModel @Inject constructor(
                 } else null
             }
             .toSet()
-        state.copy(revealedIds = revealed)
-    }.combine(_accountSort) { state, sort ->
-        // sortedAccounts has already applied the sort upstream; this combine
-        // exists only to surface the current value in the UI state.
-        state.copy(sort = sort)
+        state.copy(
+            iconFetchEnabled = iconFetchEnabled,
+            tapToRevealEnabled = tapToReveal,
+            revealedIds = revealed,
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
@@ -288,14 +296,6 @@ data class HomeUiState(
     val selectionMode: Boolean get() = selectedIds.isNotEmpty()
 }
 
-private data class Quint<A, B, C, D, E>(
-    val a: A,
-    val b: B,
-    val c: C,
-    val d: D,
-    val e: E,
-)
-
 data class AccountItem(
     val account: OtpAccount,
     val otpResult: OtpResult,
@@ -307,37 +307,7 @@ private data class RevealRecord(
     val expiresAt: Long,
 )
 
-/**
- * Stable sort with consistent tiebreakers:
- * - String comparisons are case-insensitive.
- * - sortOrder is the universal tiebreaker (matches CUSTOM ordering).
- * - lastUsedAt = 0L means "never used" and naturally sinks to the bottom
- *   under LAST_USED (descending) without null-special-casing.
- */
-internal fun List<OtpAccount>.sortedFor(sort: AccountSort): List<OtpAccount> = when (sort) {
-    AccountSort.CUSTOM -> this
-    AccountSort.ISSUER_ASC -> sortedWith(
-        compareBy<OtpAccount, String>(String.CASE_INSENSITIVE_ORDER) { it.issuer }
-            .thenBy { it.sortOrder },
-    )
-    AccountSort.ISSUER_DESC -> sortedWith(
-        Comparator<OtpAccount> { a, b ->
-            String.CASE_INSENSITIVE_ORDER.compare(b.issuer, a.issuer)
-        }.thenBy { it.sortOrder },
-    )
-    AccountSort.NAME_ASC -> sortedWith(
-        compareBy<OtpAccount, String>(String.CASE_INSENSITIVE_ORDER) { it.accountName }
-            .thenBy { it.sortOrder },
-    )
-    AccountSort.NAME_DESC -> sortedWith(
-        Comparator<OtpAccount> { a, b ->
-            String.CASE_INSENSITIVE_ORDER.compare(b.accountName, a.accountName)
-        }.thenBy { it.sortOrder },
-    )
-    AccountSort.USAGE_COUNT -> sortedWith(
-        compareByDescending<OtpAccount> { it.usageCount }.thenBy { it.sortOrder },
-    )
-    AccountSort.LAST_USED -> sortedWith(
-        compareByDescending<OtpAccount> { it.lastUsedAt }.thenBy { it.sortOrder },
-    )
-}
+private data class SortedView(
+    val accounts: List<OtpAccount>,
+    val sort: AccountSort,
+)
