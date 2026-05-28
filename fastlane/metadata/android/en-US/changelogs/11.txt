@@ -1,0 +1,7 @@
+* New: account sorting. Choose manual, alphabetical, or most-used ordering from the home screen menu.
+* New: dedicated export vault dialog with a clearer step-by-step flow.
+* New: import from Tokn-format backups (in addition to existing 2FAS, Aegis, and otpauth sources).
+* New: Google Authenticator migration accepts multiple QR screenshots at once and warns when the scanned set is incomplete.
+* Reworked the first-run onboarding flow.
+* Moved the "About" entry point into Settings.
+* Fix: QR code scales to the actual window size on the sync send screen.
