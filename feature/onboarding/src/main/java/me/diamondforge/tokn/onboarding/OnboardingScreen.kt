@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,6 +58,16 @@ fun OnboardingScreen(
     val pagerState = rememberPagerState(pageCount = { SLIDES.size })
     val pickMethodMsg = stringResource(R.string.onboarding_security_pick_method)
 
+    // A successful Welcome-slide import is the user's signal that they're done
+    // with this step; pause briefly so the "Imported N accounts" feedback can
+    // register, then slide on to the next step automatically.
+    LaunchedEffect(state.importedCount) {
+        if (state.importedCount != null && SLIDES[pagerState.currentPage] == Slide.Welcome) {
+            kotlinx.coroutines.delay(450)
+            pagerState.animateScrollToPage(nextPage(pagerState.currentPage, state.cryptType))
+        }
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         containerColor = MaterialTheme.colorScheme.background,
@@ -77,6 +88,7 @@ fun OnboardingScreen(
                     Slide.Welcome -> WelcomeSlide(
                         state = state,
                         onImport = viewModel::importBackup,
+                        onCancelPendingImport = viewModel::cancelPendingImport,
                         onSuppressLock = viewModel::suppressLock,
                         onClearImportFeedback = viewModel::clearImportFeedback,
                     )

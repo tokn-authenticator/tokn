@@ -31,6 +31,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":core:security"))
+    implementation(project(":core:import"))
 
     implementation(libs.appcompat)
     implementation(libs.androidx.core.ktx)

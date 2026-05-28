@@ -2,11 +2,15 @@
 <resources>
     <string name="onboarding_welcome_title">Willkommen bei Tokn</string>
     <string name="onboarding_welcome_description">Ein einfacher, privater Authenticator für deine Einmal-Codes.</string>
-    <string name="onboarding_import_button">Tokn-Backup importieren</string>
-    <string name="onboarding_import_hint">Aus einer anderen 2FA-App importieren? Schließe das Setup ab und mach das aus Einstellungen → Backup.</string>
+    <string name="onboarding_import_button">Tokn-Tresor wiederherstellen</string>
+    <string name="onboarding_import_hint">Aus einer anderen 2FA-App importieren? Schließe das Setup ab und mach das aus Einstellungen → Importieren &amp; Exportieren.</string>
     <string name="onboarding_import_success">%1$d Konten importiert</string>
-    <string name="onboarding_import_redirect_hint">Sieht nach einem Backup aus einer anderen App aus. Schließe das Setup ab und importiere es aus Einstellungen → Backup.</string>
-    <string name="onboarding_import_invalid">Datei konnte nicht als Tokn-Backup gelesen werden.</string>
+    <string name="onboarding_import_redirect_hint">Sieht nach einem Backup aus einer anderen App aus. Schließe das Setup ab und importiere es aus Einstellungen → Importieren &amp; Exportieren.</string>
+    <string name="onboarding_import_invalid">Datei konnte nicht als Tokn-Tresor gelesen werden.</string>
+    <string name="onboarding_import_password_title">Verschlüsselter Tokn-Tresor</string>
+    <string name="onboarding_import_password_label">Tresor-Passwort</string>
+    <string name="onboarding_import_password_action">Wiederherstellen</string>
+    <string name="onboarding_import_wrong_password">Falsches Passwort.</string>
 
     <string name="onboarding_security_title">Tresor sichern</string>
     <string name="onboarding_security_description">Wähle, wie der Zugriff auf deine Konten geschützt werden soll. Du kannst das jederzeit in den Einstellungen ändern.</string>

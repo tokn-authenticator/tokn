@@ -14,19 +14,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
-import me.diamondforge.tokn.domain.model.OtpAccount
-import me.diamondforge.tokn.domain.model.OtpAlgorithm
-import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
+import me.diamondforge.tokn.importer.ImportOutcome
+import me.diamondforge.tokn.importer.ImporterRegistry
 import me.diamondforge.tokn.security.BiometricHelper
 import me.diamondforge.tokn.security.LockManager
 import me.diamondforge.tokn.security.VaultPasswordManager
-import org.json.JSONObject
 import javax.inject.Inject
 
 enum class CryptType { NONE, PASSWORD, BIOMETRIC }
 
-enum class ImportError { Invalid, Redirect }
+enum class ImportError { Invalid, Redirect, WrongPassword }
+
+data class PendingToknImport(val uri: Uri)
 
 data class OnboardingUiState(
     val cryptType: CryptType? = null,
@@ -35,6 +35,7 @@ data class OnboardingUiState(
     val biometricAvailable: Boolean = false,
     val importedCount: Int? = null,
     val importError: ImportError? = null,
+    val pendingTokn: PendingToknImport? = null,
     val isFinishing: Boolean = false,
 )
 
@@ -45,6 +46,7 @@ class OnboardingViewModel @Inject constructor(
     private val vaultPasswordManager: VaultPasswordManager,
     private val addAccountUseCase: AddAccountUseCase,
     private val lockManager: LockManager,
+    private val importerRegistry: ImporterRegistry,
     biometricHelper: BiometricHelper,
 ) : ViewModel() {
 
@@ -66,23 +68,79 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun clearImportFeedback() {
-        _uiState.update { it.copy(importedCount = null, importError = null) }
+        _uiState.update {
+            it.copy(importedCount = null, importError = null, pendingTokn = null)
+        }
+    }
+
+    fun cancelPendingImport() {
+        _uiState.update { it.copy(pendingTokn = null, importError = null) }
     }
 
     fun suppressLock() = lockManager.suppressNextForeground()
 
-    fun importBackup(uri: Uri) {
+    /**
+     * Routes the picked file through the same importer registry used by Settings
+     * so an encrypted Tokn vault (the default export!) actually imports here
+     * instead of triggering the "looks like another app" redirect.
+     */
+    fun importBackup(uri: Uri, password: String? = null) {
         viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) { parseImport(uri) }
-            _uiState.update {
-                when (result) {
-                    is ImportResult.Success -> it.copy(
-                        importedCount = result.count,
-                        importError = null
-                    )
+            val raw = withContext(Dispatchers.IO) { readBytes(uri) }
+                ?: run {
+                    _uiState.update { it.copy(importError = ImportError.Invalid) }
+                    return@launch
+                }
 
-                    ImportResult.Redirect -> it.copy(importError = ImportError.Redirect)
-                    ImportResult.Invalid -> it.copy(importError = ImportError.Invalid)
+            val importer = importerRegistry.detect(raw)
+                ?: run {
+                    _uiState.update {
+                        it.copy(importError = ImportError.Invalid, pendingTokn = null)
+                    }
+                    return@launch
+                }
+
+            if (importer.id != "tokn") {
+                // Aegis / 2FAS / otpauth / migration-QR: punt to Settings.
+                _uiState.update {
+                    it.copy(importError = ImportError.Redirect, pendingTokn = null)
+                }
+                return@launch
+            }
+
+            when (val outcome = withContext(Dispatchers.IO) { importer.parse(raw, password) }) {
+                is ImportOutcome.Success -> {
+                    withContext(Dispatchers.IO) {
+                        outcome.accounts.forEach { addAccountUseCase(it) }
+                    }
+                    _uiState.update {
+                        it.copy(
+                            importedCount = outcome.accounts.size,
+                            importError = null,
+                            pendingTokn = null,
+                        )
+                    }
+                }
+
+                ImportOutcome.NeedsPassword -> {
+                    _uiState.update {
+                        it.copy(pendingTokn = PendingToknImport(uri), importError = null)
+                    }
+                }
+
+                is ImportOutcome.WrongPassword -> {
+                    _uiState.update {
+                        it.copy(
+                            pendingTokn = PendingToknImport(uri),
+                            importError = ImportError.WrongPassword,
+                        )
+                    }
+                }
+
+                is ImportOutcome.Malformed, ImportOutcome.Unsupported -> {
+                    _uiState.update {
+                        it.copy(importError = ImportError.Invalid, pendingTokn = null)
+                    }
                 }
             }
         }
@@ -109,49 +167,7 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    private sealed interface ImportResult {
-        data class Success(val count: Int) : ImportResult
-        data object Redirect : ImportResult
-        data object Invalid : ImportResult
-    }
-
-    private suspend fun parseImport(uri: Uri): ImportResult {
-        val raw = runCatching {
-            context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
-        }.getOrNull() ?: return ImportResult.Invalid
-
-        // Not a valid JSON document at all — treat as unsupported file.
-        val root = runCatching { JSONObject(raw) }.getOrElse { return ImportResult.Invalid }
-
-        // Anything that isn't a Tokn backup (regardless of source app) gets redirected to
-        // Settings → Backup, where format-specific importers live.
-        if (!root.has("accounts") || !root.has("version")) {
-            return ImportResult.Redirect
-        }
-
-        val accounts = runCatching { parseToknBackup(root) }
-            .getOrElse { return ImportResult.Redirect }
-        accounts.forEach { addAccountUseCase(it) }
-        return ImportResult.Success(accounts.size)
-    }
-
-    private fun parseToknBackup(root: JSONObject): List<OtpAccount> {
-        val array = root.getJSONArray("accounts")
-        return (0 until array.length()).map { i ->
-            val obj = array.getJSONObject(i)
-            OtpAccount(
-                issuer = obj.getString("issuer"),
-                accountName = obj.getString("accountName"),
-                secret = obj.getString("secret"),
-                algorithm = OtpAlgorithm.valueOf(obj.optString("algorithm", "SHA1")),
-                digits = obj.optInt("digits", 6),
-                period = obj.optInt("period", 30),
-                counter = obj.optLong("counter", 0),
-                type = OtpType.valueOf(obj.optString("type", "TOTP")),
-                sortOrder = obj.optInt("sortOrder", 0),
-                group = obj.optString("group").ifBlank { null },
-            )
-        }
-    }
-
+    private fun readBytes(uri: Uri): ByteArray? = runCatching {
+        context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+    }.getOrNull()
 }
