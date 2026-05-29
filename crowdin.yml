@@ -1,13 +1,8 @@
 preserve_hierarchy: 1
 files:
   - source: /**/src/main/res/values/strings.xml
-    translation: '%original_path%-%android_code%/%original_file_name%'
-    type: android
     ignore:
       - /analyze/**
       - /**/build/**
-    languages_mapping:
-      android_code:
-        he: iw
-        id: in
-        yi: ji
+    translation: /%original_path%-%android_code%/%original_file_name%
+    type: android
