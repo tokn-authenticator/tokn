@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tokn</string>
+    <string name="settings">Settings</string>
+    <string name="add_account">Add account</string>
+    <string name="no_accounts_title">No accounts yet</string>
+    <string name="no_accounts_subtitle">Tap + to add your first 2FA account</string>
+    <string name="code_copied">Code copied, clears in 30 s</string>
+    <string name="delete">Delete</string>
+    <string name="add_scan_qr">Scan QR code</string>
+    <string name="add_from_image">From image</string>
+    <string name="add_manually">Enter manually</string>
+    <string name="delete_confirm_title">Delete account?</string>
+    <string name="delete_confirm_message">This account will be permanently removed.</string>
+    <string name="cancel">Cancel</string>
+    <string name="search">Search</string>
+    <string name="search_placeholder">Search accounts…</string>
+    <string name="no_results_title">No results</string>
+    <string name="no_results_subtitle">No accounts match your search</string>
+    <string name="edit_account_title">Edit account</string>
+    <string name="edit_issuer">Issuer</string>
+    <string name="edit_account_name">Account name</string>
+    <string name="edit_secret">Secret key</string>
+    <string name="edit_type">Type</string>
+    <string name="edit_algorithm">Algorithm</string>
+    <string name="edit_digits">Digits</string>
+    <string name="edit_period">Period</string>
+    <string name="edit_counter">Counter</string>
+    <string name="edit_advanced">Advanced</string>
+    <string name="edit_save">Save changes</string>
+    <string name="edit_group">Group (optional)</string>
+    <string name="group_all">All</string>
+    <string name="edit">Edit</string>
+    <string name="select_all">Select all</string>
+    <string name="cd_exit_selection">Exit selection</string>
+    <string name="cd_exit_search">Close search</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_drag_handle">Drag to reorder</string>
+    <string name="cd_sort">Sort accounts</string>
+    <string name="sort_custom">Custom</string>
+    <string name="sort_issuer_asc">Issuer (A → Z)</string>
+    <string name="sort_issuer_desc">Issuer (Z → A)</string>
+    <string name="sort_name_asc">Name (A → Z)</string>
+    <string name="sort_name_desc">Name (Z → A)</string>
+    <string name="sort_most_used">Most used</string>
+    <string name="sort_recently_used">Recently used</string>
+    <string name="icon_picker_title">Choose an icon</string>
+    <string name="icon_picker_gallery">From gallery</string>
+    <string name="icon_picker_remove">Remove</string>
+    <string name="icon_picker_cancel">Cancel</string>
+    <string name="icon_picker_suggestions">Suggested</string>
+    <string name="icon_picker_no_packs">No icon packs installed. Import one in Settings › Appearance › Icon packs.</string>
+    <string name="icon_picker_search_placeholder">Search icons…</string>
+    <string name="icon_picker_no_search_results">No icons match your search</string>
+    <plurals name="delete_count_confirm_title">
+        <item quantity="one">Delete account?</item>
+        <item quantity="few">Delete %d accounts?</item>
+        <item quantity="many">Delete %d accounts?</item>
+        <item quantity="other">Delete %d accounts?</item>
+    </plurals>
+    <plurals name="delete_count_confirm_message">
+        <item quantity="one">This account will be permanently removed.</item>
+        <item quantity="few">These %d accounts will be permanently removed.</item>
+        <item quantity="many">These %d accounts will be permanently removed.</item>
+        <item quantity="other">These %d accounts will be permanently removed.</item>
+    </plurals>
+</resources>
