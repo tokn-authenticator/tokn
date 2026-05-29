@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tokn</string>
+    <string name="biometric_prompt_title">Unlock Tokn</string>
+    <string name="biometric_prompt_subtitle">Use biometrics or PIN to continue</string>
+    <string name="vault_locked">Vault is locked</string>
+    <string name="unlock">Unlock</string>
+    <string name="use_password">Use password</string>
+    <string name="use_biometrics">Use biometrics instead</string>
+    <string name="password">Password</string>
+    <string name="wrong_password">Incorrect password</string>
+</resources>
