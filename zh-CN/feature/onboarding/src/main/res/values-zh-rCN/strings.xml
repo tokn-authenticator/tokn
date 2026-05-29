@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_welcome_title">Welcome to Tokn</string>
+    <string name="onboarding_welcome_description">A simple, private authenticator for your one-time codes.</string>
+    <string name="onboarding_import_button">Restore Tokn vault</string>
+    <string name="onboarding_import_hint">Want to import from another 2FA app? Finish the setup and do it from Settings → Import &amp; Export.</string>
+    <string name="onboarding_import_success">Imported %1$d accounts</string>
+    <string name="onboarding_import_redirect_hint">Looks like a backup from another app. Finish the setup and import it from Settings → Import &amp; Export.</string>
+    <string name="onboarding_import_invalid">Could not read this file as a Tokn vault.</string>
+    <string name="onboarding_import_password_title">Encrypted Tokn vault</string>
+    <string name="onboarding_import_password_label">Vault password</string>
+    <string name="onboarding_import_password_action">Restore</string>
+    <string name="onboarding_import_wrong_password">Wrong password.</string>
+    <string name="onboarding_security_title">Secure your vault</string>
+    <string name="onboarding_security_description">Choose how to protect access to your accounts. You can change this later in Settings.</string>
+    <string name="onboarding_security_none">No encryption</string>
+    <string name="onboarding_security_none_desc">Accounts are stored locally without an extra unlock layer.</string>
+    <string name="onboarding_security_password">Password</string>
+    <string name="onboarding_security_password_desc">Encrypt the vault and unlock with a password.</string>
+    <string name="onboarding_security_biometric">Biometrics</string>
+    <string name="onboarding_security_biometric_desc">Encrypt the vault and unlock with biometrics, with a password fallback.</string>
+    <string name="onboarding_security_biometric_unavailable">Biometrics not available on this device.</string>
+    <string name="onboarding_security_pick_method">Please choose a method.</string>
+    <string name="onboarding_setup_title">Set a password</string>
+    <string name="onboarding_setup_description">Your password unlocks the vault when biometrics aren\'t available. Keep it safe, there is no recovery.</string>
+    <string name="onboarding_password">Password</string>
+    <string name="onboarding_password_confirm">Confirm password</string>
+    <string name="onboarding_password_too_short">At least 8 characters</string>
+    <string name="onboarding_password_mismatch">Passwords do not match</string>
+    <string name="onboarding_done_title">All set</string>
+    <string name="onboarding_done_description">You\'re ready to start adding accounts.</string>
+    <string name="onboarding_finish">Get started</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_previous">Previous</string>
+</resources>
