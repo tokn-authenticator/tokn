@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="biometric_prompt_title">解锁Tokn</string>
+    <string name="biometric_prompt_subtitle">使用生物识别或PIN码继续</string>
+    <string name="vault_locked">密码库处于锁定状态</string>
+    <string name="unlock">解锁</string>
+    <string name="use_password">使用密码登录</string>
+    <string name="use_biometrics">使用生物识别登录</string>
+    <string name="password">密码</string>
+    <string name="wrong_password">密码不正确</string>
+</resources>

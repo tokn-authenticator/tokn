@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings">Einstellungen</string>
+    <string name="add_account">Konto hinzufügen</string>
+    <string name="no_accounts_title">Noch keine Konten</string>
+    <string name="no_accounts_subtitle">Tippe auf + um dein erstes 2FA-Konto hinzuzufügen</string>
+    <string name="code_copied">Code kopiert – wird in 30 s gelöscht</string>
+    <string name="delete">Löschen</string>
+    <string name="add_scan_qr">QR-Code scannen</string>
+    <string name="add_from_image">Aus Galerie</string>
+    <string name="add_manually">Manuell eingeben</string>
+    <string name="delete_confirm_title">Konto löschen?</string>
+    <string name="delete_confirm_message">Dieses Konto wird dauerhaft entfernt.</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="search">Suchen</string>
+    <string name="search_placeholder">Konten durchsuchen…</string>
+    <string name="no_results_title">Keine Ergebnisse</string>
+    <string name="no_results_subtitle">Keine Konten gefunden</string>
+    <string name="edit_account_title">Konto bearbeiten</string>
+    <string name="edit_issuer">Aussteller</string>
+    <string name="edit_account_name">Kontoname</string>
+    <string name="edit_secret">Geheimschlüssel</string>
+    <string name="edit_type">Typ</string>
+    <string name="edit_algorithm">Algorithmus</string>
+    <string name="edit_digits">Stellen</string>
+    <string name="edit_period">Intervall</string>
+    <string name="edit_counter">Zähler</string>
+    <string name="edit_advanced">Erweitert</string>
+    <string name="edit_save">Änderungen speichern</string>
+    <string name="edit_group">Gruppe (optional)</string>
+    <string name="group_all">Alle</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="select_all">Alle auswählen</string>
+    <string name="cd_exit_selection">Auswahl beenden</string>
+    <string name="cd_exit_search">Suche schließen</string>
+    <string name="cd_clear_search">Suche leeren</string>
+    <string name="cd_drag_handle">Zum Verschieben halten</string>
+    <string name="cd_sort">Konten sortieren</string>
+    <string name="sort_custom">Benutzerdefiniert</string>
+    <string name="sort_issuer_asc">Aussteller (A → Z)</string>
+    <string name="sort_issuer_desc">Aussteller (Z → A)</string>
+    <string name="sort_name_asc">Name (A → Z)</string>
+    <string name="sort_name_desc">Name (Z → A)</string>
+    <string name="sort_most_used">Häufig genutzt</string>
+    <string name="sort_recently_used">Zuletzt genutzt</string>
+    <string name="icon_picker_title">Icon wählen</string>
+    <string name="icon_picker_gallery">Aus Galerie</string>
+    <string name="icon_picker_remove">Entfernen</string>
+    <string name="icon_picker_cancel">Abbrechen</string>
+    <string name="icon_picker_suggestions">Vorschläge</string>
+    <string name="icon_picker_no_packs">Keine Icon-Packs installiert. Importiere eines unter Einstellungen › Darstellung › Icon-Packs.</string>
+    <string name="icon_picker_search_placeholder">Icons suchen…</string>
+    <string name="icon_picker_no_search_results">Keine Icons gefunden</string>
+    <plurals name="delete_count_confirm_title">
+        <item quantity="one">Konto löschen?</item>
+        <item quantity="other">%d Konten löschen?</item>
+    </plurals>
+    <plurals name="delete_count_confirm_message">
+        <item quantity="one">Dieses Konto wird dauerhaft entfernt.</item>
+        <item quantity="other">Diese %d Konten werden dauerhaft entfernt.</item>
+    </plurals>
+</resources>

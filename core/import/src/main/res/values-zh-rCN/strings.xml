@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="importer_aegis_note">支持加密或未加密的Aegis JSON导出文件。</string>
+    <string name="importer_twofas_note">支持加密或未加密的2FAS Authenticator 备份文件(.2fas / .json)。</string>
+    <string name="importer_otpauth_uri_note">每行含有一个 otpauth://… URI 的纯文本文件。</string>
+</resources>
