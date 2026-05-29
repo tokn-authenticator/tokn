@@ -1,8 +1,7 @@
-preserve_hierarchy: true
-
+preserve_hierarchy: 1
 files:
   - source: /**/src/main/res/values/strings.xml
-    translation: "%original_path%-%android_code%/%original_file_name%"
+    translation: '%original_path%-%android_code%/%original_file_name%'
     type: android
     ignore:
       - /analyze/**
