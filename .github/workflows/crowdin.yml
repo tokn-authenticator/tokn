@@ -1,0 +1,29 @@
+name: Crowdin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/src/main/res/values/strings.xml'
+      - 'crowdin.yml'
+      - '.github/workflows/crowdin.yml'
+
+concurrency: crowdin-upload-${{ github.ref }}
+
+jobs:
+  upload-sources:
+    runs-on: ubuntu-latest
+    if: github.repository == 'fthomys/tokn'
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Upload sources to Crowdin
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: true
+          upload_translations: false
+          download_translations: false
+          crowdin_branch_name: main
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
