@@ -60,7 +60,7 @@ class HomeViewModel @Inject constructor(
     private val _currentTimeMillis = MutableStateFlow(System.currentTimeMillis())
     private val _accounts = getAccountsUseCase()
     private val _searchQuery = MutableStateFlow("")
-    private val _selectedGroup = MutableStateFlow<String?>(null)
+    private val _selectedGroups = MutableStateFlow<Set<String>>(emptySet())
     private val _selectedIds = MutableStateFlow<Set<Long>>(emptySet())
     private val _reveals = MutableStateFlow<Map<Long, RevealRecord>>(emptyMap())
 
@@ -78,11 +78,24 @@ class HomeViewModel @Inject constructor(
         sortedView,
         _currentTimeMillis,
         _searchQuery,
-        _selectedGroup,
+        _selectedGroups,
         _selectedIds,
-    ) { sorted, time, query, selectedGroup, selectedIds ->
+    ) { sorted, time, query, selectedGroups, selectedIds ->
         val accounts = sorted.accounts
-        val availableGroups = accounts.mapNotNull { it.group }.distinct().sorted()
+        val availableGroups = accounts.flatMap { it.groups }
+            .distinctBy { it.lowercase() }
+            .sortedBy { it.lowercase() }
+
+        // Drop filter chips for groups that no longer exist (last account
+        // in that group was deleted) so a stale selection can't permanently
+        // hide every row.
+        val existingGroupKeys = availableGroups.mapTo(mutableSetOf()) { it.lowercase() }
+        val sanitizedGroupSelection = selectedGroups.filterTo(mutableSetOf()) {
+            it.lowercase() in existingGroupKeys
+        }
+        if (sanitizedGroupSelection.size != selectedGroups.size) {
+            _selectedGroups.value = sanitizedGroupSelection
+        }
 
         val filtered = accounts
             .filter { account ->
@@ -91,7 +104,10 @@ class HomeViewModel @Inject constructor(
                         account.accountName.contains(query, ignoreCase = true)
             }
             .filter { account ->
-                selectedGroup == null || account.group == selectedGroup
+                sanitizedGroupSelection.isEmpty() ||
+                        account.groups.any { g ->
+                            sanitizedGroupSelection.any { it.equals(g, ignoreCase = true) }
+                        }
             }
 
         // Prune selection of ids that no longer exist (e.g. after delete).
@@ -115,7 +131,7 @@ class HomeViewModel @Inject constructor(
             },
             searchQuery = query,
             availableGroups = availableGroups,
-            selectedGroup = selectedGroup,
+            selectedGroups = sanitizedGroupSelection,
             selectedIds = sanitizedSelection,
             sort = sorted.sort,
         )
@@ -261,8 +277,17 @@ class HomeViewModel @Inject constructor(
         _searchQuery.value = query
     }
 
-    fun selectGroup(group: String?) {
-        _selectedGroup.value = group
+    fun toggleGroupFilter(group: String) {
+        val current = _selectedGroups.value
+        _selectedGroups.value = if (current.any { it.equals(group, ignoreCase = true) }) {
+            current.filterNotTo(mutableSetOf()) { it.equals(group, ignoreCase = true) }
+        } else {
+            current + group
+        }
+    }
+
+    fun clearGroupFilter() {
+        _selectedGroups.value = emptySet()
     }
 
     /**
@@ -286,7 +311,7 @@ data class HomeUiState(
     val items: List<AccountItem> = emptyList(),
     val searchQuery: String = "",
     val availableGroups: List<String> = emptyList(),
-    val selectedGroup: String? = null,
+    val selectedGroups: Set<String> = emptySet(),
     val iconFetchEnabled: Boolean = false,
     val selectedIds: Set<Long> = emptySet(),
     val tapToRevealEnabled: Boolean = false,

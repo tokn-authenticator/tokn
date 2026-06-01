@@ -9,7 +9,7 @@ import me.diamondforge.tokn.data.db.entity.OtpAccountEntity
 
 @Database(
     entities = [OtpAccountEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -34,6 +34,21 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE otp_accounts ADD COLUMN usage_count INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE otp_accounts ADD COLUMN last_used_at INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        // As of: 20260601
+        // v5 changes the semantics of the `group` column from a single
+        // string to a JSON-encoded list of strings. quote() handles inner
+        // quote / backslash escaping correctly so a legacy group value
+        // like he"llo serialises to ["he\"llo"].
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("UPDATE otp_accounts SET `group` = NULL WHERE `group` = ''")
+                db.execSQL(
+                    "UPDATE otp_accounts SET `group` = '[' || quote(`group`) || ']' " +
+                            "WHERE `group` IS NOT NULL"
+                )
             }
         }
     }

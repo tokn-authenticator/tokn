@@ -7,7 +7,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -124,7 +123,7 @@ class AegisImporterTest {
         val accounts = (importer.parse(raw, null) as ImportOutcome.Success).accounts
         assertEquals(1, accounts.size)
         assertEquals("keep me", accounts.first().accountName)
-        assertNull(accounts.first().group)
+        assertTrue(accounts.first().groups.isEmpty())
     }
 
     private fun sampleDb(): JSONObject = JSONObject().apply {

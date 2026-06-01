@@ -11,7 +11,7 @@ class OtpAccount(
     val counter: Long = 0,
     val type: OtpType = OtpType.TOTP,
     val sortOrder: Int = 0,
-    val group: String? = null,
+    val groups: List<String> = emptyList(),
     val customIconBytes: ByteArray? = null,
     val iconPackId: String? = null,
     val iconPackFile: String? = null,
@@ -29,7 +29,7 @@ class OtpAccount(
         counter: Long = this.counter,
         type: OtpType = this.type,
         sortOrder: Int = this.sortOrder,
-        group: String? = this.group,
+        groups: List<String> = this.groups,
         customIconBytes: ByteArray? = this.customIconBytes,
         iconPackId: String? = this.iconPackId,
         iconPackFile: String? = this.iconPackFile,
@@ -37,7 +37,7 @@ class OtpAccount(
         lastUsedAt: Long = this.lastUsedAt,
     ): OtpAccount = OtpAccount(
         id, issuer, accountName, secret, algorithm, digits, period, counter,
-        type, sortOrder, group, customIconBytes, iconPackId, iconPackFile,
+        type, sortOrder, groups, customIconBytes, iconPackId, iconPackFile,
         usageCount, lastUsedAt,
     )
 
@@ -54,7 +54,7 @@ class OtpAccount(
                 counter == other.counter &&
                 type == other.type &&
                 sortOrder == other.sortOrder &&
-                group == other.group &&
+                groups == other.groups &&
                 customIconBytes.contentEqualsOrBothNull(other.customIconBytes) &&
                 iconPackId == other.iconPackId &&
                 iconPackFile == other.iconPackFile &&
@@ -73,7 +73,7 @@ class OtpAccount(
         result = 31 * result + counter.hashCode()
         result = 31 * result + type.hashCode()
         result = 31 * result + sortOrder
-        result = 31 * result + (group?.hashCode() ?: 0)
+        result = 31 * result + groups.hashCode()
         result = 31 * result + (customIconBytes?.contentHashCode() ?: 0)
         result = 31 * result + (iconPackId?.hashCode() ?: 0)
         result = 31 * result + (iconPackFile?.hashCode() ?: 0)

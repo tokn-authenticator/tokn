@@ -140,17 +140,20 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.padding(vertical = 4.dp),
                     ) {
-                        item {
+                        item(key = "__all__") {
                             FilterChip(
-                                selected = uiState.selectedGroup == null,
-                                onClick = { viewModel.selectGroup(null) },
+                                selected = uiState.selectedGroups.isEmpty(),
+                                onClick = { viewModel.clearGroupFilter() },
                                 label = { Text(stringResource(R.string.group_all)) },
                             )
                         }
-                        items(uiState.availableGroups) { group ->
+                        items(uiState.availableGroups, key = { it.lowercase() }) { group ->
+                            val isOn = uiState.selectedGroups.any {
+                                it.equals(group, ignoreCase = true)
+                            }
                             FilterChip(
-                                selected = uiState.selectedGroup == group,
-                                onClick = { viewModel.selectGroup(group) },
+                                selected = isOn,
+                                onClick = { viewModel.toggleGroupFilter(group) },
                                 label = { Text(group) },
                             )
                         }
@@ -164,7 +167,7 @@ fun HomeScreen(
                 } else if (listItems.isEmpty()) {
                     EmptyState(
                         modifier = Modifier.fillMaxSize(),
-                        isFiltered = uiState.searchQuery.isNotBlank() || uiState.selectedGroup != null,
+                        isFiltered = uiState.searchQuery.isNotBlank() || uiState.selectedGroups.isNotEmpty(),
                     )
                 } else {
                     LazyColumn(

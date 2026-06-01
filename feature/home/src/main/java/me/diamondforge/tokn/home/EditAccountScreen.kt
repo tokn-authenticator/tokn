@@ -55,6 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
+import me.diamondforge.tokn.ui.GroupsField
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,6 +67,7 @@ fun EditAccountScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val installedPacks by viewModel.installedPacks.collectAsStateWithLifecycle()
+    val availableGroups by viewModel.availableGroups.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var advancedExpanded by remember { mutableStateOf(false) }
     var pickerOpen by remember { mutableStateOf(false) }
@@ -155,16 +157,12 @@ fun EditAccountScreen(
                 ),
                 isError = uiState.secret.isBlank() && uiState.error != null,
             )
-            OutlinedTextField(
-                value = uiState.group,
-                onValueChange = viewModel::updateGroup,
-                label = { Text(stringResource(R.string.edit_group)) },
+            GroupsField(
+                values = uiState.groups,
+                onValuesChange = viewModel::updateGroups,
+                label = stringResource(R.string.edit_group),
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    imeAction = ImeAction.Done,
-                ),
+                suggestions = availableGroups,
             )
 
             HorizontalDivider()

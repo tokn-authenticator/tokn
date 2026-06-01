@@ -28,7 +28,9 @@ object SyncPayload {
                     put("counter", account.counter)
                     put("type", account.type.name)
                     put("sortOrder", account.sortOrder)
-                    account.group?.let { put("group", it) }
+                    if (account.groups.isNotEmpty()) {
+                        put("groups", JSONArray().apply { account.groups.forEach { put(it) } })
+                    }
                     account.customIconBytes?.let {
                         put(
                             "customIconPng",
@@ -73,11 +75,24 @@ object SyncPayload {
                 counter = o.optLong("counter", 0),
                 type = OtpType.valueOf(o.optString("type", "TOTP")),
                 sortOrder = o.optInt("sortOrder", 0),
-                group = o.optString("group").ifBlank { null },
+                groups = readGroups(o),
                 customIconBytes = customIcon,
                 iconPackId = o.optString("iconPackId").ifBlank { null },
                 iconPackFile = o.optString("iconPackFile").ifBlank { null },
             )
         }
+    }
+
+    private fun readGroups(o: JSONObject): List<String> {
+        if (o.has("groups") && !o.isNull("groups")) {
+            val arr = o.getJSONArray("groups")
+            return buildList(arr.length()) {
+                for (i in 0 until arr.length()) {
+                    val s = arr.optString(i)
+                    if (s.isNotBlank()) add(s)
+                }
+            }
+        }
+        return emptyList()
     }
 }

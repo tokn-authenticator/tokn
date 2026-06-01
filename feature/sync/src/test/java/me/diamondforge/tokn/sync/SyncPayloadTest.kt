@@ -5,13 +5,13 @@ import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SyncPayloadTest {
 
     @Test
-    fun `roundtrip preserves all fields including optional group`() {
+    fun `roundtrip preserves all fields including groups`() {
         val accounts = listOf(
             OtpAccount(
                 id = 42, // id is intentionally dropped on the wire
@@ -24,7 +24,7 @@ class SyncPayloadTest {
                 counter = 0,
                 type = OtpType.TOTP,
                 sortOrder = 2,
-                group = "Work",
+                groups = listOf("Work", "Critical"),
             ),
             OtpAccount(
                 issuer = "Bank",
@@ -36,7 +36,7 @@ class SyncPayloadTest {
                 counter = 7,
                 type = OtpType.HOTP,
                 sortOrder = 0,
-                group = null,
+                groups = emptyList(),
             ),
         )
 
@@ -44,7 +44,6 @@ class SyncPayloadTest {
         val restored = SyncPayload.deserialize(json)
 
         assertEquals(2, restored.size)
-        // First account: every non-id field preserved.
         val a = restored[0]
         assertEquals("GitHub", a.issuer)
         assertEquals("alice@example.com", a.accountName)
@@ -54,12 +53,12 @@ class SyncPayloadTest {
         assertEquals(60, a.period)
         assertEquals(OtpType.TOTP, a.type)
         assertEquals(2, a.sortOrder)
-        assertEquals("Work", a.group)
-        // Second: null group + HOTP counter preserved.
+        assertEquals(listOf("Work", "Critical"), a.groups)
+
         val b = restored[1]
         assertEquals(OtpType.HOTP, b.type)
         assertEquals(7L, b.counter)
-        assertNull(b.group)
+        assertTrue(b.groups.isEmpty())
     }
 
     @Test
@@ -72,7 +71,7 @@ class SyncPayloadTest {
     @Test
     fun `deserialize fills defaults for omitted optional fields`() {
         val raw = """
-            {"version":1,"accounts":[{"secret":"JBSWY3DPEHPK3PXP"}]}
+            {"version":2,"accounts":[{"secret":"JBSWY3DPEHPK3PXP"}]}
         """.trimIndent()
         val list = SyncPayload.deserialize(raw)
         assertEquals(1, list.size)
@@ -86,7 +85,7 @@ class SyncPayloadTest {
         assertEquals(0L, a.counter)
         assertEquals(OtpType.TOTP, a.type)
         assertEquals(0, a.sortOrder)
-        assertNull(a.group)
+        assertTrue(a.groups.isEmpty())
     }
 
     @Test
@@ -96,9 +95,25 @@ class SyncPayloadTest {
     }
 
     @Test
-    fun `blank group is treated as null`() {
-        val raw = """{"version":1,"accounts":[{"secret":"X","group":""}]}"""
-        assertNull(SyncPayload.deserialize(raw)[0].group)
+    fun `empty groups array is treated as no groups`() {
+        val raw = """{"version":2,"accounts":[{"secret":"X","groups":[]}]}"""
+        assertTrue(SyncPayload.deserialize(raw)[0].groups.isEmpty())
+    }
+
+    @Test
+    fun `groups field is omitted from emitted JSON when account has none`() {
+        // Keeps the wire as small as the pre-multi-group format for the
+        // common case where an account is ungrouped.
+        val account = OtpAccount(
+            issuer = "Ungrouped",
+            accountName = "user",
+            secret = "JBSWY3DPEHPK3PXP",
+        )
+        val emitted = JSONObject(SyncPayload.serialize(listOf(account)))
+            .getJSONArray("accounts")
+            .getJSONObject(0)
+        assertTrue(!emitted.has("groups"))
+        assertTrue(!emitted.has("group"))
     }
 
     @Test

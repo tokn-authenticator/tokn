@@ -141,7 +141,9 @@ class AegisImporter @Inject constructor() : ExternalImporter {
                     period = info.optInt("period", 30),
                     counter = info.optLong("counter", 0),
                     type = type,
-                    group = entry.optString("group").ifBlank { null },
+                    groups = entry.optString("group").ifBlank { null }
+                        ?.let { listOf(it) }
+                        ?: emptyList(),
                 ),
             )
         }

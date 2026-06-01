@@ -22,7 +22,9 @@ internal fun serializeAccountsToJson(accounts: List<OtpAccount>): String {
                 put("counter", account.counter)
                 put("type", account.type.name)
                 put("sortOrder", account.sortOrder)
-                account.group?.let { put("group", it) }
+                if (account.groups.isNotEmpty()) {
+                    put("groups", JSONArray().apply { account.groups.forEach { put(it) } })
+                }
                 account.customIconBytes?.let {
                     put("customIconPng", Base64.encodeToString(it, Base64.NO_WRAP))
                 }
@@ -57,12 +59,28 @@ internal fun deserializeAccountsFromJson(json: String): List<OtpAccount> {
             counter = obj.optLong("counter", 0),
             type = OtpType.valueOf(obj.optString("type", "TOTP")),
             sortOrder = obj.optInt("sortOrder", 0),
-            group = obj.optString("group").ifBlank { null },
+            groups = readBackupGroups(obj),
             customIconBytes = customIcon,
             iconPackId = obj.optString("iconPackId").ifBlank { null },
             iconPackFile = obj.optString("iconPackFile").ifBlank { null },
         )
     }
+}
+
+// New backups write `groups` (array); pre-multi-group backups wrote a
+// single `group` (string). Read either so legacy files restore intact.
+private fun readBackupGroups(obj: JSONObject): List<String> {
+    if (obj.has("groups") && !obj.isNull("groups")) {
+        val arr = obj.getJSONArray("groups")
+        return buildList(arr.length()) {
+            for (i in 0 until arr.length()) {
+                val s = arr.optString(i)
+                if (s.isNotBlank()) add(s)
+            }
+        }
+    }
+    val legacy = obj.optString("group")
+    return if (legacy.isBlank()) emptyList() else listOf(legacy)
 }
 
 /**
@@ -110,7 +128,7 @@ private fun OtpAccount.toPlainTextBlock(): String = buildString {
         OtpType.TOTP -> appendLine("Period: $period")
         OtpType.HOTP -> appendLine("Counter: $counter")
     }
-    if (!group.isNullOrBlank()) appendLine("Group: $group")
+    if (groups.isNotEmpty()) appendLine("Groups: ${groups.joinToString(", ")}")
 }.trimEnd()
 
 private fun OtpAccount.toOtpAuthUri(): String {

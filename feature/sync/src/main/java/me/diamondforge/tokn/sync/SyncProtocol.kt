@@ -14,7 +14,7 @@ import org.json.JSONObject
  * to update when versions don't match.
  */
 object SyncProtocol {
-    const val VERSION = 1
+    const val VERSION = 2
 
     data class Hello(
         val protocol: Int,

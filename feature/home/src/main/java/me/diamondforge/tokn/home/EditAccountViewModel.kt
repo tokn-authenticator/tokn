@@ -9,8 +9,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,6 +23,7 @@ import me.diamondforge.tokn.data.icon.InstalledIconPack
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
+import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import javax.inject.Inject
 
@@ -30,6 +34,7 @@ class EditAccountViewModel @Inject constructor(
     private val getAccountByIdUseCase: GetAccountByIdUseCase,
     private val updateAccountUseCase: UpdateAccountUseCase,
     private val iconPackManager: IconPackManager,
+    getAccountsUseCase: GetAccountsUseCase,
 ) : ViewModel() {
 
     private val accountId: Long = checkNotNull(savedStateHandle["accountId"])
@@ -38,6 +43,17 @@ class EditAccountViewModel @Inject constructor(
     val uiState: StateFlow<EditAccountUiState> = _uiState.asStateFlow()
 
     val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackManager.installed
+
+    // Suggestion source for the group chip field: every distinct group
+    // currently in use across all stored accounts, case-insensitive,
+    // alphabetically sorted.
+    val availableGroups: StateFlow<List<String>> = getAccountsUseCase()
+        .map { accounts ->
+            accounts.flatMap { it.groups }
+                .distinctBy { it.lowercase() }
+                .sortedBy { it.lowercase() }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
         viewModelScope.launch {
@@ -51,7 +67,7 @@ class EditAccountViewModel @Inject constructor(
                     digits = account.digits,
                     period = account.period,
                     type = account.type,
-                    group = account.group ?: "",
+                    groups = account.groups,
                     counter = account.counter.toString(),
                     customIconBytes = account.customIconBytes,
                     iconPackId = account.iconPackId,
@@ -70,7 +86,7 @@ class EditAccountViewModel @Inject constructor(
     fun updateDigits(value: Int) = _uiState.update { it.copy(digits = value) }
     fun updatePeriod(value: Int) = _uiState.update { it.copy(period = value) }
     fun updateType(value: OtpType) = _uiState.update { it.copy(type = value) }
-    fun updateGroup(value: String) = _uiState.update { it.copy(group = value) }
+    fun updateGroups(values: List<String>) = _uiState.update { it.copy(groups = values) }
     fun updateCounter(value: String) =
         _uiState.update { it.copy(counter = value.filter { c -> c.isDigit() }) }
 
@@ -154,7 +170,7 @@ class EditAccountViewModel @Inject constructor(
                         digits = state.digits,
                         period = state.period,
                         type = state.type,
-                        group = state.group.trim().ifBlank { null },
+                        groups = state.groups,
                         counter = if (state.type == OtpType.HOTP) parsedCounter
                             ?: current.counter else current.counter,
                         customIconBytes = state.customIconBytes,
@@ -183,7 +199,7 @@ data class EditAccountUiState(
     val digits: Int = 6,
     val period: Int = 30,
     val type: OtpType = OtpType.TOTP,
-    val group: String = "",
+    val groups: List<String> = emptyList(),
     val counter: String = "0",
     val error: String? = null,
     val isLoaded: Boolean = false,
