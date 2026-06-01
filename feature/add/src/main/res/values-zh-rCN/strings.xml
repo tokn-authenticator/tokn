@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_account_title">添加账户</string>
+    <string name="scan_qr">扫描二维码</string>
+    <string name="enter_manually">手动输入</string>
+    <string name="manual_entry_title">手动输入</string>
+    <string name="issuer">发行方（如：Google）</string>
+    <string name="account_name">帐户名称 (如：user@example.com)</string>
+    <string name="secret_key">密钥</string>
+    <string name="type">类型</string>
+    <string name="algorithm">算法</string>
+    <string name="digits">验证码位数</string>
+    <string name="period_seconds">周期</string>
+    <string name="period_value">%d秒</string>
+    <string name="save">保存</string>
+    <string name="camera_permission_rationale">扫描二维码需要相机权限</string>
+    <string name="camera_permission_required">请授予相机权限以扫描二维码</string>
+    <string name="grant_permission">授予权限</string>
+    <string name="advanced_settings">高级设置</string>
+    <string name="processing_image">正在处理图片…</string>
+    <string name="qr_not_found_in_image">没有图像中找到OTP 二维码</string>
+    <string name="retry">重试</string>
+    <string name="group_optional">分组(可选)</string>
+    <string name="icon_picker_title">选择一个图标</string>
+    <string name="icon_picker_gallery">从相册选择</string>
+    <string name="icon_picker_remove">移除图标</string>
+    <string name="icon_picker_cancel">取消</string>
+    <string name="icon_picker_suggestions">推荐图标</string>
+    <string name="icon_picker_no_packs">未安装图标包。请在设置>外观>图标包中导入图标包。</string>
+    <string name="icon_picker_search_placeholder">搜索图标…</string>
+    <string name="icon_picker_no_search_results">没有匹配您搜索的图标</string>
+</resources>
