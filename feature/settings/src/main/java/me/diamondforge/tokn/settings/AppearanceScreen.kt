@@ -57,7 +57,7 @@ fun AppearanceScreen(
     var currentLangTag by remember {
         mutableStateOf(
             AppCompatDelegate.getApplicationLocales().toLanguageTags()
-                .substringBefore(",").substringBefore("-").trim()
+                .substringBefore(",").trim()
         )
     }
     var showLangDialog by remember { mutableStateOf(false) }
@@ -65,11 +65,12 @@ fun AppearanceScreen(
 
     val systemDefaultLabel = stringResource(R.string.language_system_default)
     val languages = remember(systemDefaultLabel) {
-        listOf(
-            "" to systemDefaultLabel,
+        val translated = listOf(
             "en" to "English",
             "de" to "Deutsch",
-        )
+            "zh-CN" to "简体中文",
+        ).sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.second })
+        listOf("" to systemDefaultLabel) + translated
     }
     val currentLangLabel =
         languages.firstOrNull { it.first == currentLangTag }?.second ?: systemDefaultLabel
