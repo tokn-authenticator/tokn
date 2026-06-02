@@ -41,7 +41,7 @@ abstract class AppDatabase : RoomDatabase() {
         // v5 changes the semantics of the `group` column from a single
         // string to a JSON-encoded list of strings. quote() handles inner
         // quote / backslash escaping correctly so a legacy group value
-        // like he"llo serialises to ["he\"llo"].
+        // like he"llo serialises to ["he\"llo"].g
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("UPDATE otp_accounts SET `group` = NULL WHERE `group` = ''")

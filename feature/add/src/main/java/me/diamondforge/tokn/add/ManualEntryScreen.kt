@@ -103,15 +103,27 @@ fun ManualEntryScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            AddAvatar(
-                customIconBytes = uiState.customIconBytes,
-                packIconPath = uiState.packIconPath,
-                issuer = uiState.issuer.ifBlank { uiState.accountName },
-                onClick = { pickerOpen = true },
+            Column(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 8.dp),
-            )
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                AddAvatar(
+                    customIconBytes = uiState.customIconBytes,
+                    packIconPath = uiState.packIconPath,
+                    issuer = uiState.issuer.ifBlank { uiState.accountName },
+                    onClick = { pickerOpen = true },
+                )
+                if (uiState.hasSuggestedIcon) {
+                    Text(
+                        text = stringResource(R.string.icon_picker_suggestions),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
 
             OutlinedTextField(
                 value = uiState.issuer,

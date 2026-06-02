@@ -11,14 +11,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.data.icon.IconImageUtil
+import me.diamondforge.tokn.data.icon.IconMatchType
 import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.data.icon.InstalledIconPack
+import me.diamondforge.tokn.data.icon.suggestionsFor
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
@@ -48,6 +52,43 @@ class AddAccountViewModel @Inject constructor(
                 .sortedBy { it.lowercase() }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    init {
+        viewModelScope.launch {
+            combine(
+                _uiState.map { it.issuer }.distinctUntilChanged(),
+                installedPacks,
+            ) { issuer, packs -> issuer to packs }
+                .collect { (issuer, packs) -> applyIconSuggestion(issuer, packs) }
+        }
+    }
+
+    private fun applyIconSuggestion(issuer: String, packs: List<InstalledIconPack>) {
+        if (_uiState.value.iconExplicitlySet) return
+        val match = packs.firstNotNullOfOrNull { pack ->
+            pack.suggestionsFor(issuer)
+                .firstOrNull { it.matchType == IconMatchType.NORMAL }
+                ?.let { pack to it.icon }
+        }
+        if (match != null) {
+            val (pack, icon) = match
+            val path = iconPackManager.iconFile(pack.pack.uuid, icon.filename)?.absolutePath ?: return
+            _uiState.update {
+                if (it.iconExplicitlySet) it
+                else it.copy(
+                    customIconBytes = null,
+                    iconPackId = pack.pack.uuid,
+                    iconPackFile = icon.filename,
+                    packIconPath = path,
+                )
+            }
+        } else {
+            _uiState.update {
+                if (it.iconExplicitlySet || it.packIconPath == null) it
+                else it.copy(iconPackId = null, iconPackFile = null, packIconPath = null)
+            }
+        }
+    }
 
     fun suppressLock() = lockManager.suppressNextForeground()
 
@@ -81,7 +122,8 @@ class AddAccountViewModel @Inject constructor(
                     customIconBytes = bytes,
                     iconPackId = null,
                     iconPackFile = null,
-                    packIconPath = null
+                    packIconPath = null,
+                    iconExplicitlySet = true,
                 )
             }
         }
@@ -95,12 +137,19 @@ class AddAccountViewModel @Inject constructor(
                 iconPackId = packUuid,
                 iconPackFile = filename,
                 packIconPath = path,
+                iconExplicitlySet = true,
             )
         }
     }
 
     fun clearIcon() = _uiState.update {
-        it.copy(customIconBytes = null, iconPackId = null, iconPackFile = null, packIconPath = null)
+        it.copy(
+            customIconBytes = null,
+            iconPackId = null,
+            iconPackFile = null,
+            packIconPath = null,
+            iconExplicitlySet = true,
+        )
     }
 
     fun saveAccount(onSuccess: () -> Unit) {
@@ -184,6 +233,8 @@ data class AddAccountUiState(
     val iconPackId: String? = null,
     val iconPackFile: String? = null,
     val packIconPath: String? = null,
+    val iconExplicitlySet: Boolean = false,
 ) {
     val hasIcon: Boolean get() = customIconBytes != null || packIconPath != null
+    val hasSuggestedIcon: Boolean get() = !iconExplicitlySet && packIconPath != null
 }
