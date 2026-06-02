@@ -76,6 +76,24 @@
     <string name="open">Open</string>
     <string name="data">Data</string>
 
+    <string name="settings_groups_title">Groups</string>
+    <string name="settings_groups_desc">Rename or remove account groups</string>
+    <string name="groups_empty_title">No groups yet</string>
+    <string name="groups_empty_body">Assign groups when adding or editing an account.</string>
+    <string name="groups_overflow_cd">More options</string>
+    <string name="groups_action_rename">Rename</string>
+    <string name="groups_action_delete">Delete</string>
+    <string name="groups_rename_title">Rename group</string>
+    <string name="groups_rename_label">Group name</string>
+    <string name="groups_rename_save">Save</string>
+    <string name="groups_delete_title">Remove group?</string>
+    <string name="groups_delete_body">\"%1$s\" will be removed from all accounts. The accounts themselves stay intact.</string>
+    <string name="groups_delete_confirm">Remove</string>
+    <plurals name="groups_account_count">
+        <item quantity="one">%d account</item>
+        <item quantity="other">%d accounts</item>
+    </plurals>
+
     <string name="about_title">About</string>
     <string name="about_app_tagline">A small, opinionated 2FA / MFA authenticator for Android. Your one-time codes stay on the device, encrypted. No sign-up, no sync server, no analytics.</string>
     <string name="about_section_app">App</string>

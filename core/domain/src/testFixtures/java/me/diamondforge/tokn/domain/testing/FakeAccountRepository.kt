@@ -61,4 +61,41 @@ class FakeAccountRepository(
 
     override suspend fun getAccountById(id: Long): OtpAccount? =
         state.value.firstOrNull { it.id == id }
+
+    override suspend fun renameGroup(from: String, to: String): Int {
+        val target = to.trim()
+        val source = from.trim()
+        if (target.isEmpty() || source.isEmpty()) return 0
+        var changed = 0
+        state.value = state.value.map { account ->
+            val updated = renameInList(account.groups, source, target) ?: return@map account
+            changed++
+            account.copy(groups = updated)
+        }
+        return changed
+    }
+
+    override suspend fun removeGroup(name: String): Int {
+        val target = name.trim()
+        if (target.isEmpty()) return 0
+        var changed = 0
+        state.value = state.value.map { account ->
+            if (account.groups.none { it.equals(target, ignoreCase = true) }) return@map account
+            changed++
+            account.copy(groups = account.groups.filterNot { it.equals(target, ignoreCase = true) })
+        }
+        return changed
+    }
+}
+
+private fun renameInList(groups: List<String>, from: String, to: String): List<String>? {
+    val hasMatch = groups.any { it.equals(from, ignoreCase = true) }
+    if (!hasMatch) return null
+    val seen = mutableSetOf<String>()
+    val result = mutableListOf<String>()
+    for (g in groups) {
+        val next = if (g.equals(from, ignoreCase = true)) to else g
+        if (seen.add(next.lowercase())) result += next
+    }
+    return if (result == groups) null else result
 }

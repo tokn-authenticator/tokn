@@ -15,12 +15,14 @@ import me.diamondforge.tokn.domain.repository.AccountRepository
 import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.DeleteGroupUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
 import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
+import me.diamondforge.tokn.domain.usecase.RenameGroupUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import me.diamondforge.tokn.security.KeystoreManager
@@ -84,6 +86,12 @@ object DataModule {
 
     @Provides
     fun provideImportAccountsUseCase(repo: AccountRepository) = ImportAccountsUseCase(repo)
+
+    @Provides
+    fun provideRenameGroupUseCase(repo: AccountRepository) = RenameGroupUseCase(repo)
+
+    @Provides
+    fun provideDeleteGroupUseCase(repo: AccountRepository) = DeleteGroupUseCase(repo)
 
     @Provides
     fun provideGenerateOtpUseCase() = GenerateOtpUseCase()

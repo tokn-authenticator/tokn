@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
@@ -29,6 +30,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onAppearance: () -> Unit,
     onSecurity: () -> Unit,
+    onGroups: () -> Unit,
     onBackup: () -> Unit,
     onSync: () -> Unit,
     onAbout: () -> Unit,
@@ -70,6 +72,19 @@ fun SettingsScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
                     },
                     modifier = Modifier.clickable(onClick = onSecurity),
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.settings_groups_title)) },
+                    supportingContent = { Text(stringResource(R.string.settings_groups_desc)) },
+                    leadingContent = {
+                        Icon(Icons.AutoMirrored.Filled.Label, contentDescription = null)
+                    },
+                    trailingContent = {
+                        Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
+                    },
+                    modifier = Modifier.clickable(onClick = onGroups),
                 )
             }
             item {

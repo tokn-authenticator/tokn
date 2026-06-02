@@ -15,6 +15,9 @@ interface OtpAccountDao {
     @Query("SELECT * FROM otp_accounts ORDER BY sortOrder ASC")
     fun getAllAccounts(): Flow<List<OtpAccountEntity>>
 
+    @Query("SELECT * FROM otp_accounts ORDER BY sortOrder ASC")
+    suspend fun getAllAccountsOnce(): List<OtpAccountEntity>
+
     @Query("SELECT * FROM otp_accounts WHERE id = :id LIMIT 1")
     suspend fun getAccountById(id: Long): OtpAccountEntity?
 
