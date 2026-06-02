@@ -27,8 +27,7 @@ class QrChunkCodecTest {
 
     @Test
     fun `multi-chunk payload is split and reassembled`() {
-        // 2500 bytes -> CHUNK_BYTES is 1024 -> 3 frames
-        val payload = ByteArray(2500) { (it % 251).toByte() }
+        val payload = ByteArray(1300) { (it % 251).toByte() }
         val frames = QrChunkCodec.encode(payload)
         assertEquals(3, frames.size)
 
@@ -40,7 +39,7 @@ class QrChunkCodecTest {
 
     @Test
     fun `assemble works with frames out of order`() {
-        val payload = ByteArray(2500) { (it % 251).toByte() }
+        val payload = ByteArray(1300) { (it % 251).toByte() }
         val frames = QrChunkCodec.encode(payload).shuffled().reversed()
         val chunks = frames.mapNotNull(QrChunkCodec::parseFrame)
             .associate { it.seq to it.data }
@@ -85,7 +84,7 @@ class QrChunkCodecTest {
 
     @Test
     fun `assemble returns null when a chunk is missing`() {
-        val payload = ByteArray(2500) { it.toByte() }
+        val payload = ByteArray(1300) { it.toByte() }
         val frames = QrChunkCodec.encode(payload)
         val chunks = frames.mapNotNull(QrChunkCodec::parseFrame)
             .associate { it.seq to it.data }
@@ -104,7 +103,7 @@ class QrChunkCodecTest {
 
     @Test
     fun `parsing round-trips through encode-parseFrame for sizes around chunk boundary`() {
-        for (size in listOf(1, 1023, 1024, 1025, 2047, 2048, 2049)) {
+        for (size in listOf(1, 511, 512, 513, 1023, 1024, 1025)) {
             val payload = ByteArray(size) { (it % 251).toByte() }
             val frames = QrChunkCodec.encode(payload)
             val chunks = frames.mapNotNull(QrChunkCodec::parseFrame)

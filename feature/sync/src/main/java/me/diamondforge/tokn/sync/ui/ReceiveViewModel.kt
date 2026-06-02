@@ -26,6 +26,7 @@ import me.diamondforge.tokn.sync.SyncProtocol
 import me.diamondforge.tokn.sync.lan.DiscoveredPeer
 import me.diamondforge.tokn.sync.lan.LanSyncClient
 import me.diamondforge.tokn.sync.lan.NsdDiscovery
+import me.diamondforge.tokn.sync.qr.Gzip
 import me.diamondforge.tokn.sync.qr.QrChunkCodec
 import me.diamondforge.tokn.sync.wfd.WfdManager
 import me.diamondforge.tokn.sync.wfd.WfdSyncTransport
@@ -198,7 +199,8 @@ class ReceiveViewModel @Inject constructor(
                     salt = wrapper.getString("salt"),
                 )
                 val plain = encryptionManager.decrypt(encrypted, passphrase)
-                val accounts = SyncPayload.deserialize(String(plain, Charsets.UTF_8))
+                val decoded = if (Gzip.looksGzipped(plain)) Gzip.decompress(plain) else plain
+                val accounts = SyncPayload.deserialize(String(decoded, Charsets.UTF_8))
                 importAccountsUseCase(accounts)
             }.onSuccess { summary ->
                 _uiState.update {

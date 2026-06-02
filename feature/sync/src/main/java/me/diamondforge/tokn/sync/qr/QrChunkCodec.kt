@@ -9,7 +9,7 @@ import android.util.Base64
  */
 object QrChunkCodec {
     private const val MAGIC = "T1"
-    private const val CHUNK_BYTES = 1024
+    private const val CHUNK_BYTES = 512
 
     data class Chunk(val seq: Int, val total: Int, val data: ByteArray) {
         override fun equals(other: Any?) =

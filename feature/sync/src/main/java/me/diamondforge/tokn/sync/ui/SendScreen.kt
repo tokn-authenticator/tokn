@@ -342,7 +342,7 @@ private fun AnimatedQr(
     LaunchedEffect(frames) {
         if (frames.size > 1) {
             while (true) {
-                delay(450)
+                delay(650)
                 onAdvanceFrame()
             }
         }

@@ -26,6 +26,7 @@ import me.diamondforge.tokn.sync.SyncProtocol
 import me.diamondforge.tokn.sync.crypto.Handshake
 import me.diamondforge.tokn.sync.lan.DeviceName
 import me.diamondforge.tokn.sync.lan.LanSyncServer
+import me.diamondforge.tokn.sync.qr.Gzip
 import me.diamondforge.tokn.sync.qr.QrChunkCodec
 import me.diamondforge.tokn.sync.wfd.WfdManager
 import me.diamondforge.tokn.sync.wfd.WfdSyncTransport
@@ -237,8 +238,8 @@ class SendViewModel @Inject constructor(
             runCatching {
                 withContext(Dispatchers.Default) {
                     val plain = SyncPayload.serialize(selectedAccounts())
-                    val payload =
-                        encryptionManager.encrypt(plain.toByteArray(Charsets.UTF_8), passphrase)
+                    val compressed = Gzip.compress(plain.toByteArray(Charsets.UTF_8))
+                    val payload = encryptionManager.encrypt(compressed, passphrase)
                     val wrapper = JSONObject().apply {
                         put("ciphertext", payload.ciphertext)
                         put("iv", payload.iv)
