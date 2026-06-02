@@ -33,6 +33,8 @@ stay on the device, encrypted. No sign-up, no sync server, no analytics.
   end-to-end encrypted and nothing leaves the local network.
 - **Bring it with you.** Encrypted backup and restore for migrating or just
   feeling safer.
+- **Organize the vault.** Group accounts (multiple groups per account if you
+  like) and sort the list the way you want.
 - **Pleasant to look at.** Material 3, built with Jetpack Compose.
 
 [totp-rfc]: https://www.rfc-editor.org/rfc/rfc6238
