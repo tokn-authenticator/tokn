@@ -49,7 +49,7 @@ import org.robolectric.annotation.Config
  *
  * Note on time: [HomeViewModel] starts a perpetual 1-second ticker in its init block. We
  * deliberately drive the scheduler with [runCurrent] (which runs only tasks queued at the
- * current virtual instant) instead of `advanceUntilIdle()` — the latter would chase the
+ * current virtual instant) instead of `advanceUntilIdle()`; the latter would chase the
  * ticker's never-ending stream of `delay`s forever. Each test cancels the viewModelScope
  * at the end so runTest's own cleanup doesn't hit the same trap.
  */

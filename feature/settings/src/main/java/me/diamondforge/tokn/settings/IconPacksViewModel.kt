@@ -118,7 +118,7 @@ class IconPacksViewModel @Inject constructor(
 
     private suspend fun computeAutoMatch(installed: InstalledIconPack): AutoMatchProposal {
         val accounts = withContext(Dispatchers.IO) {
-            getAccountsUseCase().map { list -> list }.first()
+            getAccountsUseCase().first()
         }
         val assignments = accounts.mapNotNull { account ->
             val best =

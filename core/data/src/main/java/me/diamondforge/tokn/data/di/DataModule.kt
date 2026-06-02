@@ -18,6 +18,7 @@ import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
 import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
@@ -80,6 +81,9 @@ object DataModule {
 
     @Provides
     fun provideRecordUsageUseCase(repo: AccountRepository) = RecordUsageUseCase(repo)
+
+    @Provides
+    fun provideImportAccountsUseCase(repo: AccountRepository) = ImportAccountsUseCase(repo)
 
     @Provides
     fun provideGenerateOtpUseCase() = GenerateOtpUseCase()

@@ -18,7 +18,6 @@ class OtpAuthUriImporter @Inject constructor() : ExternalImporter {
     override fun canHandle(raw: ByteArray): Boolean {
         val text = raw.toString(Charsets.UTF_8)
         if (text.contains("otpauth-migration://")) return false
-        // Quick check: the first non-empty, non-comment line begins with otpauth://
         return text.lineSequence()
             .map { it.trim() }
             .firstOrNull { it.isNotEmpty() && !it.startsWith("#") }

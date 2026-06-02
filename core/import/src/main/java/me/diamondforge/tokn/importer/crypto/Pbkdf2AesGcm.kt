@@ -23,9 +23,7 @@ internal object Pbkdf2AesGcm {
 
     /**
      * AES-GCM decrypt. The Java provider expects the 128-bit auth tag appended to the
-     * ciphertext, which is how both 2FAS and Aegis-internal blobs are laid out:
-     * `cipher.doFinal(plaintext)` is written verbatim, so the tag is already part of the
-     * input here.
+     * ciphertext, so callers must pass `ciphertext || tag` here.
      */
     fun decrypt(key: ByteArray, iv: ByteArray, ciphertextWithTag: ByteArray): ByteArray {
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")

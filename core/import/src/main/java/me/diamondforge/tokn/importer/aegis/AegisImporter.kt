@@ -15,9 +15,6 @@ import javax.crypto.BadPaddingException
 import javax.inject.Inject
 
 /**
- * Reads the Aegis Authenticator vault file. Format reverse-engineered from public sample
- * files; no source code derived from the Aegis Android app (GPL-3.0).
- *
  * Plain layout:
  *   { "version": 1, "header": { "slots": null, "params": null }, "db": { ... } }
  * Encrypted layout:

@@ -13,8 +13,8 @@ internal object ScryptAesGcm {
         SCrypt.generate(password, salt, n, r, p, KEY_LEN)
 
     /**
-     * Decrypts ciphertext that was produced with AES-256-GCM where the auth tag is stored
-     * separately (Aegis-style). Throws [javax.crypto.AEADBadTagException] on wrong key/data.
+     * Decrypts AES-256-GCM where ciphertext and the auth tag are stored separately.
+     * Throws [javax.crypto.AEADBadTagException] on wrong key/data.
      */
     fun decrypt(
         key: ByteArray,

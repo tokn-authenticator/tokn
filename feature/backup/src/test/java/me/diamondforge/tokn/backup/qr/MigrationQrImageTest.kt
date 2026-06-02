@@ -15,7 +15,7 @@ import org.robolectric.annotation.Config
  * full pipeline: PNG → Bitmap (Robolectric) → ZXing decode → migration URI → parser
  * → OtpAccount list.
  *
- * The fixture is intentionally not asserted against specific secrets — it just verifies
+ * The fixture is intentionally not asserted against specific secrets; it just verifies
  * the pipeline produces non-empty, well-shaped accounts. That keeps the test stable if
  * the fixture is regenerated and avoids embedding live secrets in test assertions.
  */

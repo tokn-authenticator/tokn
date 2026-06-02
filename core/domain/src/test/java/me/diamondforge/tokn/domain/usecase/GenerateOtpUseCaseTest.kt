@@ -10,7 +10,7 @@ import org.junit.Test
 
 /**
  * RFC test vectors are the canonical safety net for any OTP library. If these
- * stop passing, every existing user is locked out of every account — there is
+ * stop passing, every existing user is locked out of every account. There is
  * no "small bug" in this file. Vectors taken from:
  *  - RFC 6238 Appendix B (TOTP), using the per-erratum 20/32/64-byte keys.
  *  - RFC 4226 Appendix D (HOTP), 20-byte key, 6 digits.

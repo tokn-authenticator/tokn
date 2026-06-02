@@ -49,7 +49,7 @@ internal object AegisFixtureWriter {
         val slot = JSONObject().apply {
             put("type", 1)
             put("uuid", "00000000-0000-0000-0000-000000000001")
-            put("key", slotSalt.toHex())   // not actually used as key — placeholder
+            put("key", slotSalt.toHex())   // not actually used as key (placeholder)
             put("key_params", JSONObject().apply {
                 put("nonce", keyNonce.toHex())
                 put("tag", wrappedKeyTag.toHex())
@@ -84,7 +84,7 @@ internal object AegisFixtureWriter {
             put("version", 1)
             put("header", JSONObject().apply {
                 put("slots", JSONArray().put(JSONObject().apply {
-                    put("type", 2) // biometric — not 1
+                    put("type", 2) // biometric, not 1
                     put("uuid", "00000000-0000-0000-0000-000000000002")
                 }))
                 put("params", JSONObject().apply {

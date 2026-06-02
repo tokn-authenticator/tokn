@@ -72,7 +72,12 @@ class HomeViewModel @Inject constructor(
     // Sort once whenever accounts or sort change. The per-tick uiState combine
     // below then leaves order alone, only the OTP codes refresh each second.
     private val sortedView: Flow<SortedView> =
-        combine(_accounts, _accountSort) { accounts, sort -> SortedView(accounts.sortedFor(sort), sort) }
+        combine(_accounts, _accountSort) { accounts, sort ->
+            SortedView(
+                accounts.sortedFor(sort),
+                sort
+            )
+        }
 
     private val partialState: Flow<HomeUiState> = combine(
         sortedView,
@@ -146,7 +151,7 @@ class HomeViewModel @Inject constructor(
         // A reveal is valid only while the displayed code matches the one
         // captured at reveal time AND the per-type timeout hasn't elapsed.
         // Keying on the code (not wall-clock expiry) means a TOTP rollover
-        // re-masks atomically with the new code arriving — no flash of the
+        // re-masks atomically with the new code arriving: no flash of the
         // freshly generated code.
         val now = _currentTimeMillis.value
         val revealed = state.items
@@ -223,7 +228,7 @@ class HomeViewModel @Inject constructor(
     /**
      * Copies the displayed code to the clipboard and schedules a clear after
      * [CLIPBOARD_CLEAR_DELAY_MS]. For HOTP accounts the counter is advanced
-     * so the next render shows the *next* unused code — pasting the just-
+     * so the next render shows the *next* unused code: pasting the just-
      * copied value will succeed on the server, and the user won't see a
      * stale code on their next glance.
      *

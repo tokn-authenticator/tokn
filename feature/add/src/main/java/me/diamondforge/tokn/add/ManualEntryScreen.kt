@@ -2,6 +2,7 @@ package me.diamondforge.tokn.add
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.border
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
@@ -57,6 +57,8 @@ import coil3.compose.AsyncImage
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.ui.GroupsField
+import me.diamondforge.tokn.ui.IconPickerSheet
+import me.diamondforge.tokn.ui.IconPickerStrings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -264,6 +266,7 @@ fun ManualEntryScreen(
                 issuer = uiState.issuer,
                 installedPacks = installedPacks,
                 hasIcon = uiState.hasIcon,
+                strings = iconPickerStrings(),
                 onPickedFromGallery = viewModel::pickCustomIcon,
                 onPickedFromPack = viewModel::pickPackIcon,
                 onRemove = viewModel::clearIcon,
@@ -370,3 +373,15 @@ private fun AlgorithmDropdown(
         }
     }
 }
+
+@Composable
+private fun iconPickerStrings() = IconPickerStrings(
+    title = stringResource(R.string.icon_picker_title),
+    gallery = stringResource(R.string.icon_picker_gallery),
+    remove = stringResource(R.string.icon_picker_remove),
+    searchPlaceholder = stringResource(R.string.icon_picker_search_placeholder),
+    noPacks = stringResource(R.string.icon_picker_no_packs),
+    noSearchResults = stringResource(R.string.icon_picker_no_search_results),
+    suggestions = stringResource(R.string.icon_picker_suggestions),
+    cancel = stringResource(R.string.icon_picker_cancel),
+)

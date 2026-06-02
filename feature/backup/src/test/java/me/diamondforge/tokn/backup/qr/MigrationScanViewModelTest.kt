@@ -11,8 +11,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
-import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
-import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.importer.otpauth.OtpAuthMigrationImporter
 import me.diamondforge.tokn.security.LockManager
 import org.junit.After
@@ -48,8 +47,7 @@ class MigrationScanViewModelTest {
 
     private fun newVm() = MigrationScanViewModel(
         importer = OtpAuthMigrationImporter(),
-        getAccountsUseCase = GetAccountsUseCase(repo),
-        addAccountUseCase = AddAccountUseCase(repo),
+        importAccountsUseCase = ImportAccountsUseCase(repo),
         lockManager = LockManager(),
     )
 

@@ -21,7 +21,7 @@ object Handshake {
      * advances it; `validateRound3PayloadReceived()` then advances to
      * `STATE_ROUND_3_VALIDATED`. Once validate runs, create can no longer be
      * called. So on both sides we *create* our round-3 payload first (just
-     * holding it in memory) and only then validate the peer's — regardless of
+     * holding it in memory) and only then validate the peer's, regardless of
      * which side talks first on the wire.
      */
     fun initiator(input: DataInputStream, output: DataOutputStream, code: String): PairingKeys {

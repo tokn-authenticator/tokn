@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.domain.model.OtpAccount
-import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.importer.ExternalImporter
 import me.diamondforge.tokn.importer.ImportOutcome
 import me.diamondforge.tokn.importer.ImporterRegistry
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class BackupViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getAccountsUseCase: GetAccountsUseCase,
-    private val addAccountUseCase: AddAccountUseCase,
+    private val importAccountsUseCase: ImportAccountsUseCase,
     private val encryptedBackupManager: EncryptedBackupManager,
     private val lockManager: LockManager,
     private val importerRegistry: ImporterRegistry,
@@ -121,10 +121,9 @@ class BackupViewModel @Inject constructor(
 
     /**
      * Entry point for external-app imports. Reads the file once and either applies the
-     * importer the user picked or — if [importerId] is null — auto-detects via the
-     * registry. Surfaces format-specific outcomes (NeedsPassword / WrongPassword /
-     * Unsupported) through [BackupUiState] so the screen can react without knowing the
-     * underlying format.
+     * importer the user picked, or auto-detects via the registry when [importerId] is null.
+     * Surfaces format-specific outcomes (NeedsPassword / WrongPassword / Unsupported)
+     * through [BackupUiState] so the screen can react without knowing the underlying format.
      */
     fun importExternal(uri: Uri, importerId: String? = null, password: String? = null) {
         viewModelScope.launch {
@@ -158,12 +157,15 @@ class BackupViewModel @Inject constructor(
         when (outcome) {
             is ImportOutcome.Success -> {
                 viewModelScope.launch {
-                    val result =
-                        withContext(Dispatchers.IO) { importDeduplicated(outcome.accounts) }
+                    val summary =
+                        withContext(Dispatchers.IO) { importAccountsUseCase(outcome.accounts) }
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            importResult = result,
+                            importResult = ImportResult(
+                                found = summary.found,
+                                imported = summary.imported,
+                            ),
                             pendingExternal = null,
                         )
                     }
@@ -231,28 +233,6 @@ class BackupViewModel @Inject constructor(
     fun cancelExternalImport() {
         _uiState.update { it.copy(pendingExternal = null) }
     }
-
-    /**
-     * Mirrors dedup used by sync transfers: only insert accounts whose normalized secret
-     * isn't already present. Re-importing the same file becomes a no-op.
-     */
-    private suspend fun importDeduplicated(incoming: List<OtpAccount>): ImportResult {
-        val existingSecrets = getAccountsUseCase().first()
-            .map { it.secret.normalize() }
-            .toHashSet()
-        var imported = 0
-        for (account in incoming) {
-            val normalized = account.secret.normalize()
-            if (normalized in existingSecrets) continue
-            addAccountUseCase(account.copy(id = 0))
-            existingSecrets.add(normalized)
-            imported++
-        }
-        return ImportResult(found = incoming.size, imported = imported)
-    }
-
-    private fun String.normalize(): String =
-        replace(" ", "").replace("-", "").uppercase()
 
     fun suppressLock() = lockManager.suppressNextForeground()
 

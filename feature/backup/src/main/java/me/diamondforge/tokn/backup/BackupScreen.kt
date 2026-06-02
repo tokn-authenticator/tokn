@@ -358,11 +358,13 @@ private fun SourcePickerDialog(
                         Spacer(Modifier.width(12.dp))
                         Column {
                             Text(option.displayName, style = MaterialTheme.typography.bodyLarge)
-                            Text(
-                                stringResource(option.noteRes),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                            option.noteRes?.let { res ->
+                                Text(
+                                    stringResource(res),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
                     }
                 }
@@ -398,5 +400,5 @@ private fun filenameFor(request: ExportRequest): String {
 private data class ImportPickerOption(
     val id: String,
     val displayName: String,
-    val noteRes: Int,
+    val noteRes: Int?,
 )

@@ -29,4 +29,9 @@
     <string name="icon_picker_no_packs">No icon packs installed. Import one in Settings › Appearance › Icon packs.</string>
     <string name="icon_picker_search_placeholder">Search icons…</string>
     <string name="icon_picker_no_search_results">No icons match your search</string>
+    <string name="add_invalid_qr_code">Invalid QR code</string>
+    <string name="add_error_secret_required">Secret is required</string>
+    <string name="add_error_invalid_secret">Invalid secret key: only letters A-Z and digits 2-7 are allowed</string>
+    <string name="add_error_account_name_required">Account name is required</string>
+    <string name="add_error_save_failed">Failed to save account</string>
 </resources>

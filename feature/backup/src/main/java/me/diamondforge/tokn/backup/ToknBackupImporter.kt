@@ -7,10 +7,10 @@ import javax.crypto.BadPaddingException
 import javax.inject.Inject
 
 /**
- * Handles Tokn's own backup format inside the same picker that lists Aegis,
- * 2FAS, etc. Both plain JSON and AES-GCM-encrypted variants are detected by
- * [classifyToknBackup]; encrypted payloads surface as [ImportOutcome.NeedsPassword]
- * so the screen reuses its existing password dialog without special casing Tokn.
+ * Handles Tokn's own backup format inside the same picker that lists external sources.
+ * Both plain JSON and AES-GCM-encrypted variants are detected by [classifyToknBackup];
+ * encrypted payloads surface as [ImportOutcome.NeedsPassword] so the screen reuses its
+ * existing password dialog without special casing Tokn.
  */
 class ToknBackupImporter @Inject constructor(
     private val encryptedBackupManager: EncryptedBackupManager,

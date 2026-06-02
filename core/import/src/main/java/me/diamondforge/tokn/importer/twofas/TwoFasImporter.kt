@@ -15,9 +15,6 @@ import javax.crypto.BadPaddingException
 import javax.inject.Inject
 
 /**
- * Reads the 2FAS Authenticator backup (.2fas / .json). Format derived from public
- * sample files; not copied from any GPL source.
- *
  * Top-level shape: `{ "schemaVersion": <int>, "services": [...], "servicesEncrypted": "<b64>:<b64>:<b64>"? }`.
  * Encrypted backups omit `services` (or have an empty array) and store the encrypted body in
  * `servicesEncrypted` formatted as `ciphertext:salt:iv`, all base64. The `ciphertext`

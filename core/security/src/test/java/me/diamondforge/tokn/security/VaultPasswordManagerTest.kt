@@ -81,7 +81,7 @@ class VaultPasswordManagerTest {
         // in the heap between vault unlocks.
         manager.setup("pw")
         val handed = fakeKeystore.lastIssued
-            ?: error("FakeKeystoreManager never issued a passphrase — was setup called?")
+            ?: error("FakeKeystoreManager never issued a passphrase; was setup called?")
         assertArrayEquals(
             "expected post-setup buffer to be zeroed",
             ByteArray(handed.size),

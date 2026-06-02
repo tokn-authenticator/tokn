@@ -28,6 +28,7 @@ import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.importer.otpauth.OtpAuthParser
 import me.diamondforge.tokn.security.LockManager
 import javax.inject.Inject
 
@@ -72,7 +73,8 @@ class AddAccountViewModel @Inject constructor(
         }
         if (match != null) {
             val (pack, icon) = match
-            val path = iconPackManager.iconFile(pack.pack.uuid, icon.filename)?.absolutePath ?: return
+            val path =
+                iconPackManager.iconFile(pack.pack.uuid, icon.filename)?.absolutePath ?: return
             _uiState.update {
                 if (it.iconExplicitlySet) it
                 else it.copy(
@@ -93,16 +95,12 @@ class AddAccountViewModel @Inject constructor(
     fun suppressLock() = lockManager.suppressNextForeground()
 
     fun onQrScanned(rawValue: String) {
-        runCatching { OtpAuthParser.parse(rawValue) }
-            .onSuccess { account ->
-                _uiState.update {
-                    it.copy(
-                        parsedAccount = account,
-                        error = null
-                    )
-                }
-            }
-            .onFailure { _uiState.update { it.copy(error = "Invalid QR code") } }
+        val account = OtpAuthParser.parse(rawValue)
+        if (account != null) {
+            _uiState.update { it.copy(parsedAccount = account, error = null) }
+        } else {
+            _uiState.update { it.copy(error = context.getString(R.string.add_invalid_qr_code)) }
+        }
     }
 
     fun updateIssuer(value: String) = _uiState.update { it.copy(issuer = value) }
@@ -156,16 +154,16 @@ class AddAccountViewModel @Inject constructor(
         val state = _uiState.value
         if (state.isSaving) return
         if (state.secret.isBlank()) {
-            _uiState.update { it.copy(error = "Secret is required") }
+            _uiState.update { it.copy(error = context.getString(R.string.add_error_secret_required)) }
             return
         }
         val cleanedSecret = state.secret.trim().uppercase().replace(" ", "").trimEnd('=')
         if (!cleanedSecret.matches(Regex("[A-Z2-7]+"))) {
-            _uiState.update { it.copy(error = "Invalid secret key: only letters A–Z and digits 2–7 are allowed") }
+            _uiState.update { it.copy(error = context.getString(R.string.add_error_invalid_secret)) }
             return
         }
         if (state.accountName.isBlank()) {
-            _uiState.update { it.copy(error = "Account name is required") }
+            _uiState.update { it.copy(error = context.getString(R.string.add_error_account_name_required)) }
             return
         }
         _uiState.update { it.copy(isSaving = true) }
@@ -190,8 +188,9 @@ class AddAccountViewModel @Inject constructor(
                 .onFailure { throwable ->
                     _uiState.update {
                         it.copy(
-                            error = throwable.message ?: "Failed to save account",
-                            isSaving = false
+                            error = throwable.message
+                                ?: context.getString(R.string.add_error_save_failed),
+                            isSaving = false,
                         )
                     }
                 }

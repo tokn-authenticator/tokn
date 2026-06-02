@@ -118,9 +118,11 @@ fun SelectAccountsScreen(
             }
         },
     ) { padding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             if (!initialized && accounts.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),

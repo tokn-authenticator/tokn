@@ -222,9 +222,11 @@ fun MigrationScanScreen(
         },
         containerColor = Color.Black,
     ) { padding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             if (!cameraPermissionState.status.isGranted) {
                 Column(
                     modifier = Modifier

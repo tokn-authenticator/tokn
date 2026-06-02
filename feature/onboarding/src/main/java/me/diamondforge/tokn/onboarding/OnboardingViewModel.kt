@@ -101,7 +101,7 @@ class OnboardingViewModel @Inject constructor(
                 }
 
             if (importer.id != "tokn") {
-                // Aegis / 2FAS / otpauth / migration-QR: punt to Settings.
+                // External / migration-QR sources: punt to Settings.
                 _uiState.update {
                     it.copy(importError = ImportError.Redirect, pendingTokn = null)
                 }

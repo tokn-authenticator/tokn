@@ -60,4 +60,10 @@
         <item quantity="one">This account will be permanently removed.</item>
         <item quantity="other">These %d accounts will be permanently removed.</item>
     </plurals>
+    <string name="edit_error_secret_required">Secret is required</string>
+    <string name="edit_error_invalid_secret">Invalid secret key: only letters A-Z and digits 2-7 are allowed</string>
+    <string name="edit_error_account_name_required">Account name is required</string>
+    <string name="edit_error_counter_invalid">Counter must be a non-negative number</string>
+    <string name="edit_error_account_missing">Account not found</string>
+    <string name="edit_error_save_failed">Failed to save</string>
 </resources>

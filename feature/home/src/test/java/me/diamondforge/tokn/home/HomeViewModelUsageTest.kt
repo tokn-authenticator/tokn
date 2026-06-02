@@ -40,7 +40,7 @@ import org.robolectric.annotation.Config
  *
  *  1. `copyToClipboard` records a usage event.
  *  2. `reveal` records a usage event.
- *  3. `incrementHotpCounter` (the HOTP refresh button) does NOT — it's
+ *  3. `incrementHotpCounter` (the HOTP refresh button) does NOT: it's
  *     a counter spin, not an actual use of a code.
  *  4. Reveal-then-copy within the dedup window counts as ONE event,
  *     so users of tap-to-reveal aren't double-counted relative to
@@ -135,7 +135,7 @@ class HomeViewModelUsageTest {
 
     @Test
     fun `repeated copies each count`() = runTest(dispatcher) {
-        // Spam-tapping must bump usage — otherwise USAGE_COUNT can never
+        // Spam-tapping must bump usage; otherwise USAGE_COUNT can never
         // reflect real intent.
         val id = runBlocking { repo.addAccount(totp("JBSWY3DPEHPK3PXP")) }
         val vm = newVm()

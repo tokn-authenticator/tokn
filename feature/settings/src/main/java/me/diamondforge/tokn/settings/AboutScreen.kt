@@ -104,7 +104,7 @@ fun AboutScreen(
                     AboutRow(
                         icon = Icons.Outlined.Info,
                         title = stringResource(R.string.about_version),
-                        subtitle = versionName.ifEmpty { "—" },
+                        subtitle = versionName.ifEmpty { "-" },
                         onClick = if (versionName.isNotEmpty()) {
                             {
                                 scope.launch {

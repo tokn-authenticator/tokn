@@ -7,13 +7,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.backup.ImportResult
-import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
-import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.importer.ImportOutcome
 import me.diamondforge.tokn.importer.otpauth.OtpAuthMigrationImporter
 import me.diamondforge.tokn.security.LockManager
@@ -41,8 +39,7 @@ data class MigrationScanUiState(
 @HiltViewModel
 class MigrationScanViewModel @Inject constructor(
     private val importer: OtpAuthMigrationImporter,
-    private val getAccountsUseCase: GetAccountsUseCase,
-    private val addAccountUseCase: AddAccountUseCase,
+    private val importAccountsUseCase: ImportAccountsUseCase,
     private val lockManager: LockManager,
 ) : ViewModel() {
 
@@ -83,10 +80,18 @@ class MigrationScanViewModel @Inject constructor(
             }
             when (outcome) {
                 is ImportOutcome.Success -> {
-                    val result = withContext(Dispatchers.IO) {
-                        importDeduplicated(outcome.accounts)
+                    val summary = withContext(Dispatchers.IO) {
+                        importAccountsUseCase(outcome.accounts)
                     }
-                    _uiState.update { it.copy(isLoading = false, result = result) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            result = ImportResult(
+                                found = summary.found,
+                                imported = summary.imported,
+                            ),
+                        )
+                    }
                 }
 
                 else -> {
@@ -119,24 +124,4 @@ class MigrationScanViewModel @Inject constructor(
             )
         }
     }
-
-    private suspend fun importDeduplicated(
-        incoming: List<me.diamondforge.tokn.domain.model.OtpAccount>,
-    ): ImportResult {
-        val existingSecrets = getAccountsUseCase().first()
-            .map { it.secret.normalize() }
-            .toHashSet()
-        var imported = 0
-        for (account in incoming) {
-            val normalized = account.secret.normalize()
-            if (normalized in existingSecrets) continue
-            addAccountUseCase(account.copy(id = 0))
-            existingSecrets.add(normalized)
-            imported++
-        }
-        return ImportResult(found = incoming.size, imported = imported)
-    }
-
-    private fun String.normalize(): String =
-        replace(" ", "").replace("-", "").uppercase()
 }

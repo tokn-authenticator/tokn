@@ -139,7 +139,7 @@ class EditAccountViewModelHotpCounterTest {
         vm.pickPackIcon("no-such-pack", "missing.svg")
         val state = vm.uiState.first()
         // packIconPath resolution returns null for a non-installed pack, so the
-        // call is a no-op aside from the early return — state.customIconBytes
+        // call is a no-op aside from the early return. state.customIconBytes
         // should still be non-null (the pickPackIcon guard fires first).
         assertNotNull(state.customIconBytes)
     }

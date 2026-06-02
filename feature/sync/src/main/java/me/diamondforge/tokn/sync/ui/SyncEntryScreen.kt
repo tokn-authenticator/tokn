@@ -45,9 +45,11 @@ fun SyncEntryScreen(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             Text(
                 text = stringResource(R.string.sync_desc),
                 style = MaterialTheme.typography.bodyMedium,

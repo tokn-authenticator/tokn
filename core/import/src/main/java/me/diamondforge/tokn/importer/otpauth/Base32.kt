@@ -1,10 +1,6 @@
 package me.diamondforge.tokn.importer.otpauth
 
-/**
- * RFC 4648 Base32 encoder/decoder. The OTP secret format uses base32 so we need to
- * round-trip raw secret bytes (e.g. from the Google Authenticator migration protobuf) to
- * the canonical string representation that the rest of the app stores.
- */
+/** RFC 4648 Base32 encoder/decoder. */
 internal object Base32 {
     private const val ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
     private val DECODE = IntArray(128) { -1 }.also { table ->

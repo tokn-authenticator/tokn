@@ -43,8 +43,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.diamondforge.tokn.data.preferences.ThemeMode
 
-private val LANGUAGE_TAGS = listOf("", "en", "de")
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppearanceScreen(

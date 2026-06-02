@@ -38,7 +38,7 @@ object WfdSyncTransport {
         // (Android's GO always advertises 192.168.49.1) so the sync server
         // is not reachable on any other interface the device may have up
         // at the same time (regular WLAN, mobile hotspot, USB tethering).
-        // Falls back to wildcard if the GO interface isn't available — the
+        // Falls back to wildcard if the GO interface isn't available; the
         // J-PAKE handshake still gates the connection in that case.
         val server = openServerOnGroupOwner(port)
         server.use { sock ->
@@ -110,7 +110,7 @@ object WfdSyncTransport {
      * the group owner. This has been stable since the framework's
      * introduction. If the address ever changes or the interface is not yet
      * up when we hit this code path, fall back to wildcard binding rather
-     * than failing — the handshake still authenticates the peer.
+     * than failing. The handshake still authenticates the peer.
      */
     private fun openServerOnGroupOwner(port: Int): ServerSocket {
         return try {

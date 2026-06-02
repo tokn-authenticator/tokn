@@ -1,4 +1,4 @@
-package me.diamondforge.tokn.home
+package me.diamondforge.tokn.ui
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -47,13 +47,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import me.diamondforge.tokn.data.icon.IconPackIcon
 import me.diamondforge.tokn.data.icon.InstalledIconPack
 import me.diamondforge.tokn.data.icon.suggestionsFor
 
 private const val ICONS_PER_ROW = 6
+
+data class IconPickerStrings(
+    val title: String,
+    val gallery: String,
+    val remove: String,
+    val searchPlaceholder: String,
+    val noPacks: String,
+    val noSearchResults: String,
+    val suggestions: String,
+    val cancel: String,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +72,7 @@ fun IconPickerSheet(
     issuer: String,
     installedPacks: List<InstalledIconPack>,
     hasIcon: Boolean,
+    strings: IconPickerStrings,
     onPickedFromGallery: (Uri) -> Unit,
     onPickedFromPack: (packUuid: String, filename: String) -> Unit,
     onRemove: () -> Unit,
@@ -112,7 +124,7 @@ fun IconPickerSheet(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.icon_picker_title),
+                    text = strings.title,
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Row(
@@ -129,7 +141,7 @@ fun IconPickerSheet(
                     ) {
                         Icon(Icons.Default.Image, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.icon_picker_gallery))
+                        Text(strings.gallery)
                     }
                     if (hasIcon) {
                         OutlinedButton(
@@ -138,7 +150,7 @@ fun IconPickerSheet(
                         ) {
                             Icon(Icons.Default.Delete, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.icon_picker_remove))
+                            Text(strings.remove)
                         }
                     }
                 }
@@ -147,7 +159,7 @@ fun IconPickerSheet(
                         value = query,
                         onValueChange = { query = it },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                        placeholder = { Text(stringResource(R.string.icon_picker_search_placeholder)) },
+                        placeholder = { Text(strings.searchPlaceholder) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -161,7 +173,7 @@ fun IconPickerSheet(
                 if (installedPacks.isEmpty()) {
                     item {
                         Text(
-                            text = stringResource(R.string.icon_picker_no_packs),
+                            text = strings.noPacks,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(16.dp),
@@ -171,7 +183,7 @@ fun IconPickerSheet(
                     if (filteredFlat.isEmpty()) {
                         item {
                             Text(
-                                text = stringResource(R.string.icon_picker_no_search_results),
+                                text = strings.noSearchResults,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(16.dp),
@@ -184,7 +196,7 @@ fun IconPickerSheet(
                     }
                 } else {
                     if (suggestions.isNotEmpty()) {
-                        item { SectionHeader(stringResource(R.string.icon_picker_suggestions)) }
+                        item { SectionHeader(strings.suggestions) }
                         items(suggestions.take(60).chunked(ICONS_PER_ROW)) { row ->
                             IconRow(row, onPickedFromPack, onDismiss)
                         }
@@ -218,7 +230,7 @@ fun IconPickerSheet(
                             .fillMaxWidth()
                             .padding(16.dp),
                     ) {
-                        Text(stringResource(R.string.icon_picker_cancel))
+                        Text(strings.cancel)
                     }
                 }
             }
@@ -267,7 +279,7 @@ private fun CollapsibleHeader(
 
 @Composable
 private fun IconRow(
-    row: List<Pair<InstalledIconPack, me.diamondforge.tokn.data.icon.IconPackIcon>>,
+    row: List<Pair<InstalledIconPack, IconPackIcon>>,
     onPickedFromPack: (String, String) -> Unit,
     onDismiss: () -> Unit,
 ) {

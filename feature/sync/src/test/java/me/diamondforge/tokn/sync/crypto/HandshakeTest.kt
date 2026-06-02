@@ -99,7 +99,7 @@ class HandshakeTest {
                 initFuture.get(30, TimeUnit.SECONDS)
                 respFuture.get(30, TimeUnit.SECONDS)
             } catch (_: ExecutionException) {
-                // swallowed by the inner catch — errors are captured in refs
+                // swallowed by the inner catch; errors are captured in refs
             }
         } finally {
             pool.shutdownNow()

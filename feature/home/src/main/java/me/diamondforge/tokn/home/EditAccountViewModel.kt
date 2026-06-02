@@ -140,27 +140,28 @@ class EditAccountViewModel @Inject constructor(
         val state = _uiState.value
         if (state.isSaving) return
         if (state.secret.isBlank()) {
-            _uiState.update { it.copy(error = "Secret is required") }
+            _uiState.update { it.copy(error = context.getString(R.string.edit_error_secret_required)) }
             return
         }
         val cleanedSecret = state.secret.trim().uppercase().replace(" ", "").trimEnd('=')
         if (!cleanedSecret.matches(Regex("[A-Z2-7]+"))) {
-            _uiState.update { it.copy(error = "Invalid secret key: only letters A–Z and digits 2–7 are allowed") }
+            _uiState.update { it.copy(error = context.getString(R.string.edit_error_invalid_secret)) }
             return
         }
         if (state.accountName.isBlank()) {
-            _uiState.update { it.copy(error = "Account name is required") }
+            _uiState.update { it.copy(error = context.getString(R.string.edit_error_account_name_required)) }
             return
         }
         val parsedCounter = state.counter.trim().toLongOrNull()
         if (state.type == OtpType.HOTP && (parsedCounter == null || parsedCounter < 0)) {
-            _uiState.update { it.copy(error = "Counter must be a non-negative number") }
+            _uiState.update { it.copy(error = context.getString(R.string.edit_error_counter_invalid)) }
             return
         }
         _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             runCatching {
-                val current = getAccountByIdUseCase(accountId) ?: error("Account not found")
+                val current = getAccountByIdUseCase(accountId)
+                    ?: error(context.getString(R.string.edit_error_account_missing))
                 updateAccountUseCase(
                     current.copy(
                         issuer = state.issuer.trim(),
@@ -182,8 +183,9 @@ class EditAccountViewModel @Inject constructor(
                 .onFailure { e ->
                     _uiState.update {
                         it.copy(
-                            error = e.message ?: "Failed to save",
-                            isSaving = false
+                            error = e.message
+                                ?: context.getString(R.string.edit_error_save_failed),
+                            isSaving = false,
                         )
                     }
                 }

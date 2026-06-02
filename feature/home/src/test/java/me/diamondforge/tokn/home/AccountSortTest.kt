@@ -13,9 +13,12 @@ import org.junit.Test
  */
 class AccountSortTest {
 
-    private val alpha = account(id = 1, issuer = "Alpha", name = "a@x", sortOrder = 2, usage = 5, last = 1_000L)
-    private val bravo = account(id = 2, issuer = "Bravo", name = "b@x", sortOrder = 0, usage = 10, last = 0L)
-    private val charlie = account(id = 3, issuer = "charlie", name = "C@x", sortOrder = 1, usage = 0, last = 3_000L)
+    private val alpha =
+        account(id = 1, issuer = "Alpha", name = "a@x", sortOrder = 2, usage = 5, last = 1_000L)
+    private val bravo =
+        account(id = 2, issuer = "Bravo", name = "b@x", sortOrder = 0, usage = 10, last = 0L)
+    private val charlie =
+        account(id = 3, issuer = "charlie", name = "C@x", sortOrder = 1, usage = 0, last = 3_000L)
 
     private val fixture = listOf(alpha, bravo, charlie)
 

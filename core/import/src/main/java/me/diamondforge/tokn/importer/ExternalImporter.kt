@@ -15,8 +15,11 @@ interface ExternalImporter {
     /** User-visible display name (e.g. "Aegis Authenticator"). Not translated; brand names. */
     val displayName: String
 
-    /** Single-line localized help blurb, surfaced under the radio in the source picker. */
-    val noteRes: Int
+    /**
+     * Single-line localized help blurb shown under the radio in the source picker.
+     * `null` for importers that aren't surfaced through the picker (e.g. QR-only flows).
+     */
+    val noteRes: Int?
 
     /**
      * Sort weight in the source picker. Lower values surface first; equal values
@@ -28,7 +31,7 @@ interface ExternalImporter {
     /** MIME types passed to the system file picker. */
     val acceptedMimeTypes: Array<String>
 
-    /** Cheap structural check. Must NOT fully parse — used to route a file to the right importer. */
+    /** Cheap structural check. Must NOT fully parse; used to route a file to the right importer. */
     fun canHandle(raw: ByteArray): Boolean
 
     /**

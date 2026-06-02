@@ -43,11 +43,11 @@ class IconSuggestionTest {
     @Test
     fun `normal match (icon contains query) sorts before inverse match (query contains icon)`() {
         val pack = installed(
-            icon("normal.svg", "GitHub Actions"),  // candidate contains query "GitHub" — NORMAL
+            icon("normal.svg", "GitHub Actions"),  // candidate contains query "GitHub" -> NORMAL
             icon(
                 "inverse.svg",
                 "Git"
-            ),            // query "GitHub" contains candidate "Git" — INVERSE
+            ),            // query "GitHub" contains candidate "Git" -> INVERSE
         )
         val result = pack.suggestionsFor("GitHub")
         assertEquals(2, result.size)

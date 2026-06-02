@@ -201,9 +201,11 @@ fun QrSendScreen(
         onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
         if (state.qrFrames.isEmpty()) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp)
+            ) {
                 Text(
                     stringResource(R.string.sync_qr_passphrase_hint),
                     style = MaterialTheme.typography.bodyMedium
@@ -263,9 +265,11 @@ private fun SendScaffold(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             state.errorMessage?.let { msg ->
                 SyncErrorCard(message = msg, onDismiss = onDismissError)
             }

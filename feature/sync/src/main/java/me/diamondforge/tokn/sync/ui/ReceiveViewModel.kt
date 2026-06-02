@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.security.EncryptedPayload
 import me.diamondforge.tokn.security.EncryptionManager
 import me.diamondforge.tokn.sync.AppInfo
-import me.diamondforge.tokn.sync.SyncImporter
 import me.diamondforge.tokn.sync.SyncPayload
 import me.diamondforge.tokn.sync.SyncProtocol
 import me.diamondforge.tokn.sync.lan.DiscoveredPeer
@@ -42,7 +42,7 @@ data class ReceiveUiState(
     val qrComplete: Boolean = false,
     val errorMessage: String? = null,
     val versionMismatch: VersionMismatchInfo? = null,
-    val importSummary: SyncImporter.Summary? = null,
+    val importSummary: ImportAccountsUseCase.Summary? = null,
 ) {
     enum class Status { Idle, Connecting, Importing, Done }
 }
@@ -51,7 +51,7 @@ data class ReceiveUiState(
 class ReceiveViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val encryptionManager: EncryptionManager,
-    private val importer: SyncImporter,
+    private val importAccountsUseCase: ImportAccountsUseCase,
     private val appInfo: AppInfo,
 ) : ViewModel() {
 
@@ -156,7 +156,7 @@ class ReceiveViewModel @Inject constructor(
             }
             return
         }
-        // Check protocol version BEFORE asking the user for a passphrase —
+        // Check protocol version BEFORE asking the user for a passphrase:
         // no point burning effort if we'll just reject the import anyway.
         val mismatch = inspectQrWrapper(assembled)
         if (mismatch != null) {
@@ -199,7 +199,7 @@ class ReceiveViewModel @Inject constructor(
                 )
                 val plain = encryptionManager.decrypt(encrypted, passphrase)
                 val accounts = SyncPayload.deserialize(String(plain, Charsets.UTF_8))
-                importer.import(accounts)
+                importAccountsUseCase(accounts)
             }.onSuccess { summary ->
                 _uiState.update {
                     it.copy(
@@ -328,7 +328,7 @@ class ReceiveViewModel @Inject constructor(
     private suspend fun applyJsonPayload(json: String) {
         runCatching {
             val accounts = SyncPayload.deserialize(json)
-            importer.import(accounts)
+            importAccountsUseCase(accounts)
         }.onSuccess { summary ->
             _uiState.update {
                 it.copy(

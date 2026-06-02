@@ -6,7 +6,7 @@ import org.json.JSONObject
  * Wire/protocol version. Bump when **any** of the following changes in a way
  * that breaks compatibility with older clients:
  *  - JPAKE / SecureChannel framing
- *  - SyncPayload JSON schema (incompatible — additive optional fields don't count)
+ *  - SyncPayload JSON schema (incompatible; additive optional fields don't count)
  *  - QR wrapper format
  *
  * The protocol version is the *only* thing that gates "can these two devices

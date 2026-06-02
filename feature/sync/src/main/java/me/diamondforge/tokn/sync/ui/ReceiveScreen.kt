@@ -151,9 +151,11 @@ fun WfdReceiveScreen(
             else -> {
                 LaunchedEffect(Unit) { viewModel.startWfdDiscovery() }
                 DisposableEffect(Unit) { onDispose { viewModel.stopWfdDiscovery() } }
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
                     Text(
                         stringResource(R.string.sync_wfd_intro),
                         style = MaterialTheme.typography.bodySmall
@@ -259,9 +261,11 @@ fun QrReceiveScreen(
 
             else -> {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
                         QrSyncScannerPreview(
                             onRawDetected = viewModel::onQrFrameScanned,
                             modifier = Modifier.fillMaxSize(),
@@ -312,9 +316,11 @@ private fun ReceiveScaffold(
             )
         },
     ) { padding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             state.errorMessage?.let { msg ->
                 SyncErrorCard(message = msg, onDismiss = onDismissError)
             }

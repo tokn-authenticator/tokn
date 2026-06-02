@@ -25,6 +25,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:data"))
+
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
 
     implementation(platform(libs.compose.bom))
@@ -33,6 +36,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
+    implementation(libs.coil.compose)
 
     debugImplementation(libs.compose.ui.tooling)
 }

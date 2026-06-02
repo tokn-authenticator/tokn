@@ -86,7 +86,7 @@ private fun readBackupGroups(obj: JSONObject): List<String> {
 /**
  * Plain Tokn backups are JSON with both `accounts` (array) and `version` keys;
  * encrypted ones are a wrapper with `ciphertext` + `iv` + `salt`. Both are JSON
- * at the top level — the key set decides the path.
+ * at the top level; the key set decides the path.
  */
 internal fun classifyToknBackup(raw: ByteArray): ToknBackupShape? = runCatching {
     val obj = JSONObject(raw.toString(Charsets.UTF_8))
@@ -110,8 +110,8 @@ internal fun serializeAccountsAsOtpAuthUriList(accounts: List<OtpAccount>): Stri
 
 /**
  * Human-readable dump: one key/value block per account, blocks separated by a
- * blank line. Aimed at archival/inspection, not round-tripping — there's no
- * parser for this format, callers who want re-import should pick otpauth or
+ * blank line. Aimed at archival/inspection, not round-tripping. There's no
+ * parser for this format; callers who want re-import should pick otpauth or
  * the Tokn vault format.
  */
 internal fun serializeAccountsAsPlainText(accounts: List<OtpAccount>): String =

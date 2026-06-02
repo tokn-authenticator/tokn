@@ -110,7 +110,7 @@ fun OnboardingScreen(
                 }
             }
 
-            // Visible (effective) slide count for the indicator — SecuritySetup is hidden when NONE.
+            // Visible (effective) slide count for the indicator: SecuritySetup is hidden when NONE.
             val visibleCount =
                 if (state.cryptType == CryptType.NONE) SLIDES.size - 1 else SLIDES.size
             val visibleIndex = effectiveIndex(pagerState.currentPage, state.cryptType)

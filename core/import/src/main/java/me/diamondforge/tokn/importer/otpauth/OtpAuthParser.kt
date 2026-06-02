@@ -9,15 +9,14 @@ import me.diamondforge.tokn.domain.model.OtpType
  * Shared parser for `otpauth://` URIs as defined by Key URI Format
  * (https://github.com/google/google-authenticator/wiki/Key-Uri-Format).
  */
-internal object OtpAuthParser {
+object OtpAuthParser {
     fun parse(uriString: String): OtpAccount? {
         val uri = runCatching { Uri.parse(uriString.trim()) }.getOrNull() ?: return null
         if (uri.scheme != "otpauth") return null
 
         val type = when (uri.host?.lowercase()) {
-            "totp" -> OtpType.TOTP
             "hotp" -> OtpType.HOTP
-            else -> return null
+            else -> OtpType.TOTP
         }
 
         // Path is "/label" where label is "Issuer:Account" or just "Account".

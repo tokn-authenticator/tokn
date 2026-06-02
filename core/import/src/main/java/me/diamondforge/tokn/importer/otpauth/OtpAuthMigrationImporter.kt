@@ -32,7 +32,7 @@ data class MigrationBatchInfo(
 class OtpAuthMigrationImporter @Inject constructor() : ExternalImporter {
     override val id: String = "otpauth_migration"
     override val displayName: String = "Google Authenticator export"
-    override val noteRes: Int = 0
+    override val noteRes: Int? = null
     override val acceptedMimeTypes: Array<String> = arrayOf("text/plain", "*/*")
 
     override fun canHandle(raw: ByteArray): Boolean {

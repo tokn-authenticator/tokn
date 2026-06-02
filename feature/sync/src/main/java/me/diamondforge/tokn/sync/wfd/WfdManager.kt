@@ -23,7 +23,7 @@ import kotlin.coroutines.resume
 
 /**
  * Wraps WifiP2pManager. Lifecycle:
- *   1. `register()` — call when the screen becomes active.
+ *   1. `register()`: call when the screen becomes active.
  *   2. issue suspending operations (discover/createGroup/connect).
  *   3. `unregister()` when the screen leaves.
  */
