@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import android.os.Build
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
@@ -175,6 +177,23 @@ fun AppearanceScreen(
                         }
                     },
                 )
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                item {
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.material_you)) },
+                        supportingContent = { Text(stringResource(R.string.material_you_desc)) },
+                        leadingContent = {
+                            Icon(Icons.Default.ColorLens, contentDescription = null)
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = uiState.dynamicColorEnabled,
+                                onCheckedChange = { viewModel.setDynamicColorEnabled(it) },
+                            )
+                        },
+                    )
+                }
             }
             item { HorizontalDivider() }
             item {

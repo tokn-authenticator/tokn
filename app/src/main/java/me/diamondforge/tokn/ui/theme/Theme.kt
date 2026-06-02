@@ -14,6 +14,7 @@ import me.diamondforge.tokn.data.preferences.ThemeMode
 @Composable
 fun SimpleOTPTheme(
     themeMode: ThemeMode,
+    dynamicColor: Boolean,
     content: @Composable () -> Unit,
 ) {
     val darkTheme = when (themeMode) {
@@ -23,8 +24,9 @@ fun SimpleOTPTheme(
     }
 
     val context = LocalContext.current
+    val canUseDynamic = dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val colorScheme = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        canUseDynamic -> {
             if (darkTheme) dynamicDarkColorScheme(context)
             else dynamicLightColorScheme(context)
         }

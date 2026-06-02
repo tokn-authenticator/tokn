@@ -58,6 +58,9 @@ class MainActivity : AppCompatActivity() {
             val themeMode by userPreferencesRepository.themeMode.collectAsStateWithLifecycle(
                 ThemeMode.SYSTEM
             )
+            val dynamicColorEnabled by userPreferencesRepository.dynamicColorEnabled.collectAsStateWithLifecycle(
+                true
+            )
             val isLocked by lockManager.isLocked.collectAsStateWithLifecycle()
             val screenshotsEnabled by userPreferencesRepository.screenshotsEnabled.collectAsStateWithLifecycle(
                 false
@@ -86,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
             val hasVaultPassword = encryptionEnabled && vaultPasswordManager.hasPassword()
 
-            SimpleOTPTheme(themeMode = themeMode) {
+            SimpleOTPTheme(themeMode = themeMode, dynamicColor = dynamicColorEnabled) {
                 AppNavHost(
                     isLocked = isLocked,
                     onboardingDone = onboardingDone,

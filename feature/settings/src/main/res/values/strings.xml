@@ -17,6 +17,8 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System</string>
+    <string name="material_you">Material You colors</string>
+    <string name="material_you_desc">Use the wallpaper-based color palette from your system</string>
     <string name="account_icons">Account icons</string>
     <string name="account_icons_desc">Load service logos from the internet (Simple Icons)</string>
     <string name="account_icons_privacy_title">Load icons from the internet?</string>

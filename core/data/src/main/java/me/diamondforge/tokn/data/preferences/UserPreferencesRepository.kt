@@ -47,6 +47,10 @@ open class UserPreferencesRepository @Inject constructor(
         prefs[Keys.TAP_TO_REVEAL_ENABLED] ?: false
     }
 
+    open val dynamicColorEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.DYNAMIC_COLOR_ENABLED] ?: true
+    }
+
     open val onboardingDone: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.ONBOARDING_DONE] ?: false
     }
@@ -87,6 +91,10 @@ open class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.TAP_TO_REVEAL_ENABLED] = enabled }
     }
 
+    suspend fun setDynamicColorEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.DYNAMIC_COLOR_ENABLED] = enabled }
+    }
+
     suspend fun setOnboardingDone(done: Boolean) {
         dataStore.edit { it[Keys.ONBOARDING_DONE] = done }
     }
@@ -106,6 +114,7 @@ open class UserPreferencesRepository @Inject constructor(
         val SCREENSHOTS_ENABLED = booleanPreferencesKey("screenshots_enabled")
         val ENCRYPTION_ENABLED = booleanPreferencesKey("encryption_enabled")
         val TAP_TO_REVEAL_ENABLED = booleanPreferencesKey("tap_to_reveal_enabled")
+        val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")
         val ACCOUNT_SORT = stringPreferencesKey("account_sort")

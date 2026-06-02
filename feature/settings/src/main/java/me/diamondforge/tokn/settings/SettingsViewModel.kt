@@ -46,6 +46,8 @@ class SettingsViewModel @Inject constructor(
         state.copy(iconFetchEnabled = iconFetch)
     }.combine(preferences.tapToRevealEnabled) { state, tapToReveal ->
         state.copy(tapToRevealEnabled = tapToReveal)
+    }.combine(preferences.dynamicColorEnabled) { state, dynamicColor ->
+        state.copy(dynamicColorEnabled = dynamicColor)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     fun setThemeMode(mode: ThemeMode) {
@@ -70,6 +72,10 @@ class SettingsViewModel @Inject constructor(
 
     fun setTapToRevealEnabled(enabled: Boolean) {
         viewModelScope.launch { preferences.setTapToRevealEnabled(enabled) }
+    }
+
+    fun setDynamicColorEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferences.setDynamicColorEnabled(enabled) }
     }
 
     fun setupEncryption(password: String) {
@@ -101,5 +107,6 @@ data class SettingsUiState(
     val encryptionEnabled: Boolean = false,
     val iconFetchEnabled: Boolean = false,
     val tapToRevealEnabled: Boolean = false,
+    val dynamicColorEnabled: Boolean = true,
     val passwordVerificationFailed: Boolean = false,
 )
