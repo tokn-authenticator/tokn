@@ -14,8 +14,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.border
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
@@ -291,30 +293,55 @@ private fun EditAvatar(
     Box(
         modifier = modifier
             .size(96.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             .clickable(onClick = onClick),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(96.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+            contentAlignment = Alignment.Center,
+        ) {
+            when {
+                customIconBytes != null -> AsyncImage(
+                    model = customIconBytes,
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp),
+                )
+
+                packIconPath != null -> AsyncImage(
+                    model = File(packIconPath),
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp),
+                )
+
+                else -> Text(
+                    text = issuer.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
+        AvatarEditBadge(modifier = Modifier.align(Alignment.BottomEnd))
+    }
+}
+
+@Composable
+private fun AvatarEditBadge(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(28.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary)
+            .border(2.dp, MaterialTheme.colorScheme.surface, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
-        when {
-            customIconBytes != null -> AsyncImage(
-                model = customIconBytes,
-                contentDescription = null,
-                modifier = Modifier.size(72.dp),
-            )
-
-            packIconPath != null -> AsyncImage(
-                model = File(packIconPath),
-                contentDescription = null,
-                modifier = Modifier.size(72.dp),
-            )
-
-            else -> Text(
-                text = issuer.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        Icon(
+            imageVector = Icons.Default.Edit,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.size(16.dp),
+        )
     }
 }
 

@@ -67,7 +67,7 @@ class AddAccountViewModel @Inject constructor(
         if (_uiState.value.iconExplicitlySet) return
         val match = packs.firstNotNullOfOrNull { pack ->
             pack.suggestionsFor(issuer)
-                .firstOrNull { it.matchType == IconMatchType.NORMAL }
+                .firstOrNull { it.matchType == IconMatchType.EXACT || it.matchType == IconMatchType.NORMAL }
                 ?.let { pack to it.icon }
         }
         if (match != null) {

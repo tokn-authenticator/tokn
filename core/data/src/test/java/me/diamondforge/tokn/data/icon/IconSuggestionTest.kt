@@ -34,7 +34,7 @@ class IconSuggestionTest {
 
     @Test
     fun `match is case-insensitive`() {
-        val pack = installed(icon("g.svg", "Google"))
+        val pack = installed(icon("g.svg", "Google Cloud"))
         val result = pack.suggestionsFor("google").single()
         assertEquals(IconMatchType.NORMAL, result.matchType)
         assertEquals("g.svg", result.icon.filename)
@@ -70,10 +70,10 @@ class IconSuggestionTest {
 
     @Test
     fun `normal match wins even if an earlier candidate would have inverse-matched`() {
-        // For a given icon, the algorithm stops at the first NORMAL hit. An icon that
-        // could match both ways should be reported as NORMAL, not INVERSE.
+        // For a given icon, an inverse-only sibling candidate must not downgrade
+        // an icon that has a NORMAL hit. The priority ladder is EXACT > NORMAL > INVERSE.
         val pack = installed(
-            icon("g.svg", "Google", "G"),  // "G" is inverse of any longer query
+            icon("g.svg", "Google Cloud", "G"),
         )
         val result = pack.suggestionsFor("Google")
         assertEquals(IconMatchType.NORMAL, result.single().matchType)
@@ -83,5 +83,33 @@ class IconSuggestionTest {
     fun `icon with empty issuer list never matches`() {
         val pack = installed(icon("g.svg"))
         assertTrue(pack.suggestionsFor("Google").isEmpty())
+    }
+
+    @Test
+    fun `exact GitHub wins over GitHub Actions normal match`() {
+        val pack = installed(
+            icon("actions.svg", "GitHub Actions"),
+            icon("github.svg", "GitHub"),
+        )
+        val result = pack.suggestionsFor("GitHub")
+        assertEquals(2, result.size)
+        assertEquals(IconMatchType.EXACT, result[0].matchType)
+        assertEquals("github.svg", result[0].icon.filename)
+        assertEquals(IconMatchType.NORMAL, result[1].matchType)
+        assertEquals("actions.svg", result[1].icon.filename)
+    }
+
+    @Test
+    fun `exact match is case-insensitive`() {
+        val pack = installed(icon("g.svg", "Google"))
+        val result = pack.suggestionsFor("GOOGLE").single()
+        assertEquals(IconMatchType.EXACT, result.matchType)
+    }
+
+    @Test
+    fun `exact match ignores surrounding whitespace`() {
+        val pack = installed(icon("g.svg", "Google"))
+        val result = pack.suggestionsFor("  google  ").single()
+        assertEquals(IconMatchType.EXACT, result.matchType)
     }
 }
