@@ -1,0 +1,39 @@
+Tokn ist ein kleiner, datenschutzorientierter 2FA / MFA Authenticator. Deine Einmalcodes bleiben verschlüsselt auf deinem Gerät. Kein Konto, keine Cloud, keine Analyse, keine Werbung.
+
+Eine einfache, quelloffene TOTP / HOTP App für alle, die ihren zweiten Faktor nicht in der Cloud anderer Leute haben wollen.
+
+WARUM TOKN
+
+• Privatsphäre an erster Stelle. Keine Registrierung, keine Telemetrie und keine Google Play Services auf deinem Gerät.
+• Verschlüsselter Tresor. Liegt in einer SQLCipher Datenbank und wird mit Biometrie (Fingerabdruck oder Gesicht) oder Passwort entsperrt.
+• Funktioniert vollständig offline. Codes werden lokal auf deinem Telefon erzeugt.
+• Open Source. GPL-3.0, Quellcode auf GitHub, ebenfalls auf F-Droid verfügbar.
+
+FUNKTIONEN
+
+• TOTP und HOTP gemäß RFC 6238 und RFC 4226
+• SHA-1, SHA-256 und SHA-512
+• Konten per QR Code Scan über die Kamera oder ein Bild aus der Galerie hinzufügen
+• Manuelle Eingabe für Codes, die du nicht scannen kannst
+• Entsperren per Biometrie mit Passwort als Rückfallebene
+• Verschlüsselte Sicherung und Wiederherstellung für den Wechsel auf ein neues Telefon oder einfach als Kopie
+• Direkte Geräte-zu-Geräte Synchronisierung über lokales WLAN, Wi-Fi Direct oder animierten QR Code. Nichts verlässt dein Netzwerk und der Handshake ist Ende-zu-Ende verschlüsselt
+• Konten mit eigenen Gruppen organisieren, mehrere Gruppen pro Konto möglich
+• Eigene Icons und importierbare Icon Packs (Aegis-kompatibel)
+• Material 3 Design mit hellem, dunklem oder System-Theme und optional Material You Farben
+• Screenshot-Schutz hält Codes aus der App-Übersicht heraus und blockiert Bildschirmaufnahmen
+
+WECHSEL VON EINER ANDEREN 2FA APP
+
+Tokn importiert Backups von Aegis, 2FAS, Google Authenticator und standardmäßigen otpauth:// URIs. Bring deine bestehenden Konten in wenigen Minuten herüber.
+
+FUNKTIONIERT MIT
+
+Jedem Dienst, der TOTP oder HOTP zur Zwei-Faktor-Authentifizierung unterstützt. Google, GitHub, GitLab, Microsoft, Amazon, Discord, Twitch, Reddit, Dropbox, Proton und tausenden mehr.
+
+LIZENZ
+
+Tokn ist freie Software, veröffentlicht unter der GNU General Public License v3.0 oder später.
+
+Quellcode, Releases und Issue Tracker:
+https://github.com/fthomys/tokn

@@ -1,0 +1,1 @@
+Open-Source 2FA-Authenticator. Lokal verschlüsselt. Kein Registieren.
