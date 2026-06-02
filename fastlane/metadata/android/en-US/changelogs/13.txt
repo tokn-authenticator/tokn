@@ -1,0 +1,7 @@
+* New: assign multiple groups to a single account. Existing single-group accounts are migrated automatically.
+* New: group management screen (Settings > Groups) for renaming and deleting groups across the vault.
+* New: icon suggestions when adding or editing an account, based on the issuer and installed icon packs.
+* New: toggle for Material You colors in Appearance settings (on by default).
+* New: Simplified Chinese is now selectable in the language picker (translation in progress).
+* Improved icon matching so suggestions handle issuer variations more reliably.
+* Removed the copy and visibility buttons from the account card; tap the code to copy.
