@@ -34,17 +34,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import me.diamondforge.tokn.domain.model.OtpType
 import sh.calvin.reorderable.ReorderableCollectionItemScope
+import java.io.File
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -91,6 +95,17 @@ internal fun ReorderableCollectionItemScope.AccountCard(
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
+                /*
+                TODO: Make bigger issuer names, configurable
+                 Text(
+                    text = item.account.issuer,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                 */
                 Text(
                     text = item.account.issuer,
                     style = MaterialTheme.typography.labelMedium,
@@ -192,7 +207,7 @@ private fun IssuerAvatar(
     when {
         customIconBytes != null -> AsyncIconBox(model = customIconBytes, modifier = modifier)
         packIconPath != null -> AsyncIconBox(
-            model = java.io.File(packIconPath),
+            model = File(packIconPath),
             modifier = modifier
         )
 
