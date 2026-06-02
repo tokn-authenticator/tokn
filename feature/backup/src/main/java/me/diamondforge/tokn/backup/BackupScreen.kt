@@ -16,6 +16,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileOpen
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
@@ -303,6 +306,9 @@ fun BackupScreen(
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.import_from_file)) },
                         supportingContent = { Text(stringResource(R.string.import_from_file_desc)) },
+                        leadingContent = {
+                            Icon(Icons.Default.FileOpen, contentDescription = null)
+                        },
                         modifier = Modifier.clickable(enabled = pickerOptions.isNotEmpty()) {
                             showSourcePicker = true
                         },
@@ -312,6 +318,9 @@ fun BackupScreen(
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.import_from_google_auth)) },
                         supportingContent = { Text(stringResource(R.string.import_from_google_auth_desc)) },
+                        leadingContent = {
+                            Icon(Icons.Default.QrCodeScanner, contentDescription = null)
+                        },
                         modifier = Modifier.clickable {
                             viewModel.suppressLock()
                             onScanMigration()
@@ -322,6 +331,9 @@ fun BackupScreen(
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.export_vault)) },
                         supportingContent = { Text(stringResource(R.string.export_vault_desc)) },
+                        leadingContent = {
+                            Icon(Icons.Default.FileDownload, contentDescription = null)
+                        },
                         modifier = Modifier.clickable { showExportDialog = true },
                     )
                 }
