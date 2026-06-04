@@ -29,4 +29,9 @@
     <string name="icon_picker_no_packs">未安装图标包。请在设置>外观>图标包中导入图标包。</string>
     <string name="icon_picker_search_placeholder">搜索图标…</string>
     <string name="icon_picker_no_search_results">没有匹配您搜索的图标</string>
+    <string name="add_invalid_qr_code">无效的二维码</string>
+    <string name="add_error_secret_required">请输入密钥</string>
+    <string name="add_error_invalid_secret">密钥无效：只允许字母A-Z和数字 2-7</string>
+    <string name="add_error_account_name_required">请输入账户名称</string>
+    <string name="add_error_save_failed">未能保存账户</string>
 </resources>
