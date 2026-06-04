@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import me.diamondforge.tokn.domain.model.AccountSort
+import me.diamondforge.tokn.domain.model.TapBehavior
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -67,6 +68,12 @@ open class UserPreferencesRepository @Inject constructor(
             ?: AccountSort.CUSTOM
     }
 
+    open val tapBehavior: Flow<TapBehavior> = dataStore.data.map { prefs ->
+        prefs[Keys.TAP_BEHAVIOR]
+            ?.let { runCatching { TapBehavior.valueOf(it) }.getOrNull() }
+            ?: TapBehavior.SINGLE
+    }
+
     suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     }
@@ -107,6 +114,10 @@ open class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.ACCOUNT_SORT] = sort.name }
     }
 
+    suspend fun setTapBehavior(behavior: TapBehavior) {
+        dataStore.edit { it[Keys.TAP_BEHAVIOR] = behavior.name }
+    }
+
     private object Keys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val AUTO_LOCK_TIMEOUT = intPreferencesKey("auto_lock_timeout")
@@ -118,6 +129,7 @@ open class UserPreferencesRepository @Inject constructor(
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")
         val ACCOUNT_SORT = stringPreferencesKey("account_sort")
+        val TAP_BEHAVIOR = stringPreferencesKey("tap_behavior")
     }
 }
 

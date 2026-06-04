@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Screenshot
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.diamondforge.tokn.domain.model.TapBehavior
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -260,6 +262,33 @@ fun SecurityScreen(
                             checked = uiState.tapToRevealEnabled,
                             onCheckedChange = viewModel::setTapToRevealEnabled,
                         )
+                    },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.tap_to_copy)) },
+                    leadingContent = {
+                        Icon(Icons.Default.TouchApp, contentDescription = null)
+                    },
+                    supportingContent = {
+                        Row(
+                            modifier = Modifier.padding(top = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            listOf(
+                                TapBehavior.NONE to stringResource(R.string.tap_none),
+                                TapBehavior.SINGLE to stringResource(R.string.tap_single),
+                                TapBehavior.DOUBLE to stringResource(R.string.tap_double),
+                            ).forEach { (behavior, label) ->
+                                FilterChip(
+                                    selected = uiState.tapBehavior == behavior,
+                                    onClick = { viewModel.setTapBehavior(behavior) },
+                                    label = { Text(label) },
+                                )
+                                Spacer(Modifier.width(8.dp))
+                            }
+                        }
                     },
                 )
             }

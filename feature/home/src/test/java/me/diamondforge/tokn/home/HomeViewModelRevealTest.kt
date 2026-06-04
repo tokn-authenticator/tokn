@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.setMain
 import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
+import me.diamondforge.tokn.domain.model.TapBehavior
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
@@ -104,10 +105,19 @@ class HomeViewModelRevealTest {
 
     @Test
     fun `tapToRevealEnabled flag flows from preferences into UI state`() = runTest(dispatcher) {
-        userPrefs.tap.value = true
+        userPrefs.tapReveal.value = true
         val vm = newVm()
         val state = latestState(vm)
         assertTrue(state().tapToRevealEnabled)
+        vm.viewModelScope.cancel()
+    }
+
+    @Test
+    fun `tapBehavior flows from preferences into UI state`() = runTest(dispatcher) {
+        userPrefs.tap.value = TapBehavior.DOUBLE
+        val vm = newVm()
+        val state = latestState(vm)
+        assertEquals(TapBehavior.DOUBLE, state().tapBehavior)
         vm.viewModelScope.cancel()
     }
 

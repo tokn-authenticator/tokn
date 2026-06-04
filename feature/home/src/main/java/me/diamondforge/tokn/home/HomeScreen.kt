@@ -40,6 +40,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import me.diamondforge.tokn.domain.model.AccountSort
+import me.diamondforge.tokn.domain.model.TapBehavior
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -197,7 +198,20 @@ fun HomeScreen(
                                         } else if (isMasked) {
                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                             viewModel.reveal(item)
-                                        } else {
+                                        } else when (uiState.tapBehavior) {
+                                            TapBehavior.NONE -> Unit
+                                            TapBehavior.SINGLE -> {
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                viewModel.copyToClipboard(item)
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(copiedMessage)
+                                                }
+                                            }
+                                            TapBehavior.DOUBLE -> Unit
+                                        }
+                                    },
+                                    onDoubleTap = {
+                                        if (!selectionMode && !isMasked && uiState.tapBehavior == TapBehavior.DOUBLE) {
                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                             viewModel.copyToClipboard(item)
                                             scope.launch {

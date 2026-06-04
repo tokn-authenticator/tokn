@@ -26,6 +26,7 @@ import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
+import me.diamondforge.tokn.domain.model.TapBehavior
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
@@ -167,6 +168,8 @@ class HomeViewModel @Inject constructor(
             tapToRevealEnabled = tapToReveal,
             revealedIds = revealed,
         )
+    }.combine(userPreferences.tapBehavior) { state, tapBehavior ->
+        state.copy(tapBehavior = tapBehavior)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
@@ -320,6 +323,7 @@ data class HomeUiState(
     val iconFetchEnabled: Boolean = false,
     val selectedIds: Set<Long> = emptySet(),
     val tapToRevealEnabled: Boolean = false,
+    val tapBehavior: TapBehavior = TapBehavior.SINGLE,
     val revealedIds: Set<Long> = emptySet(),
     val sort: AccountSort = AccountSort.CUSTOM,
 ) {

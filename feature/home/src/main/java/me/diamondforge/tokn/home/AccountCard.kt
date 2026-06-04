@@ -62,6 +62,7 @@ internal fun ReorderableCollectionItemScope.AccountCard(
     canReorder: Boolean,
     isMasked: Boolean,
     onTap: () -> Unit,
+    onDoubleTap: () -> Unit,
     onLongPress: () -> Unit,
     onIncrementCounter: () -> Unit,
 ) {
@@ -73,7 +74,7 @@ internal fun ReorderableCollectionItemScope.AccountCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(onClick = onTap, onLongClick = onLongPress),
+            .combinedClickable(onClick = onTap, onDoubleClick = onDoubleTap, onLongClick = onLongPress),
         elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 1.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {

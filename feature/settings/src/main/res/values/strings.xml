@@ -69,6 +69,10 @@
     <string name="screenshot_protection_desc">Hide app contents in recents and block screenshots</string>
     <string name="tap_to_reveal">Tap to reveal</string>
     <string name="tap_to_reveal_desc">Hide codes until you tap to reveal them</string>
+    <string name="tap_to_copy">Tap to copy</string>
+    <string name="tap_none">Never</string>
+    <string name="tap_single">Single tap</string>
+    <string name="tap_double">Two taps</string>
     <string name="screenshot_warning_title">Disable screenshot protection?</string>
     <string name="screenshot_warning_body">Allowing screenshots may expose your OTP codes to other apps or screen recordings. Only disable this if you understand the risk.</string>
     <string name="enable_anyway">Enable anyway</string>

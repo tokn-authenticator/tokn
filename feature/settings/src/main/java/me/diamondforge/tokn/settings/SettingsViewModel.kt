@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
+import me.diamondforge.tokn.domain.model.TapBehavior
 import me.diamondforge.tokn.security.VaultPasswordManager
 import javax.inject.Inject
 
@@ -46,6 +47,8 @@ class SettingsViewModel @Inject constructor(
         state.copy(iconFetchEnabled = iconFetch)
     }.combine(preferences.tapToRevealEnabled) { state, tapToReveal ->
         state.copy(tapToRevealEnabled = tapToReveal)
+    }.combine(preferences.tapBehavior) { state, tapBehavior ->
+        state.copy(tapBehavior = tapBehavior)
     }.combine(preferences.dynamicColorEnabled) { state, dynamicColor ->
         state.copy(dynamicColorEnabled = dynamicColor)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
@@ -72,6 +75,10 @@ class SettingsViewModel @Inject constructor(
 
     fun setTapToRevealEnabled(enabled: Boolean) {
         viewModelScope.launch { preferences.setTapToRevealEnabled(enabled) }
+    }
+
+    fun setTapBehavior(behavior: TapBehavior) {
+        viewModelScope.launch { preferences.setTapBehavior(behavior) }
     }
 
     fun setDynamicColorEnabled(enabled: Boolean) {
@@ -107,6 +114,7 @@ data class SettingsUiState(
     val encryptionEnabled: Boolean = false,
     val iconFetchEnabled: Boolean = false,
     val tapToRevealEnabled: Boolean = false,
+    val tapBehavior: TapBehavior = TapBehavior.SINGLE,
     val dynamicColorEnabled: Boolean = true,
     val passwordVerificationFailed: Boolean = false,
 )
