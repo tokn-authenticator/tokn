@@ -1,0 +1,2 @@
+* New: choose how tapping a code copies it (single tap, two taps, or off) in Settings > Security.
+* Improved QR sync to compress the payload, so larger vaults transfer more reliably.
