@@ -29,4 +29,9 @@
     <string name="icon_picker_no_packs">Keine Icon-Packs installiert. Importiere eines unter Einstellungen › Darstellung › Icon-Packs.</string>
     <string name="icon_picker_search_placeholder">Icons suchen…</string>
     <string name="icon_picker_no_search_results">Keine Icons gefunden</string>
+    <string name="add_invalid_qr_code">Ungültiger QR code</string>
+    <string name="add_error_secret_required">Geheimnis ist erforderlich</string>
+    <string name="add_error_invalid_secret">Ungültiger geheimer Schlüssel: Nur Buchstaben A-Z und Ziffern 2-7 sind erlaubt</string>
+    <string name="add_error_account_name_required">Angabe des Kontonamens ist erforderlich</string>
+    <string name="add_error_save_failed">Fehler beim Speichern des Kontos</string>
 </resources>

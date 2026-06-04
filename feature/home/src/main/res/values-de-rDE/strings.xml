@@ -59,4 +59,10 @@
         <item quantity="one">Dieses Konto wird dauerhaft entfernt.</item>
         <item quantity="other">Diese %d Konten werden dauerhaft entfernt.</item>
     </plurals>
+    <string name="edit_error_secret_required">Geheimnis ist erforderlich</string>
+    <string name="edit_error_invalid_secret">Ungültiger geheimer Schlüssel: Nur Buchstaben A-Z und Ziffern 2-7 sind erlaubt</string>
+    <string name="edit_error_account_name_required">Angabe des Kontonamens ist erforderlich</string>
+    <string name="edit_error_counter_invalid">Zähler muss eine nicht negative Nummer sein</string>
+    <string name="edit_error_account_missing">Account nicht gefunden</string>
+    <string name="edit_error_save_failed">Speichern fehlgeschlagen</string>
 </resources>
