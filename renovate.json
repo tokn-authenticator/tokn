@@ -3,52 +3,80 @@
   "extends": ["config:recommended"],
   "packageRules": [
     {
-      "matchPackagePatterns": ["^org\\.jetbrains\\.kotlin", "^com\\.google\\.devtools\\.ksp"],
-      "groupName": "kotlin + ksp"
+      "groupName": "kotlin + ksp",
+      "matchPackageNames": [
+        "/^org\\.jetbrains\\.kotlin/",
+        "/^com\\.google\\.devtools\\.ksp/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^com\\.android\\.(application|library|tools)"],
-      "groupName": "android gradle plugin"
+      "groupName": "android gradle plugin",
+      "matchPackageNames": [
+        "/^com\\.android\\.(application|library|tools)/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^androidx\\.compose", "^androidx\\.activity"],
-      "groupName": "compose"
+      "groupName": "compose",
+      "matchPackageNames": [
+        "/^androidx\\.compose/",
+        "/^androidx\\.activity/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^androidx\\.lifecycle"],
-      "groupName": "androidx lifecycle"
+      "groupName": "androidx lifecycle",
+      "matchPackageNames": [
+        "/^androidx\\.lifecycle/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^androidx\\.navigation"],
-      "groupName": "androidx navigation"
+      "groupName": "androidx navigation",
+      "matchPackageNames": [
+        "/^androidx\\.navigation/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^androidx\\.room"],
-      "groupName": "androidx room"
+      "groupName": "androidx room",
+      "matchPackageNames": [
+        "/^androidx\\.room/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^androidx\\.camera"],
-      "groupName": "androidx camerax"
+      "groupName": "androidx camerax",
+      "matchPackageNames": [
+        "/^androidx\\.camera/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^com\\.google\\.dagger", "^androidx\\.hilt"],
-      "groupName": "hilt"
+      "groupName": "hilt",
+      "matchPackageNames": [
+        "/^com\\.google\\.dagger/",
+        "/^androidx\\.hilt/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^org\\.jetbrains\\.kotlinx:kotlinx-coroutines"],
-      "groupName": "kotlinx coroutines"
+      "groupName": "kotlinx coroutines",
+      "matchPackageNames": [
+        "/^org\\.jetbrains\\.kotlinx:kotlinx-coroutines/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^io\\.coil-kt"],
-      "groupName": "coil"
+      "groupName": "coil",
+      "matchPackageNames": [
+        "/^io\\.coil-kt/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^androidx\\.test", "^junit:junit"],
-      "groupName": "test"
+      "groupName": "test",
+      "matchPackageNames": [
+        "/^androidx\\.test/",
+        "/^junit:junit/"
+      ]
     },
     {
-      "matchPackagePatterns": ["^androidx\\.datastore"],
-      "groupName": "androidx datastore"
+      "groupName": "androidx datastore",
+      "matchPackageNames": [
+        "/^androidx\\.datastore/"
+      ]
     }
   ]
 }
