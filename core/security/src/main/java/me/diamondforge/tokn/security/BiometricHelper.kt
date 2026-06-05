@@ -31,33 +31,22 @@ class BiometricHelper @Inject constructor(
         activity: FragmentActivity,
         title: String,
         subtitle: String,
+        negativeButton: String,
+        cryptoObject: BiometricPrompt.CryptoObject,
         onSuccess: () -> Unit,
         onError: (Int, CharSequence) -> Unit,
         onFailed: () -> Unit,
     ) {
-        val executor = ContextCompat.getMainExecutor(activity)
-        val callback = object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                onSuccess()
-            }
-
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                onError(errorCode, errString)
-            }
-
-            override fun onAuthenticationFailed() {
-                onFailed()
-            }
-        }
-
-        val prompt = BiometricPrompt(activity, executor, callback)
-        val info = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(title)
-            .setSubtitle(subtitle)
-            .setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-            .build()
-
-        prompt.authenticate(info)
+        authenticateForCrypto(
+            activity = activity,
+            title = title,
+            subtitle = subtitle,
+            negativeButton = negativeButton,
+            cryptoObject = cryptoObject,
+            onSuccess = { _ -> onSuccess() },
+            onError = onError,
+            onFailed = onFailed,
+        )
     }
 
     fun authenticateForCrypto(
