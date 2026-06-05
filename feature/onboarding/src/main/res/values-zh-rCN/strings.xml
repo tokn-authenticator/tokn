@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_welcome_title">欢迎使用 Tokn</string>
+    <string name="onboarding_welcome_description">一款简洁、私密的验证器，专为您的一次性密码设计。</string>
+    <string name="onboarding_import_button">恢复Tokn密码库</string>
+    <string name="onboarding_import_hint">想要从其他二次验证应用导入账户吗？完成此向导后进入设置 -> 导入和导出处即可导入。</string>
+    <string name="onboarding_import_success">导入了 %1$d 帐户</string>
+    <string name="onboarding_import_redirect_hint">该文件似乎是来自其他应用的备份文件。完成此向导后进入设置 -> 导入和导出处即可导入。</string>
+    <string name="onboarding_import_invalid">无法将此文件作为Tokn密码库读取。</string>
+    <string name="onboarding_import_password_title">加密的Tokn密码库</string>
+    <string name="onboarding_import_password_label">密码库密码</string>
+    <string name="onboarding_import_password_action">恢复密码库</string>
+    <string name="onboarding_import_wrong_password">密码错误。</string>
+    <string name="onboarding_security_title">保护您的密码库</string>
+    <string name="onboarding_security_description">选择保护您的账户的方式。之后您可在设置中修改。</string>
+    <string name="onboarding_security_none">无加密</string>
+    <string name="onboarding_security_none_desc">帐户存储在本地，无需解锁即可访问。</string>
+    <string name="onboarding_security_password">密码加密</string>
+    <string name="onboarding_security_password_desc">通过密码加密密码库，并通过密码解锁密码库。</string>
+    <string name="onboarding_security_biometric">生物识别加密</string>
+    <string name="onboarding_security_biometric_desc">通过生物特征加密密码库，并通过生物识别解锁密码库，将密码解锁作为后备方法。</string>
+    <string name="onboarding_security_biometric_unavailable">生物识别在此设备上不可用。</string>
+    <string name="onboarding_security_pick_method">请选择一种方式。</string>
+    <string name="onboarding_setup_title">设置密码</string>
+    <string name="onboarding_setup_description">当生物识别不可用时，您需要用密码解锁密码库。密码不可找回，请妥善保存密码。</string>
+    <string name="onboarding_password">密码</string>
+    <string name="onboarding_password_confirm">确认密码</string>
+    <string name="onboarding_password_too_short">至少8个字符</string>
+    <string name="onboarding_password_mismatch">密码不一致</string>
+    <string name="onboarding_done_title">完成</string>
+    <string name="onboarding_done_description">您已准备好开始添加帐户。</string>
+    <string name="onboarding_finish">开始</string>
+    <string name="onboarding_next">继续</string>
+    <string name="onboarding_previous">返回</string>
+</resources>
