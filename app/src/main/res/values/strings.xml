@@ -9,4 +9,8 @@
     <string name="use_biometrics">Use biometrics instead</string>
     <string name="password">Password</string>
     <string name="wrong_password">Incorrect password</string>
+    <string name="rot_upgrade_title">Encryption update</string>
+    <string name="rot_upgrade_body">Tokn now uses a more modern encryption method under the hood. This doesn\'t change how you use the app day to day.\n\nBecause the new method ties your vault\'s key to your password, you need to enter it once to switch over. Afterwards your fingerprint keeps working as usual.</string>
+    <string name="rot_upgrade_confirm">Apply</string>
+    <string name="rot_upgrade_later">Later</string>
 </resources>
