@@ -11,18 +11,19 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.TapBehavior
-import me.diamondforge.tokn.security.VaultPasswordManager
+import me.diamondforge.tokn.security.vault.VaultManager
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val preferences: UserPreferencesRepository,
     private val appPreferences: AppPreferencesRepository,
-    private val vaultPasswordManager: VaultPasswordManager,
+    private val vaultManager: VaultManager,
 ) : ViewModel() {
 
     private val _passwordError = MutableStateFlow(false)
@@ -62,7 +63,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setBiometricEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setBiometricEnabled(enabled) }
+        viewModelScope.launch {
+            preferences.setBiometricEnabled(enabled)
+            // Enabling provisions the slot via a prompt in MainActivity (needs the Activity).
+            if (!enabled) {
+                withContext(Dispatchers.IO) { vaultManager.disableBiometric() }
+            }
+        }
     }
 
     fun setScreenshotsEnabled(enabled: Boolean) {
@@ -87,16 +94,17 @@ class SettingsViewModel @Inject constructor(
 
     fun setupEncryption(password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            vaultPasswordManager.setup(password)
+            vaultManager.setPassword(password)
             preferences.setEncryptionEnabled(true)
         }
     }
 
     fun disableEncryption(password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (vaultPasswordManager.verify(password)) {
-                vaultPasswordManager.clear()
+            if (vaultManager.verifyPassword(password)) {
+                vaultManager.removePassword()
                 preferences.setEncryptionEnabled(false)
+                preferences.setBiometricEnabled(false)
             } else {
                 _passwordError.update { true }
             }
