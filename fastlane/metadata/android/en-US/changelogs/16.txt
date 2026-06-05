@@ -1,0 +1,3 @@
+* Fix: tapping a code is now instant. Single tap no longer waits for the double-tap timeout before copying.
+* New: encrypt your vault with a password using Argon2id, with biometric unlock as an optional root of trust. (Before updating: create a backup)
+* New: import accounts from Stratum.
