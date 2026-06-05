@@ -17,6 +17,8 @@ import dagger.Lazy
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -93,6 +95,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        lifecycleScope.launch {
+            combine(userPreferencesRepository.biometricEnabled, vaultSession.state) { enabled, state ->
+                enabled && state == VaultState.UNLOCKED
+            }.distinctUntilChanged().collect { ready ->
+                if (ready) enrollBiometricIfNeeded()
+            }
+        }
+
         setContent {
             val themeMode by userPreferencesRepository.themeMode.collectAsStateWithLifecycle(
                 ThemeMode.SYSTEM
@@ -141,7 +151,6 @@ class MainActivity : AppCompatActivity() {
                             if (vaultManager.unlockWithPassword(password)) {
                                 withContext(Dispatchers.Main) {
                                     lockManager.unlock()
-                                    enrollBiometricIfNeeded()
                                 }
                                 true
                             } else {
@@ -293,6 +302,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun enrollBiometricIfNeeded() {
         lifecycleScope.launch {
+            if (!userPreferencesRepository.encryptionEnabled.first()) return@launch
             if (!userPreferencesRepository.biometricEnabled.first()) return@launch
             if (!vaultSession.isUnlocked) return@launch
             val alreadyProvisioned = withContext(Dispatchers.IO) { vaultManager.canBiometricUnlock() }
@@ -314,7 +324,9 @@ class MainActivity : AppCompatActivity() {
                         runCatching { vaultManager.enableBiometric(authenticatedCipher) }
                     }
                 },
-                onError = { _, _ -> },
+                onError = { _, _ ->
+                    lifecycleScope.launch { userPreferencesRepository.setBiometricEnabled(false) }
+                },
                 onFailed = { },
             )
         }
