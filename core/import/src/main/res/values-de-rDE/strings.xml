@@ -3,4 +3,5 @@
     <string name="importer_aegis_note">Unterstützt verschlüsselte und unverschlüsselte Aegis-JSON-Exporte.</string>
     <string name="importer_twofas_note">Unterstützt verschlüsselte und unverschlüsselte 2FAS-Authenticator-Backups (.2fas / .json).</string>
     <string name="importer_otpauth_uri_note">Textdatei mit je einem otpauth://…-URI pro Zeile.</string>
+    <string name="importer_stratum_note">Unterstützt sowohl verschlüsselte als auch unverschlüsselte Stratum / Authenticator Pro Backups. Nur TOTP und HOTP Konten werden importiert.</string>
 </resources>
