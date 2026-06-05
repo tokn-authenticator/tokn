@@ -62,7 +62,7 @@ internal fun ReorderableCollectionItemScope.AccountCard(
     canReorder: Boolean,
     isMasked: Boolean,
     onTap: () -> Unit,
-    onDoubleTap: () -> Unit,
+    onDoubleTap: (() -> Unit)?,
     onLongPress: () -> Unit,
     onIncrementCounter: () -> Unit,
 ) {

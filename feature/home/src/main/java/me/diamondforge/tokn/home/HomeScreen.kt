@@ -210,15 +210,17 @@ fun HomeScreen(
                                             TapBehavior.DOUBLE -> Unit
                                         }
                                     },
-                                    onDoubleTap = {
-                                        if (!selectionMode && !isMasked && uiState.tapBehavior == TapBehavior.DOUBLE) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                            viewModel.copyToClipboard(item)
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar(copiedMessage)
+                                    onDoubleTap = if (uiState.tapBehavior == TapBehavior.DOUBLE) {
+                                        {
+                                            if (!selectionMode && !isMasked) {
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                viewModel.copyToClipboard(item)
+                                                scope.launch {
+                                                    snackbarHostState.showSnackbar(copiedMessage)
+                                                }
                                             }
                                         }
-                                    },
+                                    } else null,
                                     onLongPress = {
                                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                         if (selectionMode) {
