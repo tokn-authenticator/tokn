@@ -23,6 +23,7 @@ import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.StarRate
 import androidx.compose.material3.Card
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 
+private const val HOMEPAGE_URL = "https://usetokn.app"
 private const val REPO_URL = "https://github.com/fthomys/tokn"
 private const val RELEASES_URL = "$REPO_URL/releases"
 private const val ISSUES_URL = "$REPO_URL/issues"
@@ -127,6 +129,12 @@ fun AboutScreen(
                         title = stringResource(R.string.about_changelog),
                         subtitle = stringResource(R.string.about_changelog_desc),
                         onClick = { uriHandler.openUri(RELEASES_URL) },
+                    )
+                    AboutRow(
+                        icon = Icons.Outlined.Language,
+                        title = stringResource(R.string.about_homepage),
+                        subtitle = stringResource(R.string.about_homepage_desc),
+                        onClick = { uriHandler.openUri(HOMEPAGE_URL) },
                     )
                     AboutRow(
                         icon = Icons.Outlined.Code,

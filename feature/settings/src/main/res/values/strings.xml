@@ -108,6 +108,8 @@
     <string name="about_version">Version</string>
     <string name="about_changelog">Changelog</string>
     <string name="about_changelog_desc">See what changed in recent releases</string>
+    <string name="about_homepage">Homepage</string>
+    <string name="about_homepage_desc">usetokn.app</string>
     <string name="about_source">Source code</string>
     <string name="about_source_desc">View on GitHub</string>
     <string name="about_license">License</string>
