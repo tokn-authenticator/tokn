@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
 import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
@@ -96,8 +98,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            combine(userPreferencesRepository.biometricEnabled, vaultSession.state) { enabled, state ->
-                enabled && state == VaultState.UNLOCKED
+            combine(
+                userPreferencesRepository.onboardingDone,
+                userPreferencesRepository.encryptionEnabled,
+                userPreferencesRepository.biometricEnabled,
+                vaultSession.state,
+            ) { done, encryption, biometric, state ->
+                done && encryption && biometric && state == VaultState.UNLOCKED
             }.distinctUntilChanged().collect { ready ->
                 if (ready) enrollBiometricIfNeeded()
             }
@@ -160,6 +167,7 @@ class MainActivity : AppCompatActivity() {
                     },
                     hasVaultPassword = hasVaultPassword,
                     biometricEnabled = biometricEnabled,
+                    onSetupBiometric = { setupBiometric() },
                 )
 
                 if (isLocked == false && onboardingDone == true && upgradeDue && !upgradeDismissed) {
@@ -296,6 +304,35 @@ class MainActivity : AppCompatActivity() {
                 }
             },
             onError = { _, _ -> },
+            onFailed = { },
+        )
+    }
+
+    private suspend fun setupBiometric(): Boolean = suspendCancellableCoroutine { cont ->
+        if (!biometricHelper.isBiometricEnrolled()) {
+            if (cont.isActive) cont.resume(false)
+            return@suspendCancellableCoroutine
+        }
+        val cipher = runCatching { vaultManager.biometricEncryptCipher() }.getOrNull()
+        if (cipher == null) {
+            if (cont.isActive) cont.resume(false)
+            return@suspendCancellableCoroutine
+        }
+        biometricHelper.authenticateForCrypto(
+            activity = this,
+            title = getString(R.string.biometric_prompt_title),
+            subtitle = getString(R.string.biometric_prompt_subtitle),
+            negativeButton = getString(android.R.string.cancel),
+            cryptoObject = BiometricPrompt.CryptoObject(cipher),
+            onSuccess = { authenticatedCipher ->
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        runCatching { vaultManager.enableBiometric(authenticatedCipher) }
+                    }
+                    if (cont.isActive) cont.resume(true)
+                }
+            },
+            onError = { _, _ -> if (cont.isActive) cont.resume(false) },
             onFailed = { },
         )
     }

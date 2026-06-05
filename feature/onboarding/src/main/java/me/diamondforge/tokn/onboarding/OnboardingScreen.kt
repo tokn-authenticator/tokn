@@ -23,6 +23,7 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -49,6 +50,7 @@ private val SLIDES = listOf(Slide.Welcome, Slide.SecurityPicker, Slide.SecurityS
 @Composable
 fun OnboardingScreen(
     onFinished: () -> Unit,
+    onSetupBiometric: suspend () -> Boolean = { true },
     viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -57,6 +59,7 @@ fun OnboardingScreen(
 
     val pagerState = rememberPagerState(pageCount = { SLIDES.size })
     val pickMethodMsg = stringResource(R.string.onboarding_security_pick_method)
+    val biometricRequiredMsg = stringResource(R.string.onboarding_biometric_required)
 
     // A successful Welcome-slide import is the user's signal that they're done
     // with this step; pause briefly so the "Imported N accounts" feedback can
@@ -69,47 +72,16 @@ fun OnboardingScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbar) },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                userScrollEnabled = false,
-            ) { page ->
-                when (SLIDES[page]) {
-                    Slide.Welcome -> WelcomeSlide(
-                        state = state,
-                        onImport = viewModel::importBackup,
-                        onCancelPendingImport = viewModel::cancelPendingImport,
-                        onSuppressLock = viewModel::suppressLock,
-                        onClearImportFeedback = viewModel::clearImportFeedback,
-                    )
-
-                    Slide.SecurityPicker -> SecurityPickerSlide(
-                        selected = state.cryptType,
-                        biometricAvailable = state.biometricAvailable,
-                        onSelect = viewModel::setCryptType,
-                    )
-
-                    Slide.SecuritySetup -> SecuritySetupSlide(
-                        password = state.password,
-                        passwordConfirm = state.passwordConfirm,
-                        onPasswordChange = viewModel::setPassword,
-                        onPasswordConfirmChange = viewModel::setPasswordConfirm,
-                    )
-
-                    Slide.Done -> DoneSlide()
-                }
+        snackbarHost = {
+            SnackbarHost(snackbar) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                )
             }
-
+        },
+        bottomBar = {
             // Visible (effective) slide count for the indicator: SecuritySetup is hidden when NONE.
             val visibleCount =
                 if (state.cryptType == CryptType.NONE) SLIDES.size - 1 else SLIDES.size
@@ -131,20 +103,67 @@ fun OnboardingScreen(
                 },
                 onNext = {
                     val current = SLIDES[pagerState.currentPage]
-                    if (current == Slide.SecurityPicker && state.cryptType == null) {
-                        scope.launch { snackbar.showSnackbar(pickMethodMsg) }
-                        return@PagerControls
-                    }
-                    if (current == Slide.Done) {
-                        viewModel.finish(onFinished)
-                    } else {
-                        scope.launch {
-                            val target = nextPage(pagerState.currentPage, state.cryptType)
-                            pagerState.animateScrollToPage(target)
+                    when {
+                        current == Slide.SecurityPicker && state.cryptType == null -> {
+                            scope.launch { snackbar.showSnackbar(pickMethodMsg) }
+                        }
+
+                        current == Slide.SecurityPicker && state.cryptType == CryptType.BIOMETRIC -> {
+                            scope.launch {
+                                if (onSetupBiometric()) {
+                                    pagerState.animateScrollToPage(
+                                        nextPage(pagerState.currentPage, state.cryptType),
+                                    )
+                                } else {
+                                    snackbar.showSnackbar(biometricRequiredMsg)
+                                }
+                            }
+                        }
+
+                        current == Slide.Done -> viewModel.finish(onFinished)
+
+                        else -> scope.launch {
+                            pagerState.animateScrollToPage(
+                                nextPage(pagerState.currentPage, state.cryptType),
+                            )
                         }
                     }
                 },
             )
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { padding ->
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            userScrollEnabled = false,
+        ) { page ->
+            when (SLIDES[page]) {
+                Slide.Welcome -> WelcomeSlide(
+                    state = state,
+                    onImport = viewModel::importBackup,
+                    onCancelPendingImport = viewModel::cancelPendingImport,
+                    onSuppressLock = viewModel::suppressLock,
+                    onClearImportFeedback = viewModel::clearImportFeedback,
+                )
+
+                Slide.SecurityPicker -> SecurityPickerSlide(
+                    selected = state.cryptType,
+                    biometricAvailable = state.biometricAvailable,
+                    onSelect = viewModel::setCryptType,
+                )
+
+                Slide.SecuritySetup -> SecuritySetupSlide(
+                    password = state.password,
+                    passwordConfirm = state.passwordConfirm,
+                    onPasswordChange = viewModel::setPassword,
+                    onPasswordConfirmChange = viewModel::setPasswordConfirm,
+                )
+
+                Slide.Done -> DoneSlide()
+            }
         }
     }
 }

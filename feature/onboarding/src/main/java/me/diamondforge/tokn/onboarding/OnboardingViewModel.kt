@@ -155,11 +155,14 @@ class OnboardingViewModel @Inject constructor(
                 if (type != CryptType.NONE) {
                     vaultManager.setPassword(state.password)
                 }
+                // edge case, user want  a other method
+                if (type != CryptType.BIOMETRIC) {
+                    vaultManager.disableBiometric()
+                }
                 preferences.setEncryptionEnabled(type != CryptType.NONE)
                 preferences.setBiometricEnabled(type == CryptType.BIOMETRIC)
                 preferences.setOnboardingDone(true)
             }
-            // Avoid the lock screen flashing while transitioning into the app
             lockManager.suppressNextForeground()
             lockManager.unlock()
             _uiState.update { it.copy(isFinishing = false) }
