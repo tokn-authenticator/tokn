@@ -8,6 +8,7 @@ import dagger.multibindings.IntoSet
 import me.diamondforge.tokn.importer.ExternalImporter
 import me.diamondforge.tokn.importer.aegis.AegisImporter
 import me.diamondforge.tokn.importer.otpauth.OtpAuthUriImporter
+import me.diamondforge.tokn.importer.stratum.StratumImporter
 import me.diamondforge.tokn.importer.twofas.TwoFasImporter
 
 /**
@@ -30,4 +31,8 @@ abstract class ImporterModule {
     @Binds
     @IntoSet
     abstract fun bindOtpAuthUri(impl: OtpAuthUriImporter): ExternalImporter
+
+    @Binds
+    @IntoSet
+    abstract fun bindStratum(impl: StratumImporter): ExternalImporter
 }

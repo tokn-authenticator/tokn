@@ -165,6 +165,7 @@ class BackupViewModel @Inject constructor(
                             importResult = ImportResult(
                                 found = summary.found,
                                 imported = summary.imported,
+                                unsupportedCount = outcome.unsupportedCount,
                             ),
                             pendingExternal = null,
                         )
@@ -250,7 +251,7 @@ data class BackupUiState(
     val pendingExternal: PendingExternalImport? = null,
 )
 
-data class ImportResult(val found: Int, val imported: Int) {
+data class ImportResult(val found: Int, val imported: Int, val unsupportedCount: Int = 0) {
     val skipped: Int get() = found - imported
 }
 

@@ -168,26 +168,26 @@ fun BackupScreen(
             onDismissRequest = { importResult = null },
             title = { Text(stringResource(R.string.import_result_title)) },
             text = {
-                Text(
-                    when {
-                        result.found == 0 -> stringResource(R.string.import_result_empty)
-                        result.imported == 0 -> stringResource(
-                            R.string.import_result_all_duplicates,
-                            result.found,
-                        )
-
-                        result.skipped == 0 -> stringResource(
-                            R.string.import_result_all_imported,
-                            result.imported,
-                        )
-
-                        else -> stringResource(
-                            R.string.import_result_partial,
-                            result.imported,
-                            result.skipped,
-                        )
-                    },
-                )
+                val mainText = when {
+                    result.found == 0 -> stringResource(R.string.import_result_empty)
+                    result.imported == 0 -> stringResource(
+                        R.string.import_result_all_duplicates,
+                        result.found,
+                    )
+                    result.skipped == 0 -> stringResource(
+                        R.string.import_result_all_imported,
+                        result.imported,
+                    )
+                    else -> stringResource(
+                        R.string.import_result_partial,
+                        result.imported,
+                        result.skipped,
+                    )
+                }
+                val unsupportedText = if (result.unsupportedCount > 0) {
+                    "\n\n" + stringResource(R.string.import_result_unsupported_types, result.unsupportedCount)
+                } else ""
+                Text(mainText + unsupportedText)
             },
             confirmButton = {
                 TextButton(onClick = { importResult = null }) {
