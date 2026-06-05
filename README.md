@@ -19,8 +19,10 @@ stay on the device, encrypted. No sign-up, no sync server, no analytics.
 
 - **It minds its own business.** No account, no telemetry, no Google Play
   Services on your device.
-- **Encrypted by default.** The local vault is stored in an SQLCipher database;
-  unlock with biometrics (with a password fallback) or a password alone.
+- **Encrypted by default.** The local vault is stored in an SQLCipher database,
+  with your password run through Argon2id before it ever touches the key. Unlock
+  it with a password, biometrics, or both; each method unlocks the same vault
+  independently, so losing one does not lock you out of the others.
 - **Hide on demand.** Optional screenshot protection keeps codes out of the
   recents preview and blocks screen capture.
 - **Standards based.** TOTP and HOTP per [RFC 6238][totp-rfc] and
@@ -31,8 +33,8 @@ stay on the device, encrypted. No sign-up, no sync server, no analytics.
 - **Move between phones without a server.** Encrypted device-to-device sync
   over QR codes, the local Wi-Fi network, or Wi-Fi Direct. The handshake is
   end-to-end encrypted and nothing leaves the local network.
-- **Bring it with you.** Encrypted backup and restore for migrating or just
-  feeling safer.
+- **Bring it with you.** Encrypted backup and restore (also Argon2id based) for
+  migrating or just feeling safer. Backups from older versions still restore.
 - **Organize the vault.** Group accounts (multiple groups per account if you
   like) and sort the list the way you want.
 - **Pleasant to look at.** Material 3, built with Jetpack Compose.
