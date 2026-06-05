@@ -1,0 +1,2 @@
+* New: encrypt your vault with a password using Argon2id, with biometric unlock as an optional root of trust. (Before updating: create a backup)
+* New: import accounts from Stratum.
