@@ -186,6 +186,7 @@ class MainActivity : AppCompatActivity() {
             val timeout = userPreferencesRepository.autoLockTimeoutSeconds.first()
             lockManager.onAppForeground(timeout)
             if (!vaultSession.isUnlocked || lockManager.isLocked.value != false) {
+                vaultSession.lock()
                 requestBiometric()
             }
         }
