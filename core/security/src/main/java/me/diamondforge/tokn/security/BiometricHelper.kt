@@ -8,6 +8,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.crypto.Cipher
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -57,5 +58,42 @@ class BiometricHelper @Inject constructor(
             .build()
 
         prompt.authenticate(info)
+    }
+
+    fun authenticateForCrypto(
+        activity: FragmentActivity,
+        title: String,
+        subtitle: String,
+        negativeButton: String,
+        cryptoObject: BiometricPrompt.CryptoObject,
+        onSuccess: (Cipher) -> Unit,
+        onError: (Int, CharSequence) -> Unit,
+        onFailed: () -> Unit,
+    ) {
+        val executor = ContextCompat.getMainExecutor(activity)
+        val callback = object : BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                val cipher = result.cryptoObject?.cipher
+                if (cipher != null) onSuccess(cipher) else onFailed()
+            }
+
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                onError(errorCode, errString)
+            }
+
+            override fun onAuthenticationFailed() {
+                onFailed()
+            }
+        }
+
+        val prompt = BiometricPrompt(activity, executor, callback)
+        val info = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(title)
+            .setSubtitle(subtitle)
+            .setAllowedAuthenticators(BIOMETRIC_STRONG)
+            .setNegativeButtonText(negativeButton)
+            .build()
+
+        prompt.authenticate(info, cryptoObject)
     }
 }
