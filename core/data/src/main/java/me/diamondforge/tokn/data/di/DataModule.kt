@@ -25,7 +25,7 @@ import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
 import me.diamondforge.tokn.domain.usecase.RenameGroupUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
-import me.diamondforge.tokn.security.KeystoreManager
+import me.diamondforge.tokn.security.vault.VaultSession
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import javax.inject.Singleton
 
@@ -37,10 +37,10 @@ object DataModule {
     @Singleton
     fun provideDatabase(
         @ApplicationContext context: Context,
-        keystoreManager: KeystoreManager,
+        vaultSession: VaultSession,
     ): AppDatabase {
         System.loadLibrary("sqlcipher")
-        val passphrase = keystoreManager.getDatabasePassphrase()
+        val passphrase = vaultSession.requireKey()
         val factory = SupportOpenHelperFactory(passphrase)
         return Room.databaseBuilder(context, AppDatabase::class.java, "otp_database")
             .openHelperFactory(factory)
