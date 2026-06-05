@@ -8,4 +8,8 @@
     <string name="use_biometrics">Stattdessen Biometrie verwenden</string>
     <string name="password">Passwort</string>
     <string name="wrong_password">Falsches Passwort</string>
+    <string name="rot_upgrade_title">Verschlüsselungsupdate</string>
+    <string name="rot_upgrade_body">Tokn verwendet jetzt eine modernere Verschlüsselungsmethode unter der Haube. Dies ändert nicht die Art und Weise, wie Sie die App Tag für Tag verwenden.\n\nDa die neue Methode den Schlüssel Ihres Tresors mit Ihrem Passwort verbindet, müssen Sie ihn einmal eingeben um umschalten zu können. Danach funktioniert Ihr Fingerabdruck wie gewohnt.</string>
+    <string name="rot_upgrade_confirm">Übernehmen</string>
+    <string name="rot_upgrade_later">Später</string>
 </resources>

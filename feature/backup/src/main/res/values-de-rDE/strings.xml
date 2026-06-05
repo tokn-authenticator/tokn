@@ -48,6 +48,7 @@
     <string name="import_result_partial">%1$d Konto(s) importiert, %2$d waren schon in deiner Bibliothek.</string>
     <string name="import_result_all_duplicates">Alle %d Konto(s) im Backup sind bereits in deiner Bibliothek, nichts Neues zu importieren.</string>
     <string name="import_result_empty">Keine Konten in der Backup-Datei gefunden.</string>
+    <string name="import_result_unsupported_types">%d Konten wurden übersprungen - MobileOTP, SteamOTP und YandexOTP-Typen werden nicht unterstützt.</string>
     <string name="ok">Ok</string>
     <string name="import_error_title">Import fehlgeschlagen</string>
     <string name="export_error_title">Export fehlgeschlagen</string>

@@ -101,6 +101,7 @@
     <string name="about_version">Version</string>
     <string name="about_changelog">Änderungsverlauf</string>
     <string name="about_changelog_desc">Neuerungen der letzten Releases</string>
+    <string name="about_homepage">Startseite</string>
     <string name="about_source">Quellcode</string>
     <string name="about_source_desc">Auf GitHub ansehen</string>
     <string name="about_license">Lizenz</string>
