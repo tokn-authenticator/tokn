@@ -193,11 +193,7 @@ class ReceiveViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val wrapper = JSONObject(String(payload, Charsets.UTF_8))
-                val encrypted = EncryptedPayload(
-                    ciphertext = wrapper.getString("ciphertext"),
-                    iv = wrapper.getString("iv"),
-                    salt = wrapper.getString("salt"),
-                )
+                val encrypted = EncryptedPayload.fromJson(wrapper)
                 val plain = encryptionManager.decrypt(encrypted, passphrase)
                 val decoded = if (Gzip.looksGzipped(plain)) Gzip.decompress(plain) else plain
                 val accounts = SyncPayload.deserialize(String(decoded, Charsets.UTF_8))

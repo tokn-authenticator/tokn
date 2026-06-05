@@ -241,9 +241,7 @@ class SendViewModel @Inject constructor(
                     val compressed = Gzip.compress(plain.toByteArray(Charsets.UTF_8))
                     val payload = encryptionManager.encrypt(compressed, passphrase)
                     val wrapper = JSONObject().apply {
-                        put("ciphertext", payload.ciphertext)
-                        put("iv", payload.iv)
-                        put("salt", payload.salt)
+                        payload.writeTo(this)
                         put("version", SyncPayload.VERSION)
                         put("protocol", SyncProtocol.VERSION)
                         put("app", appInfo.versionName)
