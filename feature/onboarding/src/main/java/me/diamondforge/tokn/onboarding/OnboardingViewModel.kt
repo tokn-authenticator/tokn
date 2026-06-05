@@ -19,7 +19,7 @@ import me.diamondforge.tokn.importer.ImportOutcome
 import me.diamondforge.tokn.importer.ImporterRegistry
 import me.diamondforge.tokn.security.BiometricHelper
 import me.diamondforge.tokn.security.LockManager
-import me.diamondforge.tokn.security.VaultPasswordManager
+import me.diamondforge.tokn.security.vault.VaultManager
 import javax.inject.Inject
 
 enum class CryptType { NONE, PASSWORD, BIOMETRIC }
@@ -43,7 +43,7 @@ data class OnboardingUiState(
 class OnboardingViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val preferences: UserPreferencesRepository,
-    private val vaultPasswordManager: VaultPasswordManager,
+    private val vaultManager: VaultManager,
     private val addAccountUseCase: AddAccountUseCase,
     private val lockManager: LockManager,
     private val importerRegistry: ImporterRegistry,
@@ -153,13 +153,16 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 if (type != CryptType.NONE) {
-                    vaultPasswordManager.setup(state.password)
+                    vaultManager.setPassword(state.password)
+                }
+                // edge case, user want  a other method
+                if (type != CryptType.BIOMETRIC) {
+                    vaultManager.disableBiometric()
                 }
                 preferences.setEncryptionEnabled(type != CryptType.NONE)
                 preferences.setBiometricEnabled(type == CryptType.BIOMETRIC)
                 preferences.setOnboardingDone(true)
             }
-            // Avoid the lock screen flashing while transitioning into the app
             lockManager.suppressNextForeground()
             lockManager.unlock()
             _uiState.update { it.copy(isFinishing = false) }

@@ -14,11 +14,7 @@ class EncryptedBackupManager @Inject constructor(
 ) {
     fun exportToUri(context: Context, uri: Uri, plainJson: String, password: String) {
         val payload = encryptionManager.encrypt(plainJson.toByteArray(Charsets.UTF_8), password)
-        val wrapper = JSONObject().apply {
-            put("ciphertext", payload.ciphertext)
-            put("iv", payload.iv)
-            put("salt", payload.salt)
-        }
+        val wrapper = JSONObject().apply { payload.writeTo(this) }
         context.contentResolver.openOutputStream(uri)?.use { stream ->
             stream.write(wrapper.toString().toByteArray(Charsets.UTF_8))
         } ?: error("Cannot open output stream")
@@ -33,11 +29,7 @@ class EncryptedBackupManager @Inject constructor(
 
     fun decryptBytes(raw: ByteArray, password: String): String {
         val wrapper = JSONObject(raw.toString(Charsets.UTF_8))
-        val payload = EncryptedPayload(
-            ciphertext = wrapper.getString("ciphertext"),
-            iv = wrapper.getString("iv"),
-            salt = wrapper.getString("salt"),
-        )
+        val payload = EncryptedPayload.fromJson(wrapper)
         return encryptionManager.decrypt(payload, password).toString(Charsets.UTF_8)
     }
 }

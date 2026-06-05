@@ -36,4 +36,5 @@
 
     <string name="onboarding_next">Next</string>
     <string name="onboarding_previous">Previous</string>
+    <string name="onboarding_biometric_required">Fingerprint setup is required to continue.</string>
 </resources>

@@ -36,9 +36,11 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation(libs.biometric)
     implementation(libs.hilt.android)
+    implementation(libs.bouncycastle)
     ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
+    testImplementation(libs.org.json)
 }

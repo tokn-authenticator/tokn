@@ -91,10 +91,11 @@ fun AppNavHost(
     onUnlockWithPassword: suspend (String) -> Boolean,
     hasVaultPassword: Boolean,
     biometricEnabled: Boolean,
+    onSetupBiometric: suspend () -> Boolean,
 ) {
     if (onboardingDone == null || isLocked == null) return
     if (!onboardingDone) {
-        OnboardingScreen(onFinished = {})
+        OnboardingScreen(onFinished = {}, onSetupBiometric = onSetupBiometric)
         return
     }
     if (isLocked) {
