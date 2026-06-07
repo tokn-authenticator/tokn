@@ -14,6 +14,7 @@
     <string name="language_system_default">Systemstandard</string>
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
+    <string name="theme_system">System</string>
     <string name="material_you">\"Material You\" Farben</string>
     <string name="material_you_desc">Verwendet die Hintergrund-basierte Farbpalette vom System</string>
     <string name="account_icons">Konto-Icons</string>
@@ -102,9 +103,11 @@
     <string name="about_changelog">Änderungsverlauf</string>
     <string name="about_changelog_desc">Neuerungen der letzten Releases</string>
     <string name="about_homepage">Startseite</string>
+    <string name="about_homepage_desc">usetokn.app</string>
     <string name="about_source">Quellcode</string>
     <string name="about_source_desc">Auf GitHub ansehen</string>
     <string name="about_license">Lizenz</string>
+    <string name="about_license_desc">GPL-3.0-or-later</string>
     <string name="about_third_party">Drittanbieter-Lizenzen</string>
     <string name="about_third_party_desc">Open-Source-Abhängigkeiten</string>
     <string name="about_report_issue">Problem melden</string>

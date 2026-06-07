@@ -48,6 +48,7 @@
     <string name="import_result_partial">%1$d 个帐户已导入，个帐户 %2$d 已经在您的库中。</string>
     <string name="import_result_all_duplicates">备份中的所有 %d （个）帐户已经在您的库中，没有新的账户需要导入。</string>
     <string name="import_result_empty">在备份文件中没有找到账户。</string>
+    <string name="import_result_unsupported_types">%d account(s) were skipped - MobileOTP, SteamOTP, and YandexOTP types are not supported.</string>
     <string name="ok">确定</string>
     <string name="import_error_title">导入失败</string>
     <string name="export_error_title">导出失败</string>
@@ -56,6 +57,7 @@
     <string name="error_file_not_readable">无法打开文件。它可能已被移动或删除。</string>
     <string name="error_file_not_writable">无法写入备份文件。请检查存储是否可用。</string>
     <string name="error_wrong_password">密码错误。</string>
+    <string name="error_external_not_recognized">This file isn\'t recognised by any supported importer.</string>
     <string name="error_external_unsupported">此备份文件使用硬件或生物识别保护，不能用密码导入。</string>
     <string name="error_external_malformed">选中的文件不完整或格式不正确。</string>
     <string name="error_generic">出错了: %s</string>
