@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Tokn</string>
     <string name="biometric_prompt_title">解锁Tokn</string>
     <string name="biometric_prompt_subtitle">使用生物识别或PIN码继续</string>
     <string name="vault_locked">密码库处于锁定状态</string>
@@ -8,4 +9,8 @@
     <string name="use_biometrics">使用生物识别登录</string>
     <string name="password">密码</string>
     <string name="wrong_password">密码不正确</string>
+    <string name="rot_upgrade_title">Encryption update</string>
+    <string name="rot_upgrade_body">Tokn now uses a more modern encryption method under the hood. This doesn\'t change how you use the app day to day.\n\nBecause the new method ties your vault\'s key to your password, you need to enter it once to switch over. Afterwards your fingerprint keeps working as usual.</string>
+    <string name="rot_upgrade_confirm">Apply</string>
+    <string name="rot_upgrade_later">Later</string>
 </resources>
