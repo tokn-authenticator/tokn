@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Tokn</string>
     <string name="settings">Einstellungen</string>
     <string name="add_account">Konto hinzufügen</string>
     <string name="no_accounts_title">Noch keine Konten</string>
