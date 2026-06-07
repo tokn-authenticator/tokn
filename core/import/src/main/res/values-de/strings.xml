@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="importer_aegis_note">Unterstützt verschlüsselte und unverschlüsselte Aegis-JSON-Exporte.</string>
-    <string name="importer_twofas_note">Unterstützt verschlüsselte und unverschlüsselte 2FAS-Authenticator-Backups (.2fas / .json).</string>
-    <string name="importer_otpauth_uri_note">Textdatei mit je einem otpauth://…-URI pro Zeile.</string>
-</resources>

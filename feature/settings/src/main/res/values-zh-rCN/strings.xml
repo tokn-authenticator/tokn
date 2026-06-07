@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">设置</string>
+    <string name="appearance_desc">主题与显示选项</string>
+    <string name="security_desc">生物识别解锁，自动锁定与隐私设置</string>
+    <string name="backup_desc">导出或导入帐户</string>
+    <string name="sync_menu_title">同步到其他设备</string>
+    <string name="sync_menu_desc">通过Wi-Fi或二维码传输账户</string>
+    <string name="about_desc">版本号，源代码与许可证</string>
+    <string name="appearance">外观样式</string>
+    <string name="theme">主题</string>
+    <string name="language">语言</string>
+    <string name="language_desc">选择应用语言</string>
+    <string name="language_system_default">跟随系统</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="material_you">Material You 主题</string>
+    <string name="account_icons">账户图标</string>
+    <string name="account_icons_desc">联网加载服务商图标(Simple Icons)</string>
+    <string name="account_icons_privacy_title">联网加载图标？</string>
+    <string name="account_icons_privacy_body">启用此功能后，将从Simple Icons的CDN上获取各个服务商的logo。您的发行商名称将作为请求网址的一部分被发送到CDN。可在任何时候关闭此功能。</string>
+    <string name="icon_packs_section">图标包</string>
+    <string name="icon_packs_title">图标包</string>
+    <string name="icon_packs_import">导入图标包</string>
+    <string name="icon_packs_import_desc">兼容Aegis的 .zip压缩包，包含pack.json和图标文件</string>
+    <string name="icon_packs_pick_zip">选择 .zip 文件…</string>
+    <string name="icon_packs_count_v">%1$d 个图标 · v%2$d</string>
+    <string name="icon_packs_count_v_used">%1$d 个图标 · v%2$d · 已被调用 %3$d 次</string>
+    <string name="icon_packs_delete_body_used">%1$d 个帐户正在使用此图标包。移除图标包后，它们将回退到联网获取的图标或者字母头像。</string>
+    <string name="icon_packs_empty">没有安装图标包。</string>
+    <string name="icon_packs_automatch_title">自动分配图标？</string>
+    <string name="icon_packs_automatch_body">%1$d 个账户可以使用\"%2$s\"的图标。是否应用？</string>
+    <string name="icon_packs_automatch_apply">应用</string>
+    <string name="icon_packs_automatch_skip">跳过</string>
+    <string name="icon_packs_delete_title">移除图标包？</string>
+    <string name="icon_packs_delete_body">使用此图标包的账户将回退到联网获取的图标或者字母头像。</string>
+    <string name="icon_packs_delete_confirm">移除</string>
+    <string name="security">安全</string>
+    <string name="section_vault">密码库</string>
+    <string name="encrypt_vault">加密密码库</string>
+    <string name="backup_restore">备份与恢复</string>
+</resources>

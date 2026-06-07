@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings">设置</string>
+    <string name="add_account">添加账户</string>
+    <string name="no_accounts_title">暂时没有账户</string>
+    <string name="no_accounts_subtitle">点击 + 添加您的第一个2FA 帐户</string>
+    <string name="code_copied">代码已复制，将在30秒后清除剪贴板</string>
+    <string name="delete">删除</string>
+    <string name="add_scan_qr">扫描二维码</string>
+    <string name="add_from_image">从图片导入</string>
+    <string name="add_manually">手动输入</string>
+    <string name="delete_confirm_title">删除帐户？</string>
+    <string name="delete_confirm_message">此帐户将被永久移除。</string>
+    <string name="cancel">取消</string>
+    <string name="search">搜索</string>
+    <string name="search_placeholder">搜索账户…</string>
+    <string name="no_results_title">无结果</string>
+    <string name="no_results_subtitle">没有符合您搜索的账户</string>
+    <string name="edit_account_title">编辑帐户</string>
+    <string name="edit_issuer">服务商</string>
+    <string name="edit_account_name">账户名</string>
+    <string name="edit_secret">密钥</string>
+    <string name="edit_type">类型</string>
+    <string name="edit_algorithm">算法</string>
+    <string name="edit_digits">验证码位数</string>
+    <string name="edit_period">时间间隔</string>
+    <string name="sort_custom">自定义排序</string>
+    <string name="sort_issuer_asc">按发行者正序 (A-> Z)</string>
+    <string name="sort_issuer_desc">按发行者倒序 (A-> Z)</string>
+    <string name="sort_name_asc">按账户名正序(A → Z)</string>
+    <string name="sort_name_desc">按账户名倒序(A → Z)</string>
+    <string name="sort_most_used">按常用程度排序</string>
+    <string name="sort_recently_used">按最近使用排序</string>
+    <string name="icon_picker_title">选择一个图标</string>
+    <string name="icon_picker_gallery">从相册选择</string>
+    <string name="icon_picker_remove">移除图标</string>
+    <string name="icon_picker_cancel">取消</string>
+    <string name="icon_picker_suggestions">推荐图标</string>
+    <string name="icon_picker_no_packs">未安装图标包。请在设置>外观>图标包中导入图标包。</string>
+    <string name="icon_picker_search_placeholder">搜索图标…</string>
+    <string name="icon_picker_no_search_results">没有匹配您搜索的图标</string>
+    <plurals name="delete_count_confirm_title">
+        <item quantity="other">是否删除 %d 帐户？</item>
+    </plurals>
+</resources>
