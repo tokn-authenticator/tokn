@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Tokn</string>
     <string name="settings">设置</string>
     <string name="add_account">添加账户</string>
     <string name="no_accounts_title">暂时没有账户</string>
@@ -24,6 +25,18 @@
     <string name="edit_algorithm">算法</string>
     <string name="edit_digits">验证码位数</string>
     <string name="edit_period">时间间隔</string>
+    <string name="edit_counter">Counter</string>
+    <string name="edit_advanced">Advanced</string>
+    <string name="edit_save">Save changes</string>
+    <string name="edit_group">Group (optional)</string>
+    <string name="group_all">All</string>
+    <string name="edit">Edit</string>
+    <string name="select_all">Select all</string>
+    <string name="cd_exit_selection">Exit selection</string>
+    <string name="cd_exit_search">Close search</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_drag_handle">Drag to reorder</string>
+    <string name="cd_sort">Sort accounts</string>
     <string name="sort_custom">自定义排序</string>
     <string name="sort_issuer_asc">按发行者正序 (A-> Z)</string>
     <string name="sort_issuer_desc">按发行者倒序 (A-> Z)</string>
@@ -42,4 +55,13 @@
     <plurals name="delete_count_confirm_title">
         <item quantity="other">是否删除 %d 帐户？</item>
     </plurals>
+    <plurals name="delete_count_confirm_message">
+        <item quantity="other">These %d accounts will be permanently removed.</item>
+    </plurals>
+    <string name="edit_error_secret_required">Secret is required</string>
+    <string name="edit_error_invalid_secret">Invalid secret key: only letters A-Z and digits 2-7 are allowed</string>
+    <string name="edit_error_account_name_required">Account name is required</string>
+    <string name="edit_error_counter_invalid">Counter must be a non-negative number</string>
+    <string name="edit_error_account_missing">Account not found</string>
+    <string name="edit_error_save_failed">Failed to save</string>
 </resources>
