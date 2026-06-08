@@ -81,7 +81,7 @@ internal fun ReorderableCollectionItemScope.AccountCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isSelected) {
@@ -94,27 +94,26 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                     iconFetchEnabled = iconFetchEnabled,
                 )
             }
+
+            // todo: make the spacings and sizes configurable
+
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                /*
-                TODO: Make bigger issuer names, configurable
                  Text(
                     text = item.account.issuer,
                     style = TextStyle(
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     ),
                     color = MaterialTheme.colorScheme.primary,
                 )
-                 */
-                Text(
-                    text = item.account.issuer,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
                 Text(
                     text = item.account.accountName,
-                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = 14.sp,
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
