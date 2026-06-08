@@ -66,4 +66,8 @@
     <string name="edit_error_counter_invalid">Zähler muss eine nicht negative Nummer sein</string>
     <string name="edit_error_account_missing">Account nicht gefunden</string>
     <string name="edit_error_save_failed">Speichern fehlgeschlagen</string>
+    <plurals name="home_account_count">
+        <item quantity="one">Showing %d account</item>
+        <item quantity="other">Showing %d accounts</item>
+    </plurals>
 </resources>
