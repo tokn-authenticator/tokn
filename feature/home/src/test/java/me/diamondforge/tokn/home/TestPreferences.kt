@@ -20,6 +20,8 @@ internal class FakeAppPreferences(context: Context) : AppPreferencesRepository(c
 internal class FakeUserPreferences(context: Context) : UserPreferencesRepository(context) {
     val tapReveal = MutableStateFlow(false)
     override val tapToRevealEnabled = tapReveal
+    val showNext = MutableStateFlow(false)
+    override val showNextCodeEnabled = showNext
     val tap = MutableStateFlow(TapBehavior.SINGLE)
     override val tapBehavior = tap
     val sort = MutableStateFlow(AccountSort.CUSTOM)

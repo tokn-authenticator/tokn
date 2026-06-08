@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -176,6 +177,19 @@ fun AppearanceScreen(
                                 Spacer(Modifier.width(8.dp))
                             }
                         }
+                    },
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.show_next_code)) },
+                    supportingContent = { Text(stringResource(R.string.show_next_code_desc)) },
+                    leadingContent = { Icon(Icons.Default.Schedule, contentDescription = null) },
+                    trailingContent = {
+                        Switch(
+                            checked = uiState.showNextCodeEnabled,
+                            onCheckedChange = { viewModel.setShowNextCodeEnabled(it) },
+                        )
                     },
                 )
             }

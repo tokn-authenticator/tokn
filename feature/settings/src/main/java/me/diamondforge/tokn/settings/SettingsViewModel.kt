@@ -52,6 +52,8 @@ class SettingsViewModel @Inject constructor(
         state.copy(tapBehavior = tapBehavior)
     }.combine(preferences.dynamicColorEnabled) { state, dynamicColor ->
         state.copy(dynamicColorEnabled = dynamicColor)
+    }.combine(preferences.showNextCodeEnabled) { state, showNextCode ->
+        state.copy(showNextCodeEnabled = showNextCode)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     fun setThemeMode(mode: ThemeMode) {
@@ -92,6 +94,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { preferences.setDynamicColorEnabled(enabled) }
     }
 
+    fun setShowNextCodeEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferences.setShowNextCodeEnabled(enabled) }
+    }
+
     fun setupEncryption(password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             vaultManager.setPassword(password)
@@ -124,5 +130,6 @@ data class SettingsUiState(
     val tapToRevealEnabled: Boolean = false,
     val tapBehavior: TapBehavior = TapBehavior.SINGLE,
     val dynamicColorEnabled: Boolean = true,
+    val showNextCodeEnabled: Boolean = false,
     val passwordVerificationFailed: Boolean = false,
 )

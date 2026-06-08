@@ -170,6 +170,16 @@ class HomeViewModel @Inject constructor(
         )
     }.combine(userPreferences.tapBehavior) { state, tapBehavior ->
         state.copy(tapBehavior = tapBehavior)
+    }.combine(userPreferences.showNextCodeEnabled) { state, showNextCode ->
+        if (!showNextCode) return@combine state
+        state.copy(
+            items = state.items.map { item ->
+                if (item.account.type != OtpType.TOTP) return@map item
+                val nextTime = _currentTimeMillis.value + item.account.period * 1000L
+                val next = runCatching { generateOtpUseCase(item.account, nextTime).code }.getOrNull()
+                item.copy(nextCode = next)
+            }
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
@@ -334,6 +344,7 @@ data class AccountItem(
     val account: OtpAccount,
     val otpResult: OtpResult,
     val packIconPath: String? = null,
+    val nextCode: String? = null,
 )
 
 private data class RevealRecord(

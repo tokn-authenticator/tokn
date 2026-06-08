@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -126,8 +128,19 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
                 )
+                item.nextCode?.let { next ->
+                    Text(
+                        text = if (isMasked) maskOtpCode(next) else formatOtpCode(next),
+                        modifier = Modifier.offset(y = (-3).dp),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 17.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             if (!inSelectionMode) {
                 when (item.account.type) {
                     OtpType.TOTP -> {
