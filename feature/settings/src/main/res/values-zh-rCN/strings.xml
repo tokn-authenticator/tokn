@@ -8,6 +8,8 @@
     <string name="sync_menu_desc">通过Wi-Fi或二维码传输账户</string>
     <string name="about_desc">版本号，源代码与许可证</string>
     <string name="appearance">外观样式</string>
+    <string name="app_behavior">App behavior</string>
+    <string name="app_behavior_desc">Customize how the app behaves</string>
     <string name="theme">主题</string>
     <string name="language">语言</string>
     <string name="language_desc">选择应用语言</string>
@@ -17,6 +19,8 @@
     <string name="theme_system">System</string>
     <string name="material_you">Material You 主题</string>
     <string name="material_you_desc">Use the wallpaper-based color palette from your system</string>
+    <string name="show_next_code">Show next code</string>
+    <string name="show_next_code_desc">Preview the upcoming code beneath the current one</string>
     <string name="account_icons">账户图标</string>
     <string name="account_icons_desc">联网加载服务商图标(Simple Icons)</string>
     <string name="account_icons_privacy_title">联网加载图标？</string>
