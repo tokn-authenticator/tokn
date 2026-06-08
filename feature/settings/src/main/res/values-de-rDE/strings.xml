@@ -8,8 +8,8 @@
     <string name="sync_menu_desc">Konten über WLAN oder QR-Code übertragen</string>
     <string name="about_desc">Version, Quellcode, Lizenzen</string>
     <string name="appearance">Darstellung</string>
-    <string name="app_behavior">App behavior</string>
-    <string name="app_behavior_desc">Customize how the app behaves</string>
+    <string name="app_behavior">Verhalten der App</string>
+    <string name="app_behavior_desc">Anpassen, wie sich die App verhält</string>
     <string name="theme">Design</string>
     <string name="language">Sprache</string>
     <string name="language_desc">App-Sprache auswählen</string>
@@ -19,8 +19,8 @@
     <string name="theme_system">System</string>
     <string name="material_you">\"Material You\" Farben</string>
     <string name="material_you_desc">Verwendet die Hintergrund-basierte Farbpalette vom System</string>
-    <string name="show_next_code">Show next code</string>
-    <string name="show_next_code_desc">Preview the upcoming code beneath the current one</string>
+    <string name="show_next_code">Nächsten Code anzeigen</string>
+    <string name="show_next_code_desc">Nächsten code unter dem bestehenden anzeigen</string>
     <string name="account_icons">Konto-Icons</string>
     <string name="account_icons_desc">Service-Logos aus dem Internet laden (Simple Icons)</string>
     <string name="account_icons_privacy_title">Icons aus dem Internet laden?</string>
