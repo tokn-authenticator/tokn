@@ -64,4 +64,7 @@
     <string name="edit_error_counter_invalid">Counter must be a non-negative number</string>
     <string name="edit_error_account_missing">Account not found</string>
     <string name="edit_error_save_failed">Failed to save</string>
+    <plurals name="home_account_count">
+        <item quantity="other">Showing %d accounts</item>
+    </plurals>
 </resources>
