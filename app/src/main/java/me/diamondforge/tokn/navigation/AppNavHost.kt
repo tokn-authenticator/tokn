@@ -66,6 +66,7 @@ import me.diamondforge.tokn.home.HomeScreen
 import me.diamondforge.tokn.onboarding.OnboardingScreen
 import me.diamondforge.tokn.settings.AboutScreen
 import me.diamondforge.tokn.settings.AppearanceScreen
+import me.diamondforge.tokn.settings.BehaviorScreen
 import me.diamondforge.tokn.settings.GroupManagementScreen
 import me.diamondforge.tokn.settings.IconPacksScreen
 import me.diamondforge.tokn.settings.SecurityScreen
@@ -199,6 +200,7 @@ fun AppNavHost(
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onAppearance = { entry.navigateOnce(navController, Screen.Appearance.route) },
+                onBehavior = { entry.navigateOnce(navController, Screen.Behavior.route) },
                 onSecurity = { entry.navigateOnce(navController, Screen.SecuritySettings.route) },
                 onGroups = { entry.navigateOnce(navController, Screen.GroupManagement.route) },
                 onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
@@ -296,6 +298,9 @@ fun AppNavHost(
         }
         composable(Screen.IconPacks.route) {
             IconPacksScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.Behavior.route) {
+            BehaviorScreen(onBack = { navController.popBackStack() })
         }
         composable(Screen.SecuritySettings.route) {
             SecurityScreen(onBack = { navController.popBackStack() })
@@ -473,6 +478,7 @@ sealed class Screen(val route: String) {
     data object ManualEntry : Screen("manual_entry")
     data object Settings : Screen("settings")
     data object Appearance : Screen("appearance")
+    data object Behavior : Screen("app_behavior")
     data object IconPacks : Screen("appearance/icon_packs")
     data object SecuritySettings : Screen("security_settings")
     data object GroupManagement : Screen("settings/groups")

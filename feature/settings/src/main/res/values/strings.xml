@@ -10,6 +10,8 @@
     <string name="about_desc">Version, source code, licenses</string>
 
     <string name="appearance">Appearance</string>
+    <string name="app_behavior">App behavior</string>
+    <string name="app_behavior_desc">Customize how the app behaves</string>
     <string name="theme">Theme</string>
     <string name="language">Language</string>
     <string name="language_desc">Choose app language</string>

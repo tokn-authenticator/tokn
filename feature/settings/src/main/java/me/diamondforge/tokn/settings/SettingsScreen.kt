@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 fun SettingsScreen(
     onBack: () -> Unit,
     onAppearance: () -> Unit,
+    onBehavior: () -> Unit,
     onSecurity: () -> Unit,
     onGroups: () -> Unit,
     onBackup: () -> Unit,
@@ -61,6 +63,17 @@ fun SettingsScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
                     },
                     modifier = Modifier.clickable(onClick = onAppearance),
+                )
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.app_behavior)) },
+                    supportingContent = { Text(stringResource(R.string.app_behavior_desc)) },
+                    leadingContent = { Icon(Icons.Default.Tune, contentDescription = null) },
+                    trailingContent = {
+                        Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null)
+                    },
+                    modifier = Modifier.clickable(onClick = onBehavior),
                 )
             }
             item {
