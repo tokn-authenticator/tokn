@@ -104,7 +104,7 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                  Text(
                     text = item.account.issuer,
                     style = TextStyle(
-                        fontSize = 18.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold
                     ),
                     color = MaterialTheme.colorScheme.primary,
@@ -114,7 +114,7 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = 14.sp,
+                        fontSize = 15.sp,
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -134,7 +134,7 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                         modifier = Modifier.offset(y = (-3).dp),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontFamily = FontFamily.Monospace,
-                            fontSize = 17.sp
+                            fontSize = 15.sp
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
