@@ -67,7 +67,7 @@
     <string name="edit_error_account_missing">Account nicht gefunden</string>
     <string name="edit_error_save_failed">Speichern fehlgeschlagen</string>
     <plurals name="home_account_count">
-        <item quantity="one">Showing %d account</item>
-        <item quantity="other">Showing %d accounts</item>
+        <item quantity="one">Zeige %d Konto</item>
+        <item quantity="other">Zeige %d Konten</item>
     </plurals>
 </resources>
