@@ -17,6 +17,8 @@
     <string name="theme_system">System</string>
     <string name="material_you">\"Material You\" Farben</string>
     <string name="material_you_desc">Verwendet die Hintergrund-basierte Farbpalette vom System</string>
+    <string name="show_next_code">Show next code</string>
+    <string name="show_next_code_desc">Preview the upcoming code beneath the current one</string>
     <string name="account_icons">Konto-Icons</string>
     <string name="account_icons_desc">Service-Logos aus dem Internet laden (Simple Icons)</string>
     <string name="account_icons_privacy_title">Icons aus dem Internet laden?</string>
