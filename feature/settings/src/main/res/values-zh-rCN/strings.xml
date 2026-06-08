@@ -17,6 +17,8 @@
     <string name="theme_system">System</string>
     <string name="material_you">Material You 主题</string>
     <string name="material_you_desc">Use the wallpaper-based color palette from your system</string>
+    <string name="show_next_code">Show next code</string>
+    <string name="show_next_code_desc">Preview the upcoming code beneath the current one</string>
     <string name="account_icons">账户图标</string>
     <string name="account_icons_desc">联网加载服务商图标(Simple Icons)</string>
     <string name="account_icons_privacy_title">联网加载图标？</string>
