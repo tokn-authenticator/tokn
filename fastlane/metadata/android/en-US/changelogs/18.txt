@@ -1,0 +1,3 @@
+* New: show the upcoming code beneath the current one. Enable it under Settings > App behavior.
+* New: App behavior settings screen gathers tap-to-copy and show-next-code in one place.
+* Improved: cleaner vault list with adjusted font sizes, account count, and bottom spacing.
