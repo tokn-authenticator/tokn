@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -78,6 +79,18 @@ open class UserPreferencesRepository @Inject constructor(
             ?: TapBehavior.SINGLE
     }
 
+    open val passwordReminderEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.PASSWORD_REMINDER_ENABLED] ?: true
+    }
+
+    open val passwordReminderLastShownAt: Flow<Long> = dataStore.data.map { prefs ->
+        prefs[Keys.PASSWORD_REMINDER_LAST_SHOWN_AT] ?: 0L
+    }
+
+    open val passwordReminderStage: Flow<Int> = dataStore.data.map { prefs ->
+        prefs[Keys.PASSWORD_REMINDER_STAGE] ?: 0
+    }
+
     suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     }
@@ -126,6 +139,18 @@ open class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.TAP_BEHAVIOR] = behavior.name }
     }
 
+    suspend fun setPasswordReminderEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.PASSWORD_REMINDER_ENABLED] = enabled }
+    }
+
+    suspend fun setPasswordReminderLastShownAt(timestamp: Long) {
+        dataStore.edit { it[Keys.PASSWORD_REMINDER_LAST_SHOWN_AT] = timestamp }
+    }
+
+    suspend fun setPasswordReminderStage(stage: Int) {
+        dataStore.edit { it[Keys.PASSWORD_REMINDER_STAGE] = stage }
+    }
+
     private object Keys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val AUTO_LOCK_TIMEOUT = intPreferencesKey("auto_lock_timeout")
@@ -139,6 +164,9 @@ open class UserPreferencesRepository @Inject constructor(
         val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")
         val ACCOUNT_SORT = stringPreferencesKey("account_sort")
         val TAP_BEHAVIOR = stringPreferencesKey("tap_behavior")
+        val PASSWORD_REMINDER_ENABLED = booleanPreferencesKey("password_reminder_enabled")
+        val PASSWORD_REMINDER_LAST_SHOWN_AT = longPreferencesKey("password_reminder_last_shown_at")
+        val PASSWORD_REMINDER_STAGE = intPreferencesKey("password_reminder_stage")
     }
 }
 
