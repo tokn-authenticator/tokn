@@ -81,6 +81,7 @@ dependencies {
     implementation(project(":feature:backup"))
     implementation(project(":feature:onboarding"))
     implementation(project(":feature:sync"))
+    implementation(project(":feature:passwordreminder"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.appcompat)

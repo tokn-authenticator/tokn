@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.Lazy
@@ -28,6 +29,8 @@ import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.navigation.AppNavHost
+import me.diamondforge.tokn.passwordreminder.PasswordReminderDialog
+import me.diamondforge.tokn.passwordreminder.PasswordReminderViewModel
 import me.diamondforge.tokn.security.BiometricHelper
 import me.diamondforge.tokn.security.LockManager
 import me.diamondforge.tokn.security.vault.VaultManager
@@ -84,6 +87,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             migrateOnboardingFlag()
+            seedReminderForExistingVault()
             migrationComplete.value = true
         }
 
@@ -149,6 +153,13 @@ class MainActivity : AppCompatActivity() {
             var upgradeDismissed by rememberSaveable { mutableStateOf(false) }
 
             SimpleOTPTheme(themeMode = themeMode, dynamicColor = dynamicColorEnabled) {
+                val reminderViewModel: PasswordReminderViewModel = hiltViewModel()
+                val reminderDue by reminderViewModel.shouldPrompt.collectAsStateWithLifecycle()
+                val nextReminderDays by reminderViewModel.nextReminderDays.collectAsStateWithLifecycle()
+                var reminderHandled by rememberSaveable { mutableStateOf(false) }
+                // Re-arm so a later due period isn't suppressed by the earlier prompt's flag.
+                LaunchedEffect(reminderDue) { if (reminderDue) reminderHandled = false }
+
                 AppNavHost(
                     isLocked = isLocked,
                     onboardingDone = onboardingDone,
@@ -156,6 +167,8 @@ class MainActivity : AppCompatActivity() {
                     onUnlockWithPassword = { password ->
                         withContext(Dispatchers.IO) {
                             if (vaultManager.unlockWithPassword(password)) {
+                                // Just typed the password; defer the reminder without escalating.
+                                reminderViewModel.markSeen()
                                 withContext(Dispatchers.Main) {
                                     lockManager.unlock()
                                 }
@@ -178,6 +191,25 @@ class MainActivity : AppCompatActivity() {
                             }.also { ok -> if (ok) upgradeNeeded.value = false }
                         },
                         onDismiss = { upgradeDismissed = true },
+                    )
+                }
+
+                // Root-of-trust upgrade takes precedence (!upgradeDue) so the prompts don't stack.
+                if (isLocked == false && onboardingDone == true && migrated && !upgradeDue &&
+                    hasVaultPassword && reminderDue && !reminderHandled
+                ) {
+                    PasswordReminderDialog(
+                        onVerify = { reminderViewModel.verify(it) },
+                        onVerified = {
+                            reminderViewModel.recordSuccess()
+                            reminderHandled = true
+                        },
+                        onDismiss = { wrongAttempt ->
+                            if (wrongAttempt) reminderViewModel.recordFailure()
+                            else reminderViewModel.snooze()
+                            reminderHandled = true
+                        },
+                        nextReminderDays = nextReminderDays,
                     )
                 }
             }
@@ -225,6 +257,16 @@ class MainActivity : AppCompatActivity() {
         }
         if (hasExistingData) {
             userPreferencesRepository.setOnboardingDone(true)
+        }
+    }
+
+    // Pre-feature vaults have lastShownAt=0, which would fire the prompt instantly. Seed
+    // once so the first reminder lands an interval out.
+    private suspend fun seedReminderForExistingVault() {
+        val hasPassword = withContext(Dispatchers.IO) { vaultManager.hasPasswordOrLegacy() }
+        if (hasPassword && userPreferencesRepository.passwordReminderLastShownAt.first() == 0L) {
+            userPreferencesRepository.setPasswordReminderLastShownAt(System.currentTimeMillis())
+            userPreferencesRepository.setPasswordReminderStage(0)
         }
     }
 
