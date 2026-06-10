@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Screenshot
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Visibility
@@ -219,6 +220,26 @@ fun SecurityScreen(
                                     Spacer(Modifier.width(8.dp))
                                 }
                             }
+                        },
+                    )
+                }
+            }
+
+            item {
+                AnimatedVisibility(
+                    visible = uiState.encryptionEnabled,
+                    enter = expandVertically(),
+                    exit = shrinkVertically(),
+                ) {
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.password_reminder)) },
+                        supportingContent = { Text(stringResource(R.string.password_reminder_desc)) },
+                        leadingContent = { Icon(Icons.Default.Password, contentDescription = null) },
+                        trailingContent = {
+                            Switch(
+                                checked = uiState.passwordReminderEnabled,
+                                onCheckedChange = viewModel::setPasswordReminderEnabled,
+                            )
                         },
                     )
                 }
