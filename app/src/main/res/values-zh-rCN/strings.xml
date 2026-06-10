@@ -9,8 +9,8 @@
     <string name="use_biometrics">使用生物识别登录</string>
     <string name="password">密码</string>
     <string name="wrong_password">密码不正确</string>
-    <string name="rot_upgrade_title">Encryption update</string>
-    <string name="rot_upgrade_body">Tokn now uses a more modern encryption method under the hood. This doesn\'t change how you use the app day to day.\n\nBecause the new method ties your vault\'s key to your password, you need to enter it once to switch over. Afterwards your fingerprint keeps working as usual.</string>
+    <string name="rot_upgrade_title">加密方式更新</string>
+    <string name="rot_upgrade_body">Tokn现在使用了更现代化的加密方法。这不会改变您每天使用应用程序的方式。\n\n因为新方法将您的密码库密钥与密码联系起来，您需要输入一次才能切换到该方法。 之后您的指纹仍可正常使用。</string>
     <string name="rot_upgrade_confirm">应用</string>
-    <string name="rot_upgrade_later">Later</string>
+    <string name="rot_upgrade_later">稍后再说</string>
 </resources>
