@@ -154,6 +154,9 @@ class OnboardingViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 if (type != CryptType.NONE) {
                     vaultManager.setPassword(state.password)
+                    // Seed so the first reminder is an interval out, not on day one.
+                    preferences.setPasswordReminderLastShownAt(System.currentTimeMillis())
+                    preferences.setPasswordReminderStage(0)
                 }
                 // edge case, user want  a other method
                 if (type != CryptType.BIOMETRIC) {
