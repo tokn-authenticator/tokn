@@ -54,6 +54,8 @@ class SettingsViewModel @Inject constructor(
         state.copy(dynamicColorEnabled = dynamicColor)
     }.combine(preferences.showNextCodeEnabled) { state, showNextCode ->
         state.copy(showNextCodeEnabled = showNextCode)
+    }.combine(preferences.passwordReminderEnabled) { state, passwordReminder ->
+        state.copy(passwordReminderEnabled = passwordReminder)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     fun setThemeMode(mode: ThemeMode) {
@@ -102,6 +104,9 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             vaultManager.setPassword(password)
             preferences.setEncryptionEnabled(true)
+            // Seed so enabling encryption here doesn't fire the reminder immediately.
+            preferences.setPasswordReminderLastShownAt(System.currentTimeMillis())
+            preferences.setPasswordReminderStage(0)
         }
     }
 
@@ -115,6 +120,10 @@ class SettingsViewModel @Inject constructor(
                 _passwordError.update { true }
             }
         }
+    }
+
+    fun setPasswordReminderEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferences.setPasswordReminderEnabled(enabled) }
     }
 
     fun clearPasswordError() = _passwordError.update { false }
@@ -131,5 +140,6 @@ data class SettingsUiState(
     val tapBehavior: TapBehavior = TapBehavior.SINGLE,
     val dynamicColorEnabled: Boolean = true,
     val showNextCodeEnabled: Boolean = false,
+    val passwordReminderEnabled: Boolean = true,
     val passwordVerificationFailed: Boolean = false,
 )
