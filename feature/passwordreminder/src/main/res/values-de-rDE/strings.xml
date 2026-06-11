@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="password_reminder_title">Enter your vault password</string>
+    <string name="password_reminder_body">Typing it now and then helps you remember it, and we ask less often over time. There is no way to recover your vault if you forget it.</string>
+    <string name="password_reminder_password">Password</string>
+    <string name="password_reminder_confirm">Confirm</string>
+    <string name="password_reminder_skip">Skip</string>
+    <string name="password_reminder_wrong">That\'s not your password. Try again.</string>
+    <plurals name="password_reminder_next_days">
+        <item quantity="one">We\'ll check in again in %d day.</item>
+        <item quantity="other">We\'ll check in again in %d days.</item>
+    </plurals>
+</resources>

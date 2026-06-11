@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="backup_title">Importieren &amp; Exportieren</string>
+    <string name="section_import">Import</string>
+    <string name="section_export">Export</string>
     <string name="import_from_file">Konten aus einer Datei lesen</string>
     <string name="import_from_file_desc">Konten aus einem Backup oder einer anderen App importieren</string>
     <string name="import_from_google_auth">Aus Google Authenticator migrieren</string>
