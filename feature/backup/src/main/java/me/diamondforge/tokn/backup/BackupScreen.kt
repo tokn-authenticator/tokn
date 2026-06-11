@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -303,6 +304,9 @@ fun BackupScreen(
                     .padding(padding),
             ) {
                 item {
+                    SectionLabel(stringResource(R.string.section_import))
+                }
+                item {
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.import_from_file)) },
                         supportingContent = { Text(stringResource(R.string.import_from_file_desc)) },
@@ -326,6 +330,10 @@ fun BackupScreen(
                             onScanMigration()
                         },
                     )
+                }
+                item { HorizontalDivider() }
+                item {
+                    SectionLabel(stringResource(R.string.section_export))
                 }
                 item {
                     ListItem(
@@ -395,6 +403,16 @@ private fun SourcePickerDialog(
                 Text(stringResource(R.string.cancel))
             }
         },
+    )
+}
+
+@Composable
+private fun SectionLabel(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     )
 }
 
