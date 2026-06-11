@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.diamondforge.tokn.data.security.VaultAuthGate
+import me.diamondforge.tokn.data.security.VaultAuthMode
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.security.EncryptionManager
@@ -51,9 +53,15 @@ class SendViewModel @Inject constructor(
     private val getAccountsUseCase: GetAccountsUseCase,
     private val encryptionManager: EncryptionManager,
     private val appInfo: AppInfo,
+    private val vaultAuthGate: VaultAuthGate,
 ) : ViewModel() {
 
     val localVersionLabel: String get() = "${appInfo.versionName} (build ${appInfo.versionCode})"
+
+    suspend fun authMode(): VaultAuthMode = vaultAuthGate.mode()
+
+    suspend fun verifyVaultPassword(password: String): Boolean =
+        vaultAuthGate.verifyPassword(password)
 
     private val _uiState = MutableStateFlow(SendUiState())
     val uiState: StateFlow<SendUiState> = _uiState.asStateFlow()

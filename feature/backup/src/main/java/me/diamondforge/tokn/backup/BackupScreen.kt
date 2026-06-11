@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,7 +42,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,29 +54,25 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
+import me.diamondforge.tokn.ui.auth.VaultAuthGate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackupScreen(
     onBack: () -> Unit,
     onScanMigration: () -> Unit = {},
-    onAuthenticateForBackup: suspend () -> Boolean = { true },
+    onAuthenticate: suspend () -> Boolean = { true },
     viewModel: BackupViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     var showExportDialog by remember { mutableStateOf(false) }
     var showSourcePicker by remember { mutableStateOf(false) }
 
-    // Set when the export needs the vault password before it can proceed: either
-    // a password-only vault, or biometric that was cancelled/failed.
-    var passwordGateRequest by remember { mutableStateOf<ExportRequest?>(null) }
-    var gatePassword by rememberSaveable { mutableStateOf("") }
-    var gatePasswordVisible by remember { mutableStateOf(false) }
-    var gatePasswordError by remember { mutableStateOf(false) }
+    // Non-null once an export format is chosen and awaiting the auth gate
+    // (biometric or vault password) before the file picker opens.
+    var pendingAuthRequest by remember { mutableStateOf<ExportRequest?>(null) }
 
     // Captured at OK-time and replayed once the file picker returns the target Uri.
     var pendingExportRequest by remember { mutableStateOf<ExportRequest?>(null) }
@@ -108,13 +102,6 @@ fun BackupScreen(
         pendingExportRequest = request
         viewModel.suppressLock()
         exportLauncher.launch(filenameFor(request))
-    }
-
-    fun dismissPasswordGate() {
-        passwordGateRequest = null
-        gatePassword = ""
-        gatePasswordVisible = false
-        gatePasswordError = false
     }
 
     LaunchedEffect(pendingExportUri) {
@@ -165,81 +152,23 @@ fun BackupScreen(
             onDismiss = { showExportDialog = false },
             onConfirm = { request ->
                 showExportDialog = false
-                scope.launch {
-                    when (viewModel.exportAuthMode()) {
-                        ExportAuthMode.NONE -> proceedWithExport(request)
-                        ExportAuthMode.BIOMETRIC ->
-                            if (onAuthenticateForBackup()) proceedWithExport(request)
-                            else passwordGateRequest = request
-
-                        ExportAuthMode.PASSWORD -> passwordGateRequest = request
-                    }
-                }
+                pendingAuthRequest = request
             },
         )
     }
 
-    passwordGateRequest?.let { request ->
-        AlertDialog(
-            onDismissRequest = { dismissPasswordGate() },
-            title = { Text(stringResource(R.string.export_auth_password_title)) },
-            text = {
-                Column {
-                    Text(stringResource(R.string.export_auth_password_body))
-                    Spacer(Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = gatePassword,
-                        onValueChange = {
-                            gatePassword = it
-                            gatePasswordError = false
-                        },
-                        label = { Text(stringResource(R.string.export_auth_password_label)) },
-                        isError = gatePasswordError,
-                        supportingText = if (gatePasswordError) {
-                            { Text(stringResource(R.string.error_wrong_password)) }
-                        } else null,
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = if (gatePasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { gatePasswordVisible = !gatePasswordVisible }) {
-                                Icon(
-                                    if (gatePasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done,
-                        ),
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    enabled = gatePassword.isNotEmpty(),
-                    onClick = {
-                        scope.launch {
-                            if (viewModel.verifyVaultPassword(gatePassword)) {
-                                dismissPasswordGate()
-                                proceedWithExport(request)
-                            } else {
-                                gatePasswordError = true
-                            }
-                        }
-                    },
-                ) {
-                    Text(stringResource(R.string.export_auth_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { dismissPasswordGate() }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
-        )
-    }
+    VaultAuthGate(
+        active = pendingAuthRequest != null,
+        resolveMode = viewModel::authMode,
+        authenticateBiometric = onAuthenticate,
+        verifyPassword = viewModel::verifyVaultPassword,
+        onAuthorized = {
+            val request = pendingAuthRequest
+            pendingAuthRequest = null
+            if (request != null) proceedWithExport(request)
+        },
+        onCancelled = { pendingAuthRequest = null },
+    )
 
     if (showSourcePicker) {
         SourcePickerDialog(

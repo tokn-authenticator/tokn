@@ -3,8 +3,8 @@
     <string name="app_name">Tokn</string>
     <string name="biometric_prompt_title">Unlock Tokn</string>
     <string name="biometric_prompt_subtitle">Use biometrics or PIN to continue</string>
-    <string name="export_auth_title">Confirm it\'s you</string>
-    <string name="export_auth_subtitle">Authenticate to export your vault</string>
+    <string name="vault_auth_title">Confirm it\'s you</string>
+    <string name="vault_auth_subtitle">Verify your identity to continue</string>
     <string name="vault_locked">Vault is locked</string>
     <string name="unlock">Unlock</string>
     <string name="use_password">Use password</string>

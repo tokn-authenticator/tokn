@@ -93,7 +93,7 @@ fun AppNavHost(
     hasVaultPassword: Boolean,
     biometricEnabled: Boolean,
     onSetupBiometric: suspend () -> Boolean,
-    onAuthenticateForBackup: suspend () -> Boolean,
+    onAuthenticate: suspend () -> Boolean,
 ) {
     if (onboardingDone == null || isLocked == null) return
     if (!onboardingDone) {
@@ -229,6 +229,7 @@ fun AppNavHost(
                     viewModel = sendVm,
                     onBack = { navController.popBackStack() },
                     onContinue = { entry.navigateOnce(navController, Screen.SyncSendChoose.route) },
+                    onAuthenticate = onAuthenticate,
                 )
             }
             composable(Screen.SyncSendChoose.route) { entry ->
@@ -321,7 +322,7 @@ fun AppNavHost(
             BackupScreen(
                 onBack = { navController.popBackStack() },
                 onScanMigration = { entry.navigateOnce(navController, Screen.MigrationScan.route) },
-                onAuthenticateForBackup = onAuthenticateForBackup,
+                onAuthenticate = onAuthenticate,
             )
         }
         composable(Screen.MigrationScan.route) {

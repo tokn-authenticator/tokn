@@ -42,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.diamondforge.tokn.sync.R
+import me.diamondforge.tokn.ui.auth.VaultAuthGate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,10 +50,15 @@ fun SelectAccountsScreen(
     viewModel: SendViewModel,
     onBack: () -> Unit,
     onContinue: () -> Unit,
+    onAuthenticate: suspend () -> Boolean = { true },
 ) {
     val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     var selectedIds by remember { mutableStateOf<Set<Long>>(emptySet()) }
     var initialized by remember { mutableStateOf(false) }
+
+    // True once the user taps Continue and the transfer is awaiting the auth gate
+    // (biometric or vault password) before the method picker opens.
+    var pendingContinue by remember { mutableStateOf(false) }
 
     LaunchedEffect(accounts) {
         if (!initialized && accounts.isNotEmpty()) {
@@ -109,10 +115,7 @@ fun SelectAccountsScreen(
                     )
                     Button(
                         enabled = selectedIds.isNotEmpty(),
-                        onClick = {
-                            viewModel.setSelection(selectedIds)
-                            onContinue()
-                        },
+                        onClick = { pendingContinue = true },
                     ) { Text(stringResource(R.string.sync_continue)) }
                 }
             }
@@ -173,4 +176,17 @@ fun SelectAccountsScreen(
             }
         }
     }
+
+    VaultAuthGate(
+        active = pendingContinue,
+        resolveMode = viewModel::authMode,
+        authenticateBiometric = onAuthenticate,
+        verifyPassword = viewModel::verifyVaultPassword,
+        onAuthorized = {
+            pendingContinue = false
+            viewModel.setSelection(selectedIds)
+            onContinue()
+        },
+        onCancelled = { pendingContinue = false },
+    )
 }

@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                     hasVaultPassword = hasVaultPassword,
                     biometricEnabled = biometricEnabled,
                     onSetupBiometric = { setupBiometric() },
-                    onAuthenticateForBackup = { authenticateForBackup() },
+                    onAuthenticate = { confirmVaultAuth() },
                 )
 
                 if (isLocked == false && onboardingDone == true && upgradeDue && !upgradeDismissed) {
@@ -351,11 +351,12 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    // Identity confirmation before a backup is written. The vault is already
-    // unlocked here, so this only proves the fingerprint still maps to the vault
-    // key; it deliberately does not touch the session or lock state. Returns
-    // false on cancel/error so the caller can fall back to the vault password.
-    private suspend fun authenticateForBackup(): Boolean = suspendCancellableCoroutine { cont ->
+    // Identity confirmation before a sensitive action (exporting a backup,
+    // sending the vault to another device). The vault is already unlocked here,
+    // so this only proves the fingerprint still maps to the vault key; it
+    // deliberately does not touch the session or lock state. Returns false on
+    // cancel/error so the caller can fall back to the vault password.
+    private suspend fun confirmVaultAuth(): Boolean = suspendCancellableCoroutine { cont ->
         val cipher = runCatching { vaultManager.biometricDecryptCipher() }.getOrNull()
         if (cipher == null) {
             if (cont.isActive) cont.resume(false)
@@ -363,8 +364,8 @@ class MainActivity : AppCompatActivity() {
         }
         biometricHelper.authenticateForCrypto(
             activity = this,
-            title = getString(R.string.export_auth_title),
-            subtitle = getString(R.string.export_auth_subtitle),
+            title = getString(R.string.vault_auth_title),
+            subtitle = getString(R.string.vault_auth_subtitle),
             negativeButton = getString(android.R.string.cancel),
             cryptoObject = BiometricPrompt.CryptoObject(cipher),
             onSuccess = { if (cont.isActive) cont.resume(true) },
