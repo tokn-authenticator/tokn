@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -76,7 +75,11 @@ internal fun ReorderableCollectionItemScope.AccountCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(onClick = onTap, onDoubleClick = onDoubleTap, onLongClick = onLongPress),
+            .combinedClickable(
+                onClick = onTap,
+                onDoubleClick = onDoubleTap,
+                onLongClick = onLongPress
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 1.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
@@ -101,7 +104,7 @@ internal fun ReorderableCollectionItemScope.AccountCard(
 
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                 Text(
+                Text(
                     text = item.account.issuer,
                     style = TextStyle(
                         fontSize = 15.sp,

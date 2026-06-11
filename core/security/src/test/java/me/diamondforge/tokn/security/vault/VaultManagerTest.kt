@@ -171,7 +171,9 @@ class VaultManagerTest {
         var legacyPassphrase: ByteArray? = null
 
         override fun getDatabasePassphrase(): ByteArray =
-            legacyPassphrase?.copyOf() ?: ByteArray(32) { 1 }.also { legacyPassphrase = it.copyOf() }
+            legacyPassphrase?.copyOf() ?: ByteArray(32) { 1 }.also {
+                legacyPassphrase = it.copyOf()
+            }
 
         override fun readLegacyPassphraseOrNull(): ByteArray? = legacyPassphrase?.copyOf()
 

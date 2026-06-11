@@ -53,7 +53,11 @@ class EncryptionManager @Inject constructor() {
         }
         try {
             val cipher = Cipher.getInstance(TRANSFORMATION)
-            cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(GCM_TAG_LENGTH * 8, iv))
+            cipher.init(
+                Cipher.DECRYPT_MODE,
+                SecretKeySpec(key, "AES"),
+                GCMParameterSpec(GCM_TAG_LENGTH * 8, iv)
+            )
             return cipher.doFinal(ciphertext)
         } finally {
             Arrays.fill(key, 0)

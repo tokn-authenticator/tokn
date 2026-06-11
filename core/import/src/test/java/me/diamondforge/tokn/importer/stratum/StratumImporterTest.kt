@@ -24,7 +24,8 @@ class StratumImporterTest {
 
     @Test
     fun `canHandle accepts plain Stratum JSON`() {
-        val raw = StratumFixtureWriter.plain(StratumFixtureWriter.backup(StratumFixtureWriter.totp()))
+        val raw =
+            StratumFixtureWriter.plain(StratumFixtureWriter.backup(StratumFixtureWriter.totp()))
         assertTrue(importer.canHandle(raw))
     }
 
@@ -108,7 +109,10 @@ class StratumImporterTest {
             }))
             put("CustomIcons", JSONArray())
         }
-        val accounts = (importer.parse(StratumFixtureWriter.plain(backup), null) as ImportOutcome.Success).accounts
+        val accounts = (importer.parse(
+            StratumFixtureWriter.plain(backup),
+            null
+        ) as ImportOutcome.Success).accounts
         assertEquals(listOf("Work"), accounts[0].groups)
     }
 
@@ -118,7 +122,8 @@ class StratumImporterTest {
         val iconPng = byteArrayOf(1, 2, 3, 4)
         val iconBase64 = android.util.Base64.encodeToString(iconPng, android.util.Base64.DEFAULT)
         val backup = JSONObject().apply {
-            put("Authenticators", JSONArray().put(
+            put(
+                "Authenticators", JSONArray().put(
                 StratumFixtureWriter.totp().apply { put("Icon", "@$iconId") }
             ))
             put("Categories", JSONArray())
@@ -128,7 +133,10 @@ class StratumImporterTest {
                 put("Data", iconBase64)
             }))
         }
-        val accounts = (importer.parse(StratumFixtureWriter.plain(backup), null) as ImportOutcome.Success).accounts
+        val accounts = (importer.parse(
+            StratumFixtureWriter.plain(backup),
+            null
+        ) as ImportOutcome.Success).accounts
         assertNotNull(accounts[0].customIconBytes)
         assertArrayEquals(iconPng, accounts[0].customIconBytes)
     }

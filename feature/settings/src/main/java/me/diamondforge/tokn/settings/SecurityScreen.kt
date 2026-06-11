@@ -234,7 +234,12 @@ fun SecurityScreen(
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.password_reminder)) },
                         supportingContent = { Text(stringResource(R.string.password_reminder_desc)) },
-                        leadingContent = { Icon(Icons.Default.Password, contentDescription = null) },
+                        leadingContent = {
+                            Icon(
+                                Icons.Default.Password,
+                                contentDescription = null
+                            )
+                        },
                         trailingContent = {
                             Switch(
                                 checked = uiState.passwordReminderEnabled,
@@ -333,7 +338,7 @@ private fun SetupEncryptionDialog(
                             )
                         }
                     },
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
                     ),
                 )
@@ -356,7 +361,7 @@ private fun SetupEncryptionDialog(
                             )
                         }
                     },
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
                     ),
                 )

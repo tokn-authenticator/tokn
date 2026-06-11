@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
 import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
@@ -39,6 +38,7 @@ import me.diamondforge.tokn.security.vault.VaultState
 import me.diamondforge.tokn.ui.RootOfTrustUpgradeDialog
 import me.diamondforge.tokn.ui.theme.SimpleOTPTheme
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -408,7 +408,8 @@ class MainActivity : AppCompatActivity() {
             if (!userPreferencesRepository.encryptionEnabled.first()) return@launch
             if (!userPreferencesRepository.biometricEnabled.first()) return@launch
             if (!vaultSession.isUnlocked) return@launch
-            val alreadyProvisioned = withContext(Dispatchers.IO) { vaultManager.canBiometricUnlock() }
+            val alreadyProvisioned =
+                withContext(Dispatchers.IO) { vaultManager.canBiometricUnlock() }
             if (alreadyProvisioned) return@launch
             if (!biometricHelper.isBiometricEnrolled()) return@launch
 

@@ -58,8 +58,7 @@ class IconPacksViewModel @Inject constructor(
     fun importPack(uri: Uri) {
         _ephemeral.update { it.copy(isImporting = true, importError = null) }
         viewModelScope.launch {
-            val result = iconPackManager.install(uri)
-            when (result) {
+            when (val result = iconPackManager.install(uri)) {
                 is InstallResult.Success -> {
                     val match = computeAutoMatch(result.pack)
                     _ephemeral.update {

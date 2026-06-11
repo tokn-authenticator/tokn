@@ -176,7 +176,8 @@ class HomeViewModel @Inject constructor(
             items = state.items.map { item ->
                 if (item.account.type != OtpType.TOTP) return@map item
                 val nextTime = _currentTimeMillis.value + item.account.period * 1000L
-                val next = runCatching { generateOtpUseCase(item.account, nextTime).code }.getOrNull()
+                val next =
+                    runCatching { generateOtpUseCase(item.account, nextTime).code }.getOrNull()
                 item.copy(nextCode = next)
             }
         )

@@ -198,10 +198,12 @@ fun BackupScreen(
                         R.string.import_result_all_duplicates,
                         result.found,
                     )
+
                     result.skipped == 0 -> stringResource(
                         R.string.import_result_all_imported,
                         result.imported,
                     )
+
                     else -> stringResource(
                         R.string.import_result_partial,
                         result.imported,
@@ -209,7 +211,10 @@ fun BackupScreen(
                     )
                 }
                 val unsupportedText = if (result.unsupportedCount > 0) {
-                    "\n\n" + stringResource(R.string.import_result_unsupported_types, result.unsupportedCount)
+                    "\n\n" + stringResource(
+                        R.string.import_result_unsupported_types,
+                        result.unsupportedCount
+                    )
                 } else ""
                 Text(mainText + unsupportedText)
             },

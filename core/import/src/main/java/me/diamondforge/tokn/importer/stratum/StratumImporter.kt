@@ -137,7 +137,8 @@ class StratumImporter @Inject constructor() : ExternalImporter {
         val ac = root.optJSONArray("AuthenticatorCategories") ?: return map
         for (i in 0 until ac.length()) {
             val entry = ac.getJSONObject(i)
-            val secret = entry.optString("AuthenticatorSecret").takeIf { it.isNotBlank() } ?: continue
+            val secret =
+                entry.optString("AuthenticatorSecret").takeIf { it.isNotBlank() } ?: continue
             val catId = entry.optString("CategoryId").takeIf { it.isNotBlank() } ?: continue
             val name = categoryNames[catId] ?: continue
             map.getOrPut(secret) { mutableListOf() }.add(name)

@@ -61,8 +61,8 @@ open class VaultManager @Inject constructor(
     open fun requiresUnlock(): Boolean {
         val slots = slotStore.load()
         return slots.any { it is PasswordSlot } ||
-            slots.any { it is KeystoreSlot && it.requiresAuth } ||
-            slotStore.legacyPasswordPresent
+                slots.any { it is KeystoreSlot && it.requiresAuth } ||
+                slotStore.legacyPasswordPresent
     }
 
     open fun canBiometricUnlock(): Boolean = hasBiometric() && keystoreManager.hasBiometricKey()
@@ -79,8 +79,7 @@ open class VaultManager @Inject constructor(
     @Synchronized
     open fun tryAutoUnlock(): Boolean {
         if (session.isUnlocked) return true
-        val slot = slotStore.load().firstOrNull { it is KeystoreSlot && !it.requiresAuth }
-            as? KeystoreSlot ?: return false
+        val slot = noAuthKeystoreSlot() ?: return false
         val masterKey = keystoreManager.decrypt(slot.wrappedKey)
         try {
             session.unlock(masterKey)
@@ -115,8 +114,7 @@ open class VaultManager @Inject constructor(
     private fun upgradeLegacyPassword(password: String, slots: List<Slot>): Boolean {
         if (!legacyPassword.verify(password)) return false
 
-        val noAuth = slots.firstOrNull { it is KeystoreSlot && !it.requiresAuth } as? KeystoreSlot
-            ?: return false
+        val noAuth = noAuthKeystoreSlot(slots) ?: return false
         val masterKey = keystoreManager.decrypt(noAuth.wrappedKey)
         try {
             val upgraded = slots.filterNot { it === noAuth } + passwordSlotFrom(password, masterKey)
@@ -139,13 +137,12 @@ open class VaultManager @Inject constructor(
 
     @Synchronized
     open fun provisionAndUnlockBiometric(authenticatedEncryptCipher: Cipher): Boolean {
-        val noAuth = slotStore.load().firstOrNull { it is KeystoreSlot && !it.requiresAuth }
-            as? KeystoreSlot ?: return false
+        val noAuth = noAuthKeystoreSlot() ?: return false
         val masterKey = keystoreManager.decrypt(noAuth.wrappedKey)
         try {
             val wrapped = keystoreManager.biometricWrap(authenticatedEncryptCipher, masterKey)
             val slots = slotStore.load().filterNot { it is KeystoreSlot && it.requiresAuth } +
-                KeystoreSlot(newUuid(), requiresAuth = true, wrappedKey = wrapped)
+                    authSlot(wrapped)
             slotStore.save(slots)
             session.unlock(masterKey)
         } finally {
@@ -202,7 +199,7 @@ open class VaultManager @Inject constructor(
         try {
             val wrapped = keystoreManager.biometricWrap(authenticatedCipher, masterKey)
             val slots = slotStore.load().filterNot { it is KeystoreSlot && it.requiresAuth }
-            slotStore.save(slots + KeystoreSlot(newUuid(), requiresAuth = true, wrappedKey = wrapped))
+            slotStore.save(slots + authSlot(wrapped))
         } finally {
             Arrays.fill(masterKey, 0)
         }
@@ -218,8 +215,18 @@ open class VaultManager @Inject constructor(
     private fun biometricSlot(): KeystoreSlot? =
         slotStore.load().firstOrNull { it is KeystoreSlot && it.requiresAuth } as? KeystoreSlot
 
+    private fun noAuthKeystoreSlot(slots: List<Slot> = slotStore.load()): KeystoreSlot? =
+        slots.firstOrNull { it is KeystoreSlot && !it.requiresAuth } as? KeystoreSlot
+
+    private fun authSlot(wrapped: String): KeystoreSlot =
+        KeystoreSlot(newUuid(), requiresAuth = true, wrappedKey = wrapped)
+
     private fun noAuthSlot(masterKey: ByteArray): KeystoreSlot =
-        KeystoreSlot(newUuid(), requiresAuth = false, wrappedKey = keystoreManager.encrypt(masterKey))
+        KeystoreSlot(
+            newUuid(),
+            requiresAuth = false,
+            wrappedKey = keystoreManager.encrypt(masterKey)
+        )
 
     private fun unwrapPasswordSlot(slot: PasswordSlot, password: String): ByteArray? {
         val kek = Argon2KeyDeriver.derive(

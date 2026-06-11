@@ -177,7 +177,12 @@ fun HomeScreen(
                     LazyColumn(
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 8.dp,
+                            bottom = 32.dp
+                        ),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(listItems, key = { it.account.id }) { item ->
@@ -210,6 +215,7 @@ fun HomeScreen(
                                                     snackbarHostState.showSnackbar(copiedMessage)
                                                 }
                                             }
+
                                             TapBehavior.DOUBLE -> Unit
                                         }
                                     },

@@ -26,8 +26,8 @@ class VaultAuthGate @Inject constructor(
     suspend fun mode(): VaultAuthMode = when {
         !preferences.encryptionEnabled.first() -> VaultAuthMode.NONE
         preferences.biometricEnabled.first() &&
-            withContext(Dispatchers.IO) { vaultManager.canBiometricUnlock() } &&
-            biometricHelper.isAvailable() -> VaultAuthMode.BIOMETRIC
+                withContext(Dispatchers.IO) { vaultManager.canBiometricUnlock() } &&
+                biometricHelper.isAvailable() -> VaultAuthMode.BIOMETRIC
 
         else -> VaultAuthMode.PASSWORD
     }
