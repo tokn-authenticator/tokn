@@ -181,6 +181,7 @@ class MainActivity : AppCompatActivity() {
                     hasVaultPassword = hasVaultPassword,
                     biometricEnabled = biometricEnabled,
                     onSetupBiometric = { setupBiometric() },
+                    onAuthenticateForBackup = { authenticateForBackup() },
                 )
 
                 if (isLocked == false && onboardingDone == true && upgradeDue && !upgradeDismissed) {
@@ -346,6 +347,28 @@ class MainActivity : AppCompatActivity() {
                 }
             },
             onError = { _, _ -> },
+            onFailed = { },
+        )
+    }
+
+    // Identity confirmation before a backup is written. The vault is already
+    // unlocked here, so this only proves the fingerprint still maps to the vault
+    // key; it deliberately does not touch the session or lock state. Returns
+    // false on cancel/error so the caller can fall back to the vault password.
+    private suspend fun authenticateForBackup(): Boolean = suspendCancellableCoroutine { cont ->
+        val cipher = runCatching { vaultManager.biometricDecryptCipher() }.getOrNull()
+        if (cipher == null) {
+            if (cont.isActive) cont.resume(false)
+            return@suspendCancellableCoroutine
+        }
+        biometricHelper.authenticateForCrypto(
+            activity = this,
+            title = getString(R.string.export_auth_title),
+            subtitle = getString(R.string.export_auth_subtitle),
+            negativeButton = getString(android.R.string.cancel),
+            cryptoObject = BiometricPrompt.CryptoObject(cipher),
+            onSuccess = { if (cont.isActive) cont.resume(true) },
+            onError = { _, _ -> if (cont.isActive) cont.resume(false) },
             onFailed = { },
         )
     }

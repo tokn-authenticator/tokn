@@ -14,13 +14,16 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.importer.ExternalImporter
 import me.diamondforge.tokn.importer.ImportOutcome
 import me.diamondforge.tokn.importer.ImporterRegistry
+import me.diamondforge.tokn.security.BiometricHelper
 import me.diamondforge.tokn.security.LockManager
+import me.diamondforge.tokn.security.vault.VaultManager
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,12 +34,32 @@ class BackupViewModel @Inject constructor(
     private val encryptedBackupManager: EncryptedBackupManager,
     private val lockManager: LockManager,
     private val importerRegistry: ImporterRegistry,
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val vaultManager: VaultManager,
+    private val biometricHelper: BiometricHelper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BackupUiState())
     val uiState: StateFlow<BackupUiState> = _uiState.asStateFlow()
 
     val externalImporters: List<ExternalImporter> get() = importerRegistry.all()
+
+    /**
+     * What credential, if any, the user must present before a backup file is written.
+     * Mirrors the unlock path: biometric when it's enabled and provisioned, otherwise
+     * the vault password. With no app lock there is nothing to check.
+     */
+    suspend fun exportAuthMode(): ExportAuthMode = when {
+        !userPreferencesRepository.encryptionEnabled.first() -> ExportAuthMode.NONE
+        userPreferencesRepository.biometricEnabled.first() &&
+            withContext(Dispatchers.IO) { vaultManager.canBiometricUnlock() } &&
+            biometricHelper.isAvailable() -> ExportAuthMode.BIOMETRIC
+
+        else -> ExportAuthMode.PASSWORD
+    }
+
+    suspend fun verifyVaultPassword(password: String): Boolean =
+        withContext(Dispatchers.IO) { vaultManager.verifyPassword(password) }
 
     fun exportUnencryptedBackup(uri: Uri) {
         viewModelScope.launch {
@@ -262,3 +285,5 @@ data class PendingExternalImport(
 )
 
 data class BackupError(val titleRes: Int, val messageRes: Int, val messageArg: String? = null)
+
+enum class ExportAuthMode { NONE, BIOMETRIC, PASSWORD }

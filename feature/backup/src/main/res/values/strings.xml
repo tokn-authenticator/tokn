@@ -20,6 +20,10 @@
     <string name="backup_password">Backup password</string>
     <string name="export_password_hint">Min. 8 characters</string>
     <string name="export_success">Backup exported successfully</string>
+    <string name="export_auth_password_title">Confirm export</string>
+    <string name="export_auth_password_body">Enter your vault password to export your accounts.</string>
+    <string name="export_auth_password_label">Vault password</string>
+    <string name="export_auth_confirm">Continue</string>
     <string name="import_source_picker_title">Import from file</string>
     <string name="import_picker_tokn_label">Tokn vault</string>
     <string name="import_picker_tokn_note">Tokn backup (.kv or .enc.kv).</string>
