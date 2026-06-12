@@ -68,6 +68,10 @@
     <string name="lock_5m">5 分钟</string>
     <string name="password_reminder">密码提醒工具</string>
     <string name="password_reminder_desc">偶尔向您询问密码库的密码，以防您忘记密码</string>
+    <string name="password_reminder_due">Next reminder is due now</string>
+    <plurals name="password_reminder_next">
+        <item quantity="other">Next reminder in %d days</item>
+    </plurals>
     <string name="screenshot_protection">屏幕截图保护</string>
     <string name="screenshot_protection_desc">在最近任务中隐藏应用内容并阻止屏幕截图</string>
     <string name="tap_to_reveal">点按显示</string>
