@@ -72,6 +72,27 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun `uiState reports days until the next password reminder`() = runTest(dispatcher) {
+        prefs.reminderEnabled.value = true
+        prefs.reminderLastShownAt.value = System.currentTimeMillis()
+        prefs.reminderStage.value = 0
+        val current = state(newVm())
+
+        // Stage 0 is a 2-day interval, just shown, so two whole days remain.
+        assertEquals(2, current().passwordReminderNextDays)
+    }
+
+    @Test
+    fun `uiState reports zero days once the reminder is overdue`() = runTest(dispatcher) {
+        prefs.reminderEnabled.value = true
+        prefs.reminderLastShownAt.value = System.currentTimeMillis() - 10L * 24 * 60 * 60 * 1000L
+        prefs.reminderStage.value = 0
+        val current = state(newVm())
+
+        assertEquals(0, current().passwordReminderNextDays)
+    }
+
+    @Test
     fun `simple setters write through to preferences`() = runTest(dispatcher) {
         val vm = newVm()
         state(vm)

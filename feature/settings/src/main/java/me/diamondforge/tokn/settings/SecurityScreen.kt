@@ -43,6 +43,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -233,7 +234,23 @@ fun SecurityScreen(
                 ) {
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.password_reminder)) },
-                        supportingContent = { Text(stringResource(R.string.password_reminder_desc)) },
+                        supportingContent = {
+                            Text(
+                                when {
+                                    !uiState.passwordReminderEnabled ->
+                                        stringResource(R.string.password_reminder_desc)
+
+                                    uiState.passwordReminderNextDays <= 0 ->
+                                        stringResource(R.string.password_reminder_due)
+
+                                    else -> pluralStringResource(
+                                        R.plurals.password_reminder_next,
+                                        uiState.passwordReminderNextDays,
+                                        uiState.passwordReminderNextDays,
+                                    )
+                                },
+                            )
+                        },
                         leadingContent = {
                             Icon(
                                 Icons.Default.Password,

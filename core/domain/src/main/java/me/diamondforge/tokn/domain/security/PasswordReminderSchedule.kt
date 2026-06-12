@@ -1,4 +1,4 @@
-package me.diamondforge.tokn.passwordreminder
+package me.diamondforge.tokn.domain.security
 
 /** Escalating cadence: a correct entry widens the gap to the next rung, a wrong one narrows it. */
 object PasswordReminderSchedule {
@@ -12,6 +12,13 @@ object PasswordReminderSchedule {
 
     fun isDue(now: Long, lastShownAt: Long, stage: Int): Boolean =
         now - lastShownAt >= intervalDays(stage) * MILLIS_PER_DAY
+
+    /** Whole days until the next prompt, rounded up; 0 once it is due. For the settings blurb. */
+    fun daysUntilDue(now: Long, lastShownAt: Long, stage: Int): Int {
+        val remaining = lastShownAt + intervalDays(stage) * MILLIS_PER_DAY - now
+        if (remaining <= 0L) return 0
+        return ((remaining + MILLIS_PER_DAY - 1L) / MILLIS_PER_DAY).toInt()
+    }
 
     fun nextStageOnSuccess(stage: Int): Int =
         (stage + 1).coerceIn(0, LADDER_DAYS.lastIndex)

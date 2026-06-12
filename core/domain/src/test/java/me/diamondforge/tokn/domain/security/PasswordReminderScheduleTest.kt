@@ -1,4 +1,4 @@
-package me.diamondforge.tokn.passwordreminder
+package me.diamondforge.tokn.domain.security
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -54,5 +54,27 @@ class PasswordReminderScheduleTest {
         assertFalse(PasswordReminderSchedule.isDue(now, snoozed, 3))
         assertFalse(PasswordReminderSchedule.isDue(now + 23 * 60 * 60 * 1000L, snoozed, 3))
         assertTrue(PasswordReminderSchedule.isDue(now + day, snoozed, 3))
+    }
+
+    @Test
+    fun daysUntilDueCountsWholeDaysRoundingUp() {
+        // Shown just now at stage 0 (2-day interval): two days remain.
+        assertEquals(2, PasswordReminderSchedule.daysUntilDue(now, now, 0))
+        // One full day has passed: one day remains.
+        assertEquals(1, PasswordReminderSchedule.daysUntilDue(now, now - 1 * day, 0))
+        // A partial day left still rounds up to one.
+        assertEquals(1, PasswordReminderSchedule.daysUntilDue(now, now - 1 * day - 12 * 60 * 60 * 1000L, 0))
+    }
+
+    @Test
+    fun daysUntilDueIsZeroWhenDueOrOverdue() {
+        assertEquals(0, PasswordReminderSchedule.daysUntilDue(now, now - 2 * day, 0))
+        assertEquals(0, PasswordReminderSchedule.daysUntilDue(now, now - 10 * day, 0))
+    }
+
+    @Test
+    fun daysUntilDueUsesStageInterval() {
+        // Stage 2 is a 14-day interval.
+        assertEquals(14, PasswordReminderSchedule.daysUntilDue(now, now, 2))
     }
 }

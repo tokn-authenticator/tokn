@@ -16,6 +16,7 @@ import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.TapBehavior
+import me.diamondforge.tokn.domain.security.PasswordReminderSchedule
 import me.diamondforge.tokn.security.vault.VaultManager
 import javax.inject.Inject
 
@@ -56,6 +57,17 @@ class SettingsViewModel @Inject constructor(
         state.copy(showNextCodeEnabled = showNextCode)
     }.combine(preferences.passwordReminderEnabled) { state, passwordReminder ->
         state.copy(passwordReminderEnabled = passwordReminder)
+    }.combine(preferences.passwordReminderLastShownAt) { state, lastShownAt ->
+        state.copy(passwordReminderLastShownAt = lastShownAt)
+    }.combine(preferences.passwordReminderStage) { state, stage ->
+        // Re-read the clock per emission so the countdown reflects the current day.
+        state.copy(
+            passwordReminderNextDays = PasswordReminderSchedule.daysUntilDue(
+                System.currentTimeMillis(),
+                state.passwordReminderLastShownAt,
+                stage,
+            ),
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     fun setThemeMode(mode: ThemeMode) {
@@ -141,5 +153,7 @@ data class SettingsUiState(
     val dynamicColorEnabled: Boolean = true,
     val showNextCodeEnabled: Boolean = false,
     val passwordReminderEnabled: Boolean = true,
+    val passwordReminderLastShownAt: Long = 0L,
+    val passwordReminderNextDays: Int = 0,
     val passwordVerificationFailed: Boolean = false,
 )

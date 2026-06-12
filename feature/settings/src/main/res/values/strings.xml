@@ -71,6 +71,11 @@
     <string name="lock_5m">5 min</string>
     <string name="password_reminder">Password reminder</string>
     <string name="password_reminder_desc">Occasionally ask for your password so you don\'t forget it</string>
+    <string name="password_reminder_due">Next reminder is due now</string>
+    <plurals name="password_reminder_next">
+        <item quantity="one">Next reminder in %d day</item>
+        <item quantity="other">Next reminder in %d days</item>
+    </plurals>
     <string name="screenshot_protection">Screenshot protection</string>
     <string name="screenshot_protection_desc">Hide app contents in recents and block screenshots</string>
     <string name="tap_to_reveal">Tap to reveal</string>
