@@ -1,4 +1,5 @@
 * New: a redesigned interface built on Material 3 Expressive, with bolder titles, grouped cards, and smoother motion throughout the app.
 * New: optional password reminder that asks you to type your vault password now and then so you don't forget it, spacing the prompts further apart over time. Default enabled
+* New: Russian support
 * Improved: exporting a backup and starting a device transfer now require unlocking the vault first.
 * Fixed: navbar in onboarding no longer overlap the system bars.
