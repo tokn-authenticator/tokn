@@ -106,6 +106,15 @@ internal fun SettingsSectionHeader(text: String, modifier: Modifier = Modifier) 
 }
 
 /**
+ * Default divider inset for icon rows: it lines the divider up with the start
+ * of [SettingsRow]'s title text, clearing the leading icon. Derived from that
+ * row's leading run: 20.dp left padding + 24.dp icon + 20.dp icon-to-text gap.
+ * Groups whose rows have no leading icon should pass a smaller dividerStartInset
+ * (their own content padding) so the line doesn't float in from the text.
+ */
+private val IconRowDividerInset = 64.dp
+
+/**
  * Rounded tonal container that groups related rows. Rows are passed as a list
  * so hairline dividers can be inset between them automatically.
  */
@@ -113,6 +122,7 @@ internal fun SettingsSectionHeader(text: String, modifier: Modifier = Modifier) 
 internal fun SettingsGroup(
     items: List<@Composable () -> Unit>,
     modifier: Modifier = Modifier,
+    dividerStartInset: Dp = IconRowDividerInset,
 ) {
     Surface(
         modifier = modifier
@@ -126,7 +136,7 @@ internal fun SettingsGroup(
                 item()
                 if (index != items.lastIndex) {
                     HorizontalDivider(
-                        modifier = Modifier.padding(start = 64.dp),
+                        modifier = Modifier.padding(start = dividerStartInset),
                         thickness = Dp.Hairline,
                         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
                     )
