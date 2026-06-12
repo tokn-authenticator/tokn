@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_title">Настройки</string>
+    <string name="settings_section_general">General</string>
+    <string name="settings_section_data">Backup &amp; sync</string>
+    <string name="settings_section_icons">Icons</string>
     <string name="appearance_desc">Параметры темы и отображения</string>
     <string name="security_desc">Биометрическая разблокировка, автоблокировка, конфиденциальность</string>
     <string name="backup_desc">Экспорт и импорт ваших аккаунтов</string>
