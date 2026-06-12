@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="vault_auth_password_title">Confirm it\'s you</string>
-    <string name="vault_auth_password_body">Enter your vault password to continue.</string>
-    <string name="vault_auth_password_label">Vault password</string>
-    <string name="vault_auth_continue">Continue</string>
-    <string name="vault_auth_wrong_password">Wrong password.</string>
+    <string name="vault_auth_password_title">Bestätigen Sie, dass Sie es sind</string>
+    <string name="vault_auth_password_body">Geben Sie Ihr Tresor-Passwort ein, um fortzufahren.</string>
+    <string name="vault_auth_password_label">Tresor-Passwort</string>
+    <string name="vault_auth_continue">Fortfahren</string>
+    <string name="vault_auth_wrong_password">Falsches Passwort.</string>
 </resources>
