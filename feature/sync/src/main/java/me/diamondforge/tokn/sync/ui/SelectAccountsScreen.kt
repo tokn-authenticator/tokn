@@ -1,35 +1,41 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package me.diamondforge.tokn.sync.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.LargeFlexibleTopAppBar
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +44,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.diamondforge.tokn.sync.R
@@ -69,9 +78,11 @@ fun SelectAccountsScreen(
 
     val allSelected = accounts.isNotEmpty() && selectedIds.size == accounts.size
 
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
+            LargeFlexibleTopAppBar(
                 title = { Text(stringResource(R.string.sync_select_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -89,6 +100,7 @@ fun SelectAccountsScreen(
                         )
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
         bottomBar = {
@@ -132,7 +144,7 @@ fun SelectAccountsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    CircularProgressIndicator()
+                    LoadingIndicator()
                 }
             } else if (accounts.isEmpty()) {
                 Column(
@@ -148,21 +160,17 @@ fun SelectAccountsScreen(
                     )
                 }
             } else {
-                LazyColumn {
+                LazyColumn(
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     items(accounts, key = { it.id }) { account ->
                         val checked = account.id in selectedIds
-                        ListItem(
-                            headlineContent = { Text(account.issuer.ifBlank { account.accountName }) },
-                            supportingContent = {
-                                Text(account.accountName.takeIf { it.isNotBlank() } ?: " ")
-                            },
-                            leadingContent = {
-                                Checkbox(
-                                    checked = checked,
-                                    onCheckedChange = null,
-                                )
-                            },
-                            modifier = Modifier.clickable {
+                        AccountSelectRow(
+                            title = account.issuer.ifBlank { account.accountName },
+                            subtitle = account.accountName.takeIf { it.isNotBlank() },
+                            checked = checked,
+                            onToggle = {
                                 selectedIds = if (checked) {
                                     selectedIds - account.id
                                 } else {
@@ -171,7 +179,6 @@ fun SelectAccountsScreen(
                             },
                         )
                     }
-                    item { Spacer(Modifier.height(8.dp)) }
                 }
             }
         }
@@ -189,4 +196,50 @@ fun SelectAccountsScreen(
         },
         onCancelled = { pendingContinue = false },
     )
+}
+
+/** Selectable account row that fills with the secondary container tone when checked. */
+@Composable
+private fun AccountSelectRow(
+    title: String,
+    subtitle: String?,
+    checked: Boolean,
+    onToggle: () -> Unit,
+) {
+    val container = if (checked) MaterialTheme.colorScheme.secondaryContainer
+    else MaterialTheme.colorScheme.surfaceContainerHigh
+    Surface(
+        color = container,
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onToggle),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(checked = checked, onCheckedChange = null)
+            Spacer(Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
+    }
 }

@@ -15,14 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -52,7 +55,11 @@ import sh.calvin.reorderable.ReorderableCollectionItemScope
 import java.io.File
 import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalFoundationApi::class,
+)
 @Composable
 internal fun ReorderableCollectionItemScope.AccountCard(
     item: AccountItem,
@@ -69,8 +76,8 @@ internal fun ReorderableCollectionItemScope.AccountCard(
 ) {
     val containerColor = when {
         isSelected -> MaterialTheme.colorScheme.secondaryContainer
-        isDragging -> MaterialTheme.colorScheme.surfaceVariant
-        else -> MaterialTheme.colorScheme.surface
+        isDragging -> MaterialTheme.colorScheme.surfaceContainerHigh
+        else -> MaterialTheme.colorScheme.surfaceContainerLow
     }
     Card(
         modifier = Modifier
@@ -80,7 +87,8 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                 onDoubleClick = onDoubleTap,
                 onLongClick = onLongPress
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 1.dp),
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 0.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
         Row(
@@ -154,14 +162,17 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                         )
                         val secondsRemaining = (item.otpResult.remainingMillis / 1000).toInt()
                         Box(contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
+                            CircularWavyProgressIndicator(
                                 progress = { progress },
-                                modifier = Modifier.size(40.dp),
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .scale(scaleX = -1f, scaleY = 1f),
                                 color = if (secondsRemaining <= 5)
                                     MaterialTheme.colorScheme.error
                                 else
                                     MaterialTheme.colorScheme.primary,
                                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                amplitude = { (it * 5f).coerceIn(0f, 1f) },
                             )
                             Text(
                                 text = secondsRemaining.toString(),
