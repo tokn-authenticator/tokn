@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)

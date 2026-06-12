@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     implementation(libs.camerax.core)
     implementation(libs.camerax.camera2)

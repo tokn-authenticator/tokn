@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.bouncycastle)
     ksp(libs.hilt.compiler)
+    ksp(libs.kotlin.metadata.jvm)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
