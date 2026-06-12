@@ -9,7 +9,7 @@
     <string name="about_desc">版本号，源代码与许可证</string>
     <string name="appearance">外观样式</string>
     <string name="app_behavior">应用行为</string>
-    <string name="app_behavior_desc">Customize how the app behaves</string>
+    <string name="app_behavior_desc">自定义应用行为</string>
     <string name="theme">主题</string>
     <string name="language">语言</string>
     <string name="language_desc">选择应用语言</string>
@@ -66,8 +66,8 @@
     <string name="lock_30s">30 秒</string>
     <string name="lock_1m">1 分钟</string>
     <string name="lock_5m">5 分钟</string>
-    <string name="password_reminder">Password reminder</string>
-    <string name="password_reminder_desc">Occasionally ask for your password so you don\'t forget it</string>
+    <string name="password_reminder">密码提醒工具</string>
+    <string name="password_reminder_desc">偶尔向您询问密码库的密码，以防您忘记密码</string>
     <string name="screenshot_protection">屏幕截图保护</string>
     <string name="screenshot_protection_desc">在最近任务中隐藏应用内容并阻止屏幕截图</string>
     <string name="tap_to_reveal">点按显示</string>
