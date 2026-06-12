@@ -55,6 +55,7 @@ fun AppearanceScreen(
         val translated = listOf(
             "en" to "English",
             "de" to "Deutsch",
+            "ru" to "Русский",
             "zh-CN" to "简体中文",
         ).sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.second })
         listOf("" to systemDefaultLabel) + translated
