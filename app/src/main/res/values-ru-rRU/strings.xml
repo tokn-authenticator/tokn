@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tokn</string>
+    <string name="biometric_prompt_title">Разблокировать Tokn</string>
+    <string name="biometric_prompt_subtitle">Чтобы продолжить, используйте биометрию или PIN-код</string>
+    <string name="vault_auth_title">Подтвердите, что это вы</string>
+    <string name="vault_auth_subtitle">Подтвердите свою личность для продолжения</string>
+    <string name="vault_locked">Хранилище заблокировано</string>
+    <string name="unlock">Разблокировать</string>
+    <string name="use_password">Использовать пароль</string>
+    <string name="use_biometrics">Использовать биометрию</string>
+    <string name="password">Пароль</string>
+    <string name="wrong_password">Неверный пароль</string>
+    <string name="rot_upgrade_title">Обновление шифрования</string>
+    <string name="rot_upgrade_body">Теперь Tokn использует более современный метод шифрования. Это не меняет того, как вы пользуетесь приложением каждый день.\n\nПоскольку новый метод связывает ключ вашего хранилища с паролем, вам нужно ввести его один раз для перехода. После этого биометрия (например ваш отпечаток пальца) продолжит работать как обычно.</string>
+    <string name="rot_upgrade_confirm">Применить</string>
+    <string name="rot_upgrade_later">Позже</string>
+</resources>
