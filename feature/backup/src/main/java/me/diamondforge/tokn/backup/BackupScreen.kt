@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -30,16 +32,17 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,11 +52,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -305,15 +312,18 @@ fun BackupScreen(
         )
     }
 
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
+            LargeFlexibleTopAppBar(
                 title = { Text(stringResource(R.string.backup_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
+                scrollBehavior = scrollBehavior,
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -333,47 +343,53 @@ fun BackupScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
+                contentPadding = PaddingValues(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 item {
-                    SectionLabel(stringResource(R.string.section_import))
+                    BackupSectionHeader(stringResource(R.string.section_import))
                 }
                 item {
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.import_from_file)) },
-                        supportingContent = { Text(stringResource(R.string.import_from_file_desc)) },
-                        leadingContent = {
-                            Icon(Icons.Default.FileOpen, contentDescription = null)
-                        },
-                        modifier = Modifier.clickable(enabled = pickerOptions.isNotEmpty()) {
-                            showSourcePicker = true
-                        },
+                    BackupGroup(
+                        items = listOf(
+                            {
+                                BackupRow(
+                                    title = stringResource(R.string.import_from_file),
+                                    subtitle = stringResource(R.string.import_from_file_desc),
+                                    icon = Icons.Default.FileOpen,
+                                    enabled = pickerOptions.isNotEmpty(),
+                                    onClick = { showSourcePicker = true },
+                                )
+                            },
+                            {
+                                BackupRow(
+                                    title = stringResource(R.string.import_from_google_auth),
+                                    subtitle = stringResource(R.string.import_from_google_auth_desc),
+                                    icon = Icons.Default.QrCodeScanner,
+                                    onClick = {
+                                        viewModel.suppressLock()
+                                        onScanMigration()
+                                    },
+                                )
+                            },
+                        ),
                     )
                 }
                 item {
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.import_from_google_auth)) },
-                        supportingContent = { Text(stringResource(R.string.import_from_google_auth_desc)) },
-                        leadingContent = {
-                            Icon(Icons.Default.QrCodeScanner, contentDescription = null)
-                        },
-                        modifier = Modifier.clickable {
-                            viewModel.suppressLock()
-                            onScanMigration()
-                        },
-                    )
-                }
-                item { HorizontalDivider() }
-                item {
-                    SectionLabel(stringResource(R.string.section_export))
+                    BackupSectionHeader(stringResource(R.string.section_export))
                 }
                 item {
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.export_vault)) },
-                        supportingContent = { Text(stringResource(R.string.export_vault_desc)) },
-                        leadingContent = {
-                            Icon(Icons.Default.FileDownload, contentDescription = null)
-                        },
-                        modifier = Modifier.clickable { showExportDialog = true },
+                    BackupGroup(
+                        items = listOf(
+                            {
+                                BackupRow(
+                                    title = stringResource(R.string.export_vault),
+                                    subtitle = stringResource(R.string.export_vault_desc),
+                                    icon = Icons.Default.FileDownload,
+                                    onClick = { showExportDialog = true },
+                                )
+                            },
+                        ),
                     )
                 }
             }
@@ -437,14 +453,77 @@ private fun SourcePickerDialog(
     )
 }
 
+/** Accent-tinted label that introduces a [BackupGroup]. */
 @Composable
-private fun SectionLabel(title: String) {
+private fun BackupSectionHeader(text: String) {
     Text(
-        text = title,
-        style = MaterialTheme.typography.labelMedium,
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.padding(start = 28.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
     )
+}
+
+@Composable
+private fun BackupGroup(items: List<@Composable () -> Unit>) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(28.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        Column {
+            items.forEachIndexed { index, item ->
+                item()
+                if (index != items.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 64.dp),
+                        thickness = Dp.Hairline,
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** Leading icon, title and supporting text row inside a [BackupGroup]. */
+@Composable
+private fun BackupRow(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.width(20.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }
 
 private fun filenameFor(request: ExportRequest): String {
