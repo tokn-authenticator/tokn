@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_title">Einstellungen</string>
+    <string name="settings_section_general">General</string>
+    <string name="settings_section_data">Backup &amp; sync</string>
+    <string name="settings_section_icons">Icons</string>
     <string name="appearance_desc">Design und Anzeigeoptionen</string>
     <string name="security_desc">Biometrie, Sperrzeit, Datenschutz</string>
     <string name="backup_desc">Konten exportieren und importieren</string>
