@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="importer_aegis_note">Поддерживает зашифрованные и незашифрованные экспорты Aegis в формате JSON.</string>
+    <string name="importer_twofas_note">Поддерживает зашифрованные и незашифрованные резервные копии 2FAS Authenticator (.2fas / .json).</string>
+    <string name="importer_otpauth_uri_note">Текстовый файл, содержащий по одному URI otpauth://… в каждой строке.</string>
+    <string name="importer_stratum_note">Поддерживает зашифрованные и незашифрованные резервные копии Stratum / Authenticator Pro. Импортируются только аккаунты TOTP и HOTP.</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="password_reminder_title">Введите пароль хранилища</string>
+    <string name="password_reminder_body">Периодический ввод пароля помогает запомнить его, и со временем мы будем спрашивать его реже. Если вы забудете пароль, восстановить хранилище будет невозможно.</string>
+    <string name="password_reminder_password">Пароль</string>
+    <string name="password_reminder_confirm">Подтвердить</string>
+    <string name="password_reminder_skip">Пропустить</string>
+    <string name="password_reminder_wrong">Это неверный пароль. Попробуйте ещё раз.</string>
+    <plurals name="password_reminder_next_days">
+        <item quantity="one">Мы снова напомним через %d день.</item>
+        <item quantity="few">Мы снова напомним через %d дня.</item>
+        <item quantity="many">Мы снова напомним через %d дней.</item>
+        <item quantity="other">Мы снова напомним через %d дня.</item>
+    </plurals>
+</resources>

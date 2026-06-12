@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_account_title">Добавить аккаунт</string>
+    <string name="scan_qr">Сканировать QR-код</string>
+    <string name="enter_manually">Ввести вручную</string>
+    <string name="manual_entry_title">Ручной ввод</string>
+    <string name="issuer">Поставщик (например, Google)</string>
+    <string name="account_name">Имя аккаунта (например, user@example.com)</string>
+    <string name="secret_key">Секретный ключ</string>
+    <string name="type">Тип</string>
+    <string name="algorithm">Алгоритм</string>
+    <string name="digits">Количество цифр</string>
+    <string name="period_seconds">Длительность</string>
+    <string name="period_value">%d с</string>
+    <string name="save">Сохранить</string>
+    <string name="camera_permission_rationale">Для сканирования QR-кодов требуется доступ к камере</string>
+    <string name="camera_permission_required">Предоставьте разрешение на использование камеры для сканирования QR-кодов</string>
+    <string name="grant_permission">Разрешить</string>
+    <string name="advanced_settings">Дополнительно</string>
+    <string name="processing_image">Обработка изображения…</string>
+    <string name="qr_not_found_in_image">OTP QR-код не найден на изображении</string>
+    <string name="retry">Повторить</string>
+    <string name="group_optional">Группа (необязательно)</string>
+    <string name="icon_picker_title">Выберите значок</string>
+    <string name="icon_picker_gallery">Из галереи</string>
+    <string name="icon_picker_remove">Удалить</string>
+    <string name="icon_picker_cancel">Отмена</string>
+    <string name="icon_picker_suggestions">Рекомендуемые</string>
+    <string name="icon_picker_no_packs">Наборы значков не установлены. Импортируйте набор в разделе Настройки › Оформление › Наборы значков.</string>
+    <string name="icon_picker_search_placeholder">Поиск значков…</string>
+    <string name="icon_picker_no_search_results">Нет значков, соответствующих вашему запросу</string>
+    <string name="add_invalid_qr_code">Недействительный QR-код</string>
+    <string name="add_error_secret_required">Требуется секретный ключ</string>
+    <string name="add_error_invalid_secret">Недействительный секретный ключ: допускаются только буквы A-Z и цифры 2-7</string>
+    <string name="add_error_account_name_required">Требуется имя аккаунта</string>
+    <string name="add_error_save_failed">Не удалось сохранить аккаунт</string>
+</resources>

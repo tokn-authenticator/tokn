@@ -68,6 +68,11 @@
     <string name="lock_5m">5 Min</string>
     <string name="password_reminder">Kennworterinnerung</string>
     <string name="password_reminder_desc">Gelegentlich nach dem Passwort fragen, sodass es nicht vergessen wird</string>
+    <string name="password_reminder_due">Nächste Erinnerung ist jetzt fällig</string>
+    <plurals name="password_reminder_next">
+        <item quantity="one">Nächste Erinnerung in %d Tag</item>
+        <item quantity="other">Nächste Erinnerung in %d Tagen</item>
+    </plurals>
     <string name="screenshot_protection">Screenshot-Schutz</string>
     <string name="screenshot_protection_desc">App-Inhalte im Aufgaben-Manager ausblenden und Screenshots blockieren</string>
     <string name="tap_to_reveal">Zum Anzeigen tippen</string>

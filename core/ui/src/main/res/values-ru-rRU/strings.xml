@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vault_auth_password_title">Подтвердите, что это вы</string>
+    <string name="vault_auth_password_body">Чтобы продолжить, введите пароль хранилища.</string>
+    <string name="vault_auth_password_label">Пароль хранилища</string>
+    <string name="vault_auth_continue">Продолжить</string>
+    <string name="vault_auth_wrong_password">Неверный пароль.</string>
+</resources>

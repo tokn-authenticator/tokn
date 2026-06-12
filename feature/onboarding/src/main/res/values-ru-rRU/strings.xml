@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_welcome_title">Добро пожаловать в Tokn</string>
+    <string name="onboarding_welcome_description">Простой и приватный аутентификатор для ваших одноразовых кодов.</string>
+    <string name="onboarding_import_button">Восстановить хранилище Tokn</string>
+    <string name="onboarding_import_hint">Хотите импортировать из другого приложения 2FA? Завершите настройку и сделайте это в разделе Настройки → Импорт &amp; Экспорт.</string>
+    <string name="onboarding_import_success">Импортировано аккаунтов: %1$d</string>
+    <string name="onboarding_import_redirect_hint">Похоже на резервную копию из другого приложения. Завершите настройку и импортируйте её в разделе Настройки → Импорт &amp; Экспорт.</string>
+    <string name="onboarding_import_invalid">Не удалось прочитать этот файл как хранилище Tokn.</string>
+    <string name="onboarding_import_password_title">Зашифрованное хранилище Tokn</string>
+    <string name="onboarding_import_password_label">Пароль хранилища</string>
+    <string name="onboarding_import_password_action">Восстановить</string>
+    <string name="onboarding_import_wrong_password">Неверный пароль.</string>
+    <string name="onboarding_security_title">Защитите своё хранилище</string>
+    <string name="onboarding_security_description">Выберите способ защиты доступа к вашим аккаунтам. Вы можете изменить это позже в настройках.</string>
+    <string name="onboarding_security_none">Без шифрования</string>
+    <string name="onboarding_security_none_desc">Аккаунты хранятся локально без дополнительного слоя разблокировки.</string>
+    <string name="onboarding_security_password">Пароль</string>
+    <string name="onboarding_security_password_desc">Зашифровать хранилище и разблокировать с помощью пароля.</string>
+    <string name="onboarding_security_biometric">Биометрия</string>
+    <string name="onboarding_security_biometric_desc">Зашифровать хранилище и разблокировать с помощью биометрии, с паролем в качестве запасного варианта.</string>
+    <string name="onboarding_security_biometric_unavailable">Биометрия недоступна на этом устройстве.</string>
+    <string name="onboarding_security_pick_method">Пожалуйста, выберите способ.</string>
+    <string name="onboarding_setup_title">Установите пароль</string>
+    <string name="onboarding_setup_description">Ваш пароль разблокирует хранилище, когда биометрия недоступна. Храните его в безопасности — восстановление невозможно.</string>
+    <string name="onboarding_password">Пароль</string>
+    <string name="onboarding_password_confirm">Подтвердите пароль</string>
+    <string name="onboarding_password_too_short">Не менее 8 символов</string>
+    <string name="onboarding_password_mismatch">Пароли не совпадают</string>
+    <string name="onboarding_done_title">Всё готово</string>
+    <string name="onboarding_done_description">Вы готовы начать добавлять аккаунты.</string>
+    <string name="onboarding_finish">Начать</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_previous">Назад</string>
+    <string name="onboarding_biometric_required">Для продолжения необходимо настроить отпечаток пальца.</string>
+</resources>
