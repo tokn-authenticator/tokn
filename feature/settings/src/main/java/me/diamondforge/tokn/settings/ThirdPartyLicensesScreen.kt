@@ -51,6 +51,7 @@ fun ThirdPartyLicensesScreen(onBack: () -> Unit) {
                 items = DEPENDENCIES.map { dep ->
                     { DepRow(dep = dep, onClick = { uriHandler.openUri(dep.url) }) }
                 },
+                dividerStartInset = 16.dp,
             )
         }
     }
