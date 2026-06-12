@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -161,12 +162,15 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                         Box(contentAlignment = Alignment.Center) {
                             CircularWavyProgressIndicator(
                                 progress = { progress },
-                                modifier = Modifier.size(44.dp),
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .scale(scaleX = -1f, scaleY = 1f),
                                 color = if (secondsRemaining <= 5)
                                     MaterialTheme.colorScheme.error
                                 else
                                     MaterialTheme.colorScheme.primary,
                                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                amplitude = { (it * 5f).coerceIn(0f, 1f) },
                             )
                             Text(
                                 text = secondsRemaining.toString(),
