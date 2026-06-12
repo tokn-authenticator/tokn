@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DragHandle
@@ -75,8 +76,8 @@ internal fun ReorderableCollectionItemScope.AccountCard(
 ) {
     val containerColor = when {
         isSelected -> MaterialTheme.colorScheme.secondaryContainer
-        isDragging -> MaterialTheme.colorScheme.surfaceVariant
-        else -> MaterialTheme.colorScheme.surface
+        isDragging -> MaterialTheme.colorScheme.surfaceContainerHigh
+        else -> MaterialTheme.colorScheme.surfaceContainerLow
     }
     Card(
         modifier = Modifier
@@ -86,7 +87,8 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                 onDoubleClick = onDoubleTap,
                 onLongClick = onLongPress
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 1.dp),
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isDragging) 8.dp else 0.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
         Row(
