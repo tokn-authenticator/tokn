@@ -409,31 +409,13 @@ private fun SourcePickerDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.import_source_picker_title)) },
         text = {
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 options.forEach { option ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSelect(option.id) }
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        RadioButton(
-                            selected = selectedId == option.id,
-                            onClick = { onSelect(option.id) },
-                        )
-                        Spacer(Modifier.width(12.dp))
-                        Column {
-                            Text(option.displayName, style = MaterialTheme.typography.bodyLarge)
-                            option.noteRes?.let { res ->
-                                Text(
-                                    stringResource(res),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                    }
+                    SourceOptionRow(
+                        option = option,
+                        selected = selectedId == option.id,
+                        onClick = { onSelect(option.id) },
+                    )
                 }
             }
         },
@@ -451,6 +433,55 @@ private fun SourcePickerDialog(
             }
         },
     )
+}
+
+@Composable
+private fun SourceOptionRow(
+    option: ImportPickerOption,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val container = if (selected)
+        MaterialTheme.colorScheme.primaryContainer
+    else
+        MaterialTheme.colorScheme.surfaceContainerHigh
+    val onContainer = if (selected)
+        MaterialTheme.colorScheme.onPrimaryContainer
+    else
+        MaterialTheme.colorScheme.onSurface
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(20.dp),
+        color = container,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            RadioButton(selected = selected, onClick = onClick)
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    option.displayName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = onContainer,
+                )
+                option.noteRes?.let { res ->
+                    Text(
+                        stringResource(res),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (selected)
+                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
 }
 
 /** Accent-tinted label that introduces a [BackupGroup]. */
