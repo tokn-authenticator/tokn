@@ -91,63 +91,63 @@ open class UserPreferencesRepository @Inject constructor(
         prefs[Keys.PASSWORD_REMINDER_STAGE] ?: 0
     }
 
-    suspend fun setThemeMode(mode: ThemeMode) {
+    open suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     }
 
-    suspend fun setAutoLockTimeout(seconds: Int) {
+    open suspend fun setAutoLockTimeout(seconds: Int) {
         dataStore.edit { it[Keys.AUTO_LOCK_TIMEOUT] = seconds }
     }
 
-    suspend fun setBiometricEnabled(enabled: Boolean) {
+    open suspend fun setBiometricEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.BIOMETRIC_ENABLED] = enabled }
     }
 
-    suspend fun setScreenshotsEnabled(enabled: Boolean) {
+    open suspend fun setScreenshotsEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.SCREENSHOTS_ENABLED] = enabled }
     }
 
-    suspend fun setEncryptionEnabled(enabled: Boolean) {
+    open suspend fun setEncryptionEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.ENCRYPTION_ENABLED] = enabled }
     }
 
-    suspend fun setTapToRevealEnabled(enabled: Boolean) {
+    open suspend fun setTapToRevealEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.TAP_TO_REVEAL_ENABLED] = enabled }
     }
 
-    suspend fun setShowNextCodeEnabled(enabled: Boolean) {
+    open suspend fun setShowNextCodeEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.SHOW_NEXT_CODE_ENABLED] = enabled }
     }
 
-    suspend fun setDynamicColorEnabled(enabled: Boolean) {
+    open suspend fun setDynamicColorEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.DYNAMIC_COLOR_ENABLED] = enabled }
     }
 
-    suspend fun setOnboardingDone(done: Boolean) {
+    open suspend fun setOnboardingDone(done: Boolean) {
         dataStore.edit { it[Keys.ONBOARDING_DONE] = done }
     }
 
-    suspend fun setLastSyncMethod(method: SyncMethod) {
+    open suspend fun setLastSyncMethod(method: SyncMethod) {
         dataStore.edit { it[Keys.LAST_SYNC_METHOD] = method.name }
     }
 
-    suspend fun setAccountSort(sort: AccountSort) {
+    open suspend fun setAccountSort(sort: AccountSort) {
         dataStore.edit { it[Keys.ACCOUNT_SORT] = sort.name }
     }
 
-    suspend fun setTapBehavior(behavior: TapBehavior) {
+    open suspend fun setTapBehavior(behavior: TapBehavior) {
         dataStore.edit { it[Keys.TAP_BEHAVIOR] = behavior.name }
     }
 
-    suspend fun setPasswordReminderEnabled(enabled: Boolean) {
+    open suspend fun setPasswordReminderEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.PASSWORD_REMINDER_ENABLED] = enabled }
     }
 
-    suspend fun setPasswordReminderLastShownAt(timestamp: Long) {
+    open suspend fun setPasswordReminderLastShownAt(timestamp: Long) {
         dataStore.edit { it[Keys.PASSWORD_REMINDER_LAST_SHOWN_AT] = timestamp }
     }
 
-    suspend fun setPasswordReminderStage(stage: Int) {
+    open suspend fun setPasswordReminderStage(stage: Int) {
         dataStore.edit { it[Keys.PASSWORD_REMINDER_STAGE] = stage }
     }
 

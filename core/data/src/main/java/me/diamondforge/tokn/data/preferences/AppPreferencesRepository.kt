@@ -24,7 +24,7 @@ open class AppPreferencesRepository @Inject constructor(
         prefs[Keys.ICON_FETCH_ENABLED] ?: false
     }
 
-    suspend fun setIconFetchEnabled(enabled: Boolean) {
+    open suspend fun setIconFetchEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.ICON_FETCH_ENABLED] = enabled }
     }
 

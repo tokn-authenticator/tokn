@@ -65,6 +65,8 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.org.json)
     testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.coroutines.test)
     testImplementation(testFixtures(project(":core:domain")))
 
     implementation(libs.camerax.core)
