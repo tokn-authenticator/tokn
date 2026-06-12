@@ -2,6 +2,10 @@
 <resources>
     <string name="settings_title">Settings</string>
 
+    <string name="settings_section_general">General</string>
+    <string name="settings_section_data">Backup &amp; sync</string>
+    <string name="settings_section_icons">Icons</string>
+
     <string name="appearance_desc">Theme and display options</string>
     <string name="security_desc">Biometric unlock, auto-lock, privacy</string>
     <string name="backup_desc">Export and import your accounts</string>
