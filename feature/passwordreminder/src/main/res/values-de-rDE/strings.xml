@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="password_reminder_title">Enter your vault password</string>
-    <string name="password_reminder_body">Typing it now and then helps you remember it, and we ask less often over time. There is no way to recover your vault if you forget it.</string>
-    <string name="password_reminder_password">Password</string>
-    <string name="password_reminder_confirm">Confirm</string>
-    <string name="password_reminder_skip">Skip</string>
-    <string name="password_reminder_wrong">That\'s not your password. Try again.</string>
+    <string name="password_reminder_title">Geben Sie Ihr Tresor Passwort ein</string>
+    <string name="password_reminder_body">Wenn Sie es ab und zu eintippen, können Sie es sich besser merken, und mit der Zeit fragen wir immer weniger danach. Wenn Sie es vergessen, gibt es keine Möglichkeit, Ihren Tresor wiederherzustellen.</string>
+    <string name="password_reminder_password">Passwort</string>
+    <string name="password_reminder_confirm">Bestätigen</string>
+    <string name="password_reminder_skip">Überspringen</string>
+    <string name="password_reminder_wrong">Das ist nicht Ihr Passwort. Versuchen Sie es erneut.</string>
     <plurals name="password_reminder_next_days">
-        <item quantity="one">We\'ll check in again in %d day.</item>
-        <item quantity="other">We\'ll check in again in %d days.</item>
+        <item quantity="one">Wir werden in %d Tag wieder nachfragen.</item>
+        <item quantity="other">Wir werden in %d Tagen wieder nachfragen.</item>
     </plurals>
 </resources>
