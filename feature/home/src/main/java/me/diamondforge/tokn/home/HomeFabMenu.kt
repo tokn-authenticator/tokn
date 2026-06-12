@@ -1,6 +1,7 @@
 package me.diamondforge.tokn.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -15,25 +16,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleFloatingActionButton
-import androidx.compose.material3.ToggleFloatingActionButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
@@ -48,8 +46,8 @@ internal fun BoxScope.HomeFabMenu(
     onFromImage: () -> Unit,
     onManualEntry: () -> Unit,
 ) {
-    // Scrim for tap-outside-to-dismiss; the expressive FAB menu component does
-    // not intercept outside touches on its own.
+    // Scrim for tap-outside-to-dismiss; the FAB menu component does not
+    // intercept outside touches on its own.
     AnimatedVisibility(
         visible = open,
         enter = fadeIn(),
@@ -84,22 +82,16 @@ internal fun BoxScope.HomeFabMenu(
             .padding(fabPadding),
         expanded = open,
         button = {
-            ToggleFloatingActionButton(
-                checked = open,
-                onCheckedChange = onOpenChange,
-            ) {
-                val icon by remember {
-                    derivedStateOf {
-                        if (checkedProgress > 0.5f) Icons.Default.Close else Icons.Default.Add
-                    }
-                }
-                with(ToggleFloatingActionButtonDefaults) {
-                    Icon(
-                        painter = rememberVectorPainter(icon),
-                        contentDescription = stringResource(R.string.add_account),
-                        modifier = Modifier.animateIcon({ checkedProgress }),
-                    )
-                }
+            val rotation by animateFloatAsState(
+                targetValue = if (open) 45f else 0f,
+                label = "fab-rotation",
+            )
+            FloatingActionButton(onClick = { onOpenChange(!open) }) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_account),
+                    modifier = Modifier.rotate(rotation),
+                )
             }
         },
     ) {
