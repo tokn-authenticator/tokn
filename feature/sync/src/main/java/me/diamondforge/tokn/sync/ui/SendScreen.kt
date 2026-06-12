@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package me.diamondforge.tokn.sync.ui
 
 import android.Manifest
@@ -20,8 +22,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -304,7 +308,7 @@ private fun PairingCodeView(state: SendUiState, onCancel: () -> Unit) {
         style = MaterialTheme.typography.bodySmall
     )
     Spacer(Modifier.height(32.dp))
-    CircularProgressIndicator()
+    LoadingIndicator()
     Spacer(Modifier.height(16.dp))
     Text(
         if (state.status == SendUiState.Status.Waiting) stringResource(R.string.sync_waiting_for_peer)
