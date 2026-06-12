@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_title">设置</string>
+    <string name="settings_section_general">General</string>
+    <string name="settings_section_data">Backup &amp; sync</string>
+    <string name="settings_section_icons">Icons</string>
     <string name="appearance_desc">主题与显示选项</string>
     <string name="security_desc">生物识别解锁，自动锁定与隐私设置</string>
     <string name="backup_desc">导出或导入帐户</string>
