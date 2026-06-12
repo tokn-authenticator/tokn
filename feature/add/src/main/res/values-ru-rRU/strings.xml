@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_account_title">Add account</string>
+    <string name="scan_qr">Scan QR code</string>
+    <string name="enter_manually">Enter manually</string>
+    <string name="manual_entry_title">Manual entry</string>
+    <string name="issuer">Issuer (e.g. Google)</string>
+    <string name="account_name">Account name (e.g. user@example.com)</string>
+    <string name="secret_key">Secret key</string>
+    <string name="type">Type</string>
+    <string name="algorithm">Algorithm</string>
+    <string name="digits">Digits</string>
+    <string name="period_seconds">Period</string>
+    <string name="period_value">%d s</string>
+    <string name="save">Save</string>
+    <string name="camera_permission_rationale">Camera access is needed to scan QR codes</string>
+    <string name="camera_permission_required">Please grant camera permission to scan QR codes</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="advanced_settings">Advanced</string>
+    <string name="processing_image">Processing image…</string>
+    <string name="qr_not_found_in_image">No OTP QR code found in image</string>
+    <string name="retry">Retry</string>
+    <string name="group_optional">Group (optional)</string>
+    <string name="icon_picker_title">Choose an icon</string>
+    <string name="icon_picker_gallery">From gallery</string>
+    <string name="icon_picker_remove">Remove</string>
+    <string name="icon_picker_cancel">Cancel</string>
+    <string name="icon_picker_suggestions">Suggested</string>
+    <string name="icon_picker_no_packs">No icon packs installed. Import one in Settings › Appearance › Icon packs.</string>
+    <string name="icon_picker_search_placeholder">Search icons…</string>
+    <string name="icon_picker_no_search_results">No icons match your search</string>
+    <string name="add_invalid_qr_code">Invalid QR code</string>
+    <string name="add_error_secret_required">Secret is required</string>
+    <string name="add_error_invalid_secret">Invalid secret key: only letters A-Z and digits 2-7 are allowed</string>
+    <string name="add_error_account_name_required">Account name is required</string>
+    <string name="add_error_save_failed">Failed to save account</string>
+</resources>
