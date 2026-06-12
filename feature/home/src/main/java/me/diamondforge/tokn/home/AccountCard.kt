@@ -21,8 +21,9 @@ import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,7 +53,11 @@ import sh.calvin.reorderable.ReorderableCollectionItemScope
 import java.io.File
 import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalFoundationApi::class,
+)
 @Composable
 internal fun ReorderableCollectionItemScope.AccountCard(
     item: AccountItem,
@@ -154,9 +159,9 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                         )
                         val secondsRemaining = (item.otpResult.remainingMillis / 1000).toInt()
                         Box(contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
+                            CircularWavyProgressIndicator(
                                 progress = { progress },
-                                modifier = Modifier.size(40.dp),
+                                modifier = Modifier.size(44.dp),
                                 color = if (secondsRemaining <= 5)
                                     MaterialTheme.colorScheme.error
                                 else
