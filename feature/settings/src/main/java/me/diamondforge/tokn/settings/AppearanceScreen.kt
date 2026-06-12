@@ -6,31 +6,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,7 +33,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.diamondforge.tokn.data.preferences.ThemeMode
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppearanceScreen(
     onBack: () -> Unit,
@@ -133,103 +120,85 @@ fun AppearanceScreen(
         )
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.appearance)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                    }
-                },
-            )
-        },
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-        ) {
-            item {
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.theme)) },
-                    leadingContent = { Icon(Icons.Default.Palette, contentDescription = null) },
-                    supportingContent = {
-                        Row(
-                            modifier = Modifier.padding(top = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            ThemeMode.entries.forEach { mode ->
-                                FilterChip(
-                                    selected = uiState.themeMode == mode,
-                                    onClick = { viewModel.setThemeMode(mode) },
-                                    label = {
-                                        Text(
-                                            when (mode) {
-                                                ThemeMode.LIGHT -> stringResource(R.string.theme_light)
-                                                ThemeMode.DARK -> stringResource(R.string.theme_dark)
-                                                ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
-                                            },
-                                        )
-                                    },
-                                )
-                                Spacer(Modifier.width(8.dp))
+    SettingsScaffold(
+        title = stringResource(R.string.appearance),
+        onBack = onBack,
+    ) {
+        item { SettingsSectionHeader(stringResource(R.string.settings_section_general)) }
+        item {
+            val generalItems = buildList<@Composable () -> Unit> {
+                add {
+                    SettingsToggleRow(
+                        title = stringResource(R.string.theme),
+                        icon = Icons.Default.Palette,
+                        options = ThemeMode.entries.map { mode ->
+                            mode to when (mode) {
+                                ThemeMode.LIGHT -> stringResource(R.string.theme_light)
+                                ThemeMode.DARK -> stringResource(R.string.theme_dark)
+                                ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
                             }
-                        }
-                    },
-                )
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                item {
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.material_you)) },
-                        supportingContent = { Text(stringResource(R.string.material_you_desc)) },
-                        leadingContent = {
-                            Icon(Icons.Default.ColorLens, contentDescription = null)
                         },
-                        trailingContent = {
-                            Switch(
-                                checked = uiState.dynamicColorEnabled,
-                                onCheckedChange = { viewModel.setDynamicColorEnabled(it) },
-                            )
-                        },
+                        selected = uiState.themeMode,
+                        onSelect = { viewModel.setThemeMode(it) },
+                    )
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    add {
+                        SettingsRow(
+                            title = stringResource(R.string.material_you),
+                            subtitle = stringResource(R.string.material_you_desc),
+                            icon = Icons.Default.ColorLens,
+                            trailing = {
+                                SettingsSwitch(
+                                    checked = uiState.dynamicColorEnabled,
+                                    onCheckedChange = { viewModel.setDynamicColorEnabled(it) },
+                                )
+                            },
+                        )
+                    }
+                }
+                add {
+                    SettingsRow(
+                        title = stringResource(R.string.language),
+                        subtitle = currentLangLabel,
+                        icon = Icons.Default.Language,
+                        onClick = { showLangDialog = true },
                     )
                 }
             }
-            item { HorizontalDivider() }
-            item {
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.language)) },
-                    supportingContent = { Text(currentLangLabel) },
-                    leadingContent = { Icon(Icons.Default.Language, contentDescription = null) },
-                    modifier = Modifier.clickable { showLangDialog = true },
-                )
-            }
-            item { HorizontalDivider() }
-            item {
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.account_icons)) },
-                    supportingContent = { Text(stringResource(R.string.account_icons_desc)) },
-                    leadingContent = { Icon(Icons.Default.Image, contentDescription = null) },
-                    trailingContent = {
-                        Switch(
-                            checked = uiState.iconFetchEnabled,
-                            onCheckedChange = { enabled ->
-                                if (enabled) showIconPrivacyDialog = true
-                                else viewModel.setIconFetchEnabled(false)
+            SettingsGroup(items = generalItems)
+        }
+
+        item { SettingsSectionHeader(stringResource(R.string.settings_section_icons)) }
+        item {
+            SettingsGroup(
+                items = listOf(
+                    {
+                        SettingsRow(
+                            title = stringResource(R.string.account_icons),
+                            subtitle = stringResource(R.string.account_icons_desc),
+                            icon = Icons.Default.Image,
+                            trailing = {
+                                SettingsSwitch(
+                                    checked = uiState.iconFetchEnabled,
+                                    onCheckedChange = { enabled ->
+                                        if (enabled) showIconPrivacyDialog = true
+                                        else viewModel.setIconFetchEnabled(false)
+                                    },
+                                )
                             },
                         )
                     },
-                )
-            }
-            item {
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.icon_packs_section)) },
-                    supportingContent = { Text(stringResource(R.string.icon_packs_section_desc)) },
-                    leadingContent = { Icon(Icons.Default.Image, contentDescription = null) },
-                    modifier = Modifier.clickable { onIconPacks() },
-                )
-            }
+                    {
+                        SettingsRow(
+                            title = stringResource(R.string.icon_packs_section),
+                            subtitle = stringResource(R.string.icon_packs_section_desc),
+                            icon = Icons.Default.Image,
+                            onClick = onIconPacks,
+                        )
+                    },
+                ),
+            )
         }
     }
 }
