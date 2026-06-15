@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -36,7 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -161,19 +161,23 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                             label = "countdown",
                         )
                         val secondsRemaining = (item.otpResult.remainingMillis / 1000).toInt()
+                        val expiring = secondsRemaining <= 5
                         Box(contentAlignment = Alignment.Center) {
-                            CircularWavyProgressIndicator(
-                                progress = { progress },
-                                modifier = Modifier
-                                    .size(44.dp)
-                                    .scale(scaleX = -1f, scaleY = 1f),
-                                color = if (secondsRemaining <= 5)
-                                    MaterialTheme.colorScheme.error
-                                else
-                                    MaterialTheme.colorScheme.primary,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                                amplitude = { (it * 5f).coerceIn(0f, 1f) },
-                            )
+                            if (expiring) {
+                                CircularWavyProgressIndicator(
+                                    progress = { progress },
+                                    modifier = Modifier.size(44.dp),
+                                    color = MaterialTheme.colorScheme.error,
+                                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                )
+                            } else {
+                                CircularProgressIndicator(
+                                    progress = { progress },
+                                    modifier = Modifier.size(40.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                )
+                            }
                             Text(
                                 text = secondsRemaining.toString(),
                                 style = MaterialTheme.typography.labelSmall,
