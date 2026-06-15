@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_title">Настройки</string>
-    <string name="settings_section_general">General</string>
-    <string name="settings_section_data">Backup &amp; sync</string>
-    <string name="settings_section_icons">Icons</string>
+    <string name="settings_section_general">Основное</string>
+    <string name="settings_section_data">Бэкап &amp; синхронизация</string>
+    <string name="settings_section_icons">Иконки</string>
     <string name="appearance_desc">Параметры темы и отображения</string>
     <string name="security_desc">Биометрическая разблокировка, автоблокировка, конфиденциальность</string>
     <string name="backup_desc">Экспорт и импорт ваших аккаунтов</string>
@@ -19,7 +19,7 @@
     <string name="language_system_default">Системный</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Тёмная</string>
-    <string name="theme_system">System</string>
+    <string name="theme_system">Системная</string>
     <string name="material_you">Цвета Material You</string>
     <string name="material_you_desc">Использовать палитру цветов на основе обоев из вашей системы</string>
     <string name="show_next_code">Показывать следующий код</string>
