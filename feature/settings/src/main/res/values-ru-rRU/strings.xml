@@ -19,7 +19,7 @@
     <string name="language_system_default">Системный</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Тёмная</string>
-    <string name="theme_system">System</string>
+    <string name="theme_system">Системная</string>
     <string name="material_you">Цвета Material You</string>
     <string name="material_you_desc">Использовать палитру цветов на основе обоев из вашей системы</string>
     <string name="show_next_code">Показывать следующий код</string>
