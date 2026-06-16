@@ -59,6 +59,12 @@ android {
     packaging {
         jniLibs.useLegacyPackaging = false
     }
+    
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
