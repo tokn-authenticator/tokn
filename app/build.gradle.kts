@@ -56,6 +56,10 @@ android {
 
     buildFeatures { compose = true }
 
+    dependenciesInfo {
+        includeInApk = false
+    }
+
     packaging {
         jniLibs.useLegacyPackaging = false
     }
