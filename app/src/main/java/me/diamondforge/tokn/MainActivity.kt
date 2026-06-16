@@ -1,11 +1,13 @@
 package me.diamondforge.tokn
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
+import androidx.core.net.toUri
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +32,8 @@ import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.navigation.AppNavHost
 import me.diamondforge.tokn.passwordreminder.PasswordReminderDialog
 import me.diamondforge.tokn.passwordreminder.PasswordReminderViewModel
+import me.diamondforge.tokn.rating.RatingPromptDialog
+import me.diamondforge.tokn.rating.RatingPromptViewModel
 import me.diamondforge.tokn.security.BiometricHelper
 import me.diamondforge.tokn.security.LockManager
 import me.diamondforge.tokn.security.vault.VaultManager
@@ -160,6 +164,17 @@ class MainActivity : AppCompatActivity() {
                 // Re-arm so a later due period isn't suppressed by the earlier prompt's flag.
                 LaunchedEffect(reminderDue) { if (reminderDue) reminderHandled = false }
 
+                val ratingViewModel: RatingPromptViewModel = hiltViewModel()
+                val ratingDue by ratingViewModel.shouldPrompt.collectAsStateWithLifecycle()
+                var ratingHandled by rememberSaveable { mutableStateOf(false) }
+                var launchRecorded by rememberSaveable { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    if (!launchRecorded) {
+                        ratingViewModel.recordLaunch()
+                        launchRecorded = true
+                    }
+                }
+
                 AppNavHost(
                     isLocked = isLocked,
                     onboardingDone = onboardingDone,
@@ -213,6 +228,49 @@ class MainActivity : AppCompatActivity() {
                         nextReminderDays = nextReminderDays,
                     )
                 }
+
+                val reminderShowing = hasVaultPassword && reminderDue && !reminderHandled
+                if (isLocked == false && onboardingDone == true && migrated && !upgradeDue &&
+                    !reminderShowing && ratingDue && !ratingHandled
+                ) {
+                    RatingPromptDialog(
+                        onRate = {
+                            openPlayStoreReview()
+                            ratingViewModel.markHandled()
+                            ratingHandled = true
+                        },
+                        onLater = {
+                            ratingViewModel.snooze()
+                            ratingHandled = true
+                        },
+                        onNever = {
+                            ratingViewModel.markHandled()
+                            ratingHandled = true
+                        },
+                    )
+                }
+            }
+        }
+    }
+
+    private fun openPlayStoreReview() {
+        lockManager.suppressNextForeground()
+        val market = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri()).apply {
+            setPackage("com.android.vending")
+            addFlags(
+                Intent.FLAG_ACTIVITY_NO_HISTORY or
+                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+                    Intent.FLAG_ACTIVITY_MULTIPLE_TASK,
+            )
+        }
+        if (runCatching { startActivity(market) }.isFailure) {
+            runCatching {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "https://play.google.com/store/apps/details?id=$packageName".toUri(),
+                    ),
+                )
             }
         }
     }

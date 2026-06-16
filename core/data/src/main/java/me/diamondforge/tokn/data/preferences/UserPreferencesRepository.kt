@@ -91,6 +91,18 @@ open class UserPreferencesRepository @Inject constructor(
         prefs[Keys.PASSWORD_REMINDER_STAGE] ?: 0
     }
 
+    open val ratingPromptLaunchCount: Flow<Int> = dataStore.data.map { prefs ->
+        prefs[Keys.RATING_PROMPT_LAUNCH_COUNT] ?: 0
+    }
+
+    open val ratingPromptHandled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.RATING_PROMPT_HANDLED] ?: false
+    }
+
+    open val ratingPromptSnoozedUntil: Flow<Long> = dataStore.data.map { prefs ->
+        prefs[Keys.RATING_PROMPT_SNOOZED_UNTIL] ?: 0L
+    }
+
     open suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     }
@@ -151,6 +163,18 @@ open class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.PASSWORD_REMINDER_STAGE] = stage }
     }
 
+    open suspend fun setRatingPromptLaunchCount(count: Int) {
+        dataStore.edit { it[Keys.RATING_PROMPT_LAUNCH_COUNT] = count }
+    }
+
+    open suspend fun setRatingPromptHandled(handled: Boolean) {
+        dataStore.edit { it[Keys.RATING_PROMPT_HANDLED] = handled }
+    }
+
+    open suspend fun setRatingPromptSnoozedUntil(timestamp: Long) {
+        dataStore.edit { it[Keys.RATING_PROMPT_SNOOZED_UNTIL] = timestamp }
+    }
+
     private object Keys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val AUTO_LOCK_TIMEOUT = intPreferencesKey("auto_lock_timeout")
@@ -167,6 +191,9 @@ open class UserPreferencesRepository @Inject constructor(
         val PASSWORD_REMINDER_ENABLED = booleanPreferencesKey("password_reminder_enabled")
         val PASSWORD_REMINDER_LAST_SHOWN_AT = longPreferencesKey("password_reminder_last_shown_at")
         val PASSWORD_REMINDER_STAGE = intPreferencesKey("password_reminder_stage")
+        val RATING_PROMPT_LAUNCH_COUNT = intPreferencesKey("rating_prompt_launch_count")
+        val RATING_PROMPT_HANDLED = booleanPreferencesKey("rating_prompt_handled")
+        val RATING_PROMPT_SNOOZED_UNTIL = longPreferencesKey("rating_prompt_snoozed_until")
     }
 }
 
