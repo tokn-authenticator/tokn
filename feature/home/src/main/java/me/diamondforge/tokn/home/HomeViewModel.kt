@@ -147,8 +147,9 @@ class HomeViewModel @Inject constructor(
         partialState,
         appPreferences.iconFetchEnabled,
         userPreferences.tapToRevealEnabled,
+        userPreferences.stayRevealedEnabled,
         _reveals,
-    ) { state, iconFetchEnabled, tapToReveal, reveals ->
+    ) { state, iconFetchEnabled, tapToReveal, stayRevealed, reveals ->
         // A reveal is valid only while the displayed code matches the one
         // captured at reveal time AND the per-type timeout hasn't elapsed.
         // Keying on the code (not wall-clock expiry) means a TOTP rollover
@@ -158,7 +159,8 @@ class HomeViewModel @Inject constructor(
         val revealed = state.items
             .mapNotNull { item ->
                 val record = reveals[item.account.id] ?: return@mapNotNull null
-                if (record.code == item.otpResult.code && record.expiresAt > now) {
+                val codeMatches = stayRevealed || record.code == item.otpResult.code
+                if (codeMatches && record.expiresAt > now) {
                     item.account.id
                 } else null
             }

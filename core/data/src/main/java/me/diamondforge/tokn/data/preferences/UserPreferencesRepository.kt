@@ -49,6 +49,10 @@ open class UserPreferencesRepository @Inject constructor(
         prefs[Keys.TAP_TO_REVEAL_ENABLED] ?: false
     }
 
+    open val stayRevealedEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.STAY_REVEALED_ENABLED] ?: false
+    }
+
     open val showNextCodeEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.SHOW_NEXT_CODE_ENABLED] ?: false
     }
@@ -127,6 +131,10 @@ open class UserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.TAP_TO_REVEAL_ENABLED] = enabled }
     }
 
+    open suspend fun setStayRevealedEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.STAY_REVEALED_ENABLED] = enabled }
+    }
+
     open suspend fun setShowNextCodeEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.SHOW_NEXT_CODE_ENABLED] = enabled }
     }
@@ -182,6 +190,7 @@ open class UserPreferencesRepository @Inject constructor(
         val SCREENSHOTS_ENABLED = booleanPreferencesKey("screenshots_enabled")
         val ENCRYPTION_ENABLED = booleanPreferencesKey("encryption_enabled")
         val TAP_TO_REVEAL_ENABLED = booleanPreferencesKey("tap_to_reveal_enabled")
+        val STAY_REVEALED_ENABLED = booleanPreferencesKey("stay_revealed_enabled")
         val SHOW_NEXT_CODE_ENABLED = booleanPreferencesKey("show_next_code_enabled")
         val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")

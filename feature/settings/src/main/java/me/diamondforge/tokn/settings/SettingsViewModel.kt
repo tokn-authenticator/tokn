@@ -49,6 +49,8 @@ class SettingsViewModel @Inject constructor(
         state.copy(iconFetchEnabled = iconFetch)
     }.combine(preferences.tapToRevealEnabled) { state, tapToReveal ->
         state.copy(tapToRevealEnabled = tapToReveal)
+    }.combine(preferences.stayRevealedEnabled) { state, stayRevealed ->
+        state.copy(stayRevealedEnabled = stayRevealed)
     }.combine(preferences.tapBehavior) { state, tapBehavior ->
         state.copy(tapBehavior = tapBehavior)
     }.combine(preferences.dynamicColorEnabled) { state, dynamicColor ->
@@ -100,6 +102,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { preferences.setTapToRevealEnabled(enabled) }
     }
 
+    fun setStayRevealedEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferences.setStayRevealedEnabled(enabled) }
+    }
+
     fun setTapBehavior(behavior: TapBehavior) {
         viewModelScope.launch { preferences.setTapBehavior(behavior) }
     }
@@ -149,6 +155,7 @@ data class SettingsUiState(
     val encryptionEnabled: Boolean = false,
     val iconFetchEnabled: Boolean = false,
     val tapToRevealEnabled: Boolean = false,
+    val stayRevealedEnabled: Boolean = false,
     val tapBehavior: TapBehavior = TapBehavior.SINGLE,
     val dynamicColorEnabled: Boolean = true,
     val showNextCodeEnabled: Boolean = false,

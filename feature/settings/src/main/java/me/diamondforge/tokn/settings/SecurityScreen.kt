@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Screenshot
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Visibility
@@ -199,8 +200,8 @@ fun SecurityScreen(
         item { SettingsSectionHeader(stringResource(R.string.section_privacy)) }
         item {
             SettingsGroup(
-                items = listOf(
-                    {
+                items = buildList {
+                    add {
                         SettingsRow(
                             title = stringResource(R.string.screenshot_protection),
                             subtitle = stringResource(R.string.screenshot_protection_desc),
@@ -215,8 +216,8 @@ fun SecurityScreen(
                                 )
                             },
                         )
-                    },
-                    {
+                    }
+                    add {
                         SettingsRow(
                             title = stringResource(R.string.tap_to_reveal),
                             subtitle = stringResource(R.string.tap_to_reveal_desc),
@@ -229,8 +230,23 @@ fun SecurityScreen(
                                 )
                             },
                         )
-                    },
-                ),
+                    }
+                    if (uiState.tapToRevealEnabled) {
+                        add {
+                            SettingsRow(
+                                title = stringResource(R.string.stay_revealed),
+                                subtitle = stringResource(R.string.stay_revealed_desc),
+                                icon = Icons.Default.PushPin,
+                                trailing = {
+                                    SettingsSwitch(
+                                        checked = uiState.stayRevealedEnabled,
+                                        onCheckedChange = viewModel::setStayRevealedEnabled,
+                                    )
+                                },
+                            )
+                        }
+                    }
+                },
             )
         }
     }

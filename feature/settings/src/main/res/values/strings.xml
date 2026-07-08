@@ -84,6 +84,8 @@
     <string name="screenshot_protection_desc">Hide app contents in recents and block screenshots</string>
     <string name="tap_to_reveal">Tap to reveal</string>
     <string name="tap_to_reveal_desc">Hide codes until you tap to reveal them</string>
+    <string name="stay_revealed">Stay revealed</string>
+    <string name="stay_revealed_desc">Keep a revealed code visible when its timer resets</string>
     <string name="tap_to_copy">Tap to copy</string>
     <string name="tap_none">Never</string>
     <string name="tap_single">Single tap</string>
