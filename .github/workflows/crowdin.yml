@@ -16,7 +16,7 @@ permissions:
 jobs:
   upload-sources:
     runs-on: ubuntu-latest
-    if: github.repository == 'fthomys/tokn'
+    if: github.repository == 'tokn-authenticator/tokn'
     steps:
       - uses: actions/checkout@v7
 
