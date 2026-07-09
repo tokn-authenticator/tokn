@@ -80,6 +80,8 @@
     <string name="screenshot_protection_desc">App-Inhalte im Aufgaben-Manager ausblenden und Screenshots blockieren</string>
     <string name="tap_to_reveal">Zum Anzeigen tippen</string>
     <string name="tap_to_reveal_desc">Codes verbergen, bis du sie zum Anzeigen antippst</string>
+    <string name="stay_revealed">Angezeigt lassen</string>
+    <string name="stay_revealed_desc">Lasse einen aufgedeckten code angezeigt, wenn der Timer abläuft</string>
     <string name="tap_to_copy">Zum Kopieren tippen</string>
     <string name="tap_none">Niemals</string>
     <string name="tap_single">Einmal Tippen</string>

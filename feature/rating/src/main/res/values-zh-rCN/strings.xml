@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="rating_title">Enjoying Tokn?</string>
-    <string name="rating_body">If Tokn keeps your accounts safe and simple, a quick rating on the Play Store really helps.</string>
-    <string name="rating_rate">Rate Tokn</string>
-    <string name="rating_later">Later</string>
-    <string name="rating_never">No thanks</string>
+    <string name="rating_title">喜欢用Tokn吗？</string>
+    <string name="rating_body">如果Tokn帮助您的账户保持安全和易于管理，在Play商店上点个赞，将帮助我们继续发展。</string>
+    <string name="rating_rate">给Tokn 评分</string>
+    <string name="rating_later">稍后再说</string>
+    <string name="rating_never">不，谢谢</string>
 </resources>

@@ -82,6 +82,8 @@
     <string name="screenshot_protection_desc">Скрывать содержимое приложения в недавних и блокировать скриншоты</string>
     <string name="tap_to_reveal">Нажмите для показа</string>
     <string name="tap_to_reveal_desc">Скрывать коды, пока вы не нажмёте, чтобы показать их</string>
+    <string name="stay_revealed">Stay revealed</string>
+    <string name="stay_revealed_desc">Keep a revealed code visible when its timer resets</string>
     <string name="tap_to_copy">Нажмите, чтобы скопировать</string>
     <string name="tap_none">Никогда</string>
     <string name="tap_single">Одно нажатие</string>
