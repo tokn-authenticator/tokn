@@ -57,7 +57,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import me.diamondforge.tokn.sync.R
-import me.diamondforge.tokn.sync.qr.QrRenderer
+import me.diamondforge.tokn.ui.qr.QrRenderer
 
 internal fun wfdPermissionName(): String = when {
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> Manifest.permission.NEARBY_WIFI_DEVICES
