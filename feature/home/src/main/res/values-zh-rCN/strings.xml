@@ -31,6 +31,10 @@
     <string name="edit_group">组 (可选)</string>
     <string name="group_all">All</string>
     <string name="edit">编辑</string>
+    <string name="export_qr">Export as QR code</string>
+    <string name="export_secret_warning">This QR code contains your secret in plain text. Only scan it on a device you trust.</string>
+    <string name="export_copy_uri">Copy otpauth URI</string>
+    <string name="export_copied">Copied to clipboard</string>
     <string name="select_all">全选</string>
     <string name="cd_exit_selection">退出选择</string>
     <string name="cd_exit_search">关闭搜索</string>
