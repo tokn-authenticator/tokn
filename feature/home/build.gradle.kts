@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":core:security"))
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
+    implementation(project(":core:import"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
