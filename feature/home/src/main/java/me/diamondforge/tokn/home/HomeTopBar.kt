@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
@@ -55,6 +56,7 @@ internal fun HomeTopBar(
     onSettings: () -> Unit,
     onClearSelection: () -> Unit,
     onEditSelected: () -> Unit,
+    onExportSelected: () -> Unit,
     onDeleteSelected: () -> Unit,
     onSelectAll: () -> Unit,
     sort: AccountSort,
@@ -71,6 +73,7 @@ internal fun HomeTopBar(
                 selectedCount = selectedCount,
                 onClearSelection = onClearSelection,
                 onEditSelected = onEditSelected,
+                onExportSelected = onExportSelected,
                 onDeleteSelected = onDeleteSelected,
                 onSelectAll = onSelectAll,
                 scrollBehavior = scrollBehavior,
@@ -108,6 +111,7 @@ private fun SelectionTopBar(
     selectedCount: Int,
     onClearSelection: () -> Unit,
     onEditSelected: () -> Unit,
+    onExportSelected: () -> Unit,
     onDeleteSelected: () -> Unit,
     onSelectAll: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
@@ -125,6 +129,12 @@ private fun SelectionTopBar(
         },
         actions = {
             if (selectedCount == 1) {
+                IconButton(onClick = onExportSelected) {
+                    Icon(
+                        Icons.Default.QrCode2,
+                        contentDescription = stringResource(R.string.export_qr),
+                    )
+                }
                 IconButton(onClick = onEditSelected) {
                     Icon(
                         Icons.Default.Edit,

@@ -44,6 +44,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import me.diamondforge.tokn.domain.model.AccountSort
+import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.TapBehavior
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -67,6 +68,7 @@ fun HomeScreen(
     var fabMenuOpen by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
     var showBulkDeleteConfirm by remember { mutableStateOf(false) }
+    var exportAccount by remember { mutableStateOf<OtpAccount?>(null) }
 
     val selectionMode = uiState.selectionMode
 
@@ -124,6 +126,11 @@ fun HomeScreen(
                         val id = uiState.selectedIds.singleOrNull() ?: return@HomeTopBar
                         viewModel.clearSelection()
                         onEditAccount(id)
+                    },
+                    onExportSelected = {
+                        val id = uiState.selectedIds.singleOrNull() ?: return@HomeTopBar
+                        exportAccount = uiState.items.firstOrNull { it.account.id == id }?.account
+                        viewModel.clearSelection()
                     },
                     onDeleteSelected = { showBulkDeleteConfirm = true },
                     onSelectAll = { viewModel.selectAll() },
@@ -283,6 +290,13 @@ fun HomeScreen(
                 showBulkDeleteConfirm = false
             },
             onDismiss = { showBulkDeleteConfirm = false },
+        )
+    }
+
+    exportAccount?.let { account ->
+        ExportQrBottomSheet(
+            account = account,
+            onDismiss = { exportAccount = null },
         )
     }
 }
