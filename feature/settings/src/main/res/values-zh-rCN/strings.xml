@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_title">设置</string>
-    <string name="settings_section_general">General</string>
-    <string name="settings_section_data">Backup &amp; sync</string>
-    <string name="settings_section_icons">Icons</string>
+    <string name="settings_section_general">通用</string>
+    <string name="settings_section_data">备份与同步</string>
+    <string name="settings_section_icons">图标</string>
     <string name="appearance_desc">主题与显示选项</string>
     <string name="security_desc">生物识别解锁，自动锁定与隐私设置</string>
     <string name="backup_desc">导出或导入帐户</string>
@@ -79,6 +79,8 @@
     <string name="screenshot_protection_desc">在最近任务中隐藏应用内容并阻止屏幕截图</string>
     <string name="tap_to_reveal">点按显示</string>
     <string name="tap_to_reveal_desc">隐藏代码，直到您点击以显示</string>
+    <string name="stay_revealed">Stay revealed</string>
+    <string name="stay_revealed_desc">Keep a revealed code visible when its timer resets</string>
     <string name="tap_to_copy">点击复制代码</string>
     <string name="tap_none">从不</string>
     <string name="tap_single">单击</string>
