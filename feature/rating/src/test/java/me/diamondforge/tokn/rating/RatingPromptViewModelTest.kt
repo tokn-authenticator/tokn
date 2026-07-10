@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.diamondforge.tokn.data.preferences.FakePreferencesDataStore
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
@@ -151,7 +152,7 @@ class RatingPromptViewModelTest {
         override fun isFromPlayStore(): Boolean = playStore
     }
 
-    private class FakePrefs(context: Context) : UserPreferencesRepository(context) {
+    private class FakePrefs(context: Context) : UserPreferencesRepository(FakePreferencesDataStore()) {
         val launchCount = MutableStateFlow(5)
         val handled = MutableStateFlow(false)
         val snoozedUntil = MutableStateFlow(0L)

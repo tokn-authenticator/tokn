@@ -3,6 +3,7 @@ package me.diamondforge.tokn.settings
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
+import me.diamondforge.tokn.data.preferences.FakePreferencesDataStore
 import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.TapBehavior
@@ -11,7 +12,7 @@ import me.diamondforge.tokn.security.VaultPasswordManager
 import me.diamondforge.tokn.security.vault.VaultManager
 import me.diamondforge.tokn.security.vault.VaultSession
 
-internal class FakeUserPreferences(context: Context) : UserPreferencesRepository(context) {
+internal class FakeUserPreferences(context: Context) : UserPreferencesRepository(FakePreferencesDataStore()) {
     val theme = MutableStateFlow(ThemeMode.SYSTEM)
     val autoLock = MutableStateFlow(60)
     val biometric = MutableStateFlow(true)
@@ -52,7 +53,7 @@ internal class FakeUserPreferences(context: Context) : UserPreferencesRepository
     override suspend fun setPasswordReminderStage(stage: Int) { reminderStage.value = stage }
 }
 
-internal class FakeAppPreferences(context: Context) : AppPreferencesRepository(context) {
+internal class FakeAppPreferences(context: Context) : AppPreferencesRepository(FakePreferencesDataStore()) {
     val iconFetch = MutableStateFlow(false)
     override val iconFetchEnabled = iconFetch
     override suspend fun setIconFetchEnabled(enabled: Boolean) { iconFetch.value = enabled }

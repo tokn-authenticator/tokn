@@ -13,6 +13,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    testFixtures {
+        enable = true
+    }
+
     testOptions {
         unitTests {
             isReturnDefaultValues = true
@@ -46,6 +50,8 @@ dependencies {
     implementation(libs.sqlite.ktx)
 
     implementation(libs.datastore.preferences)
+    testFixturesApi(libs.datastore.preferences)
+    testFixturesImplementation(libs.coroutines.core)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     ksp(libs.kotlin.metadata.jvm)

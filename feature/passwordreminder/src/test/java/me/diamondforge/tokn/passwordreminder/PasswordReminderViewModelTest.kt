@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.diamondforge.tokn.data.preferences.FakePreferencesDataStore
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.security.KeystoreManager
 import me.diamondforge.tokn.security.VaultPasswordManager
@@ -133,7 +134,7 @@ class PasswordReminderViewModelTest {
         assertFalse(vm.verify("nope"))
     }
 
-    private class FakePrefs(context: Context) : UserPreferencesRepository(context) {
+    private class FakePrefs(context: Context) : UserPreferencesRepository(FakePreferencesDataStore()) {
         val enabled = MutableStateFlow(true)
         val lastShownAt = MutableStateFlow(0L)
         val stage = MutableStateFlow(0)

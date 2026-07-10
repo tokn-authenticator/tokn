@@ -15,10 +15,10 @@ import javax.inject.Singleton
 private val Context.appPrefsDataStore: DataStore<Preferences> by preferencesDataStore("app_preferences")
 
 @Singleton
-open class AppPreferencesRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+open class AppPreferencesRepository(
+    private val dataStore: DataStore<Preferences>,
 ) {
-    private val dataStore = context.appPrefsDataStore
+    @Inject constructor(@ApplicationContext context: Context) : this(context.appPrefsDataStore)
 
     open val iconFetchEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.ICON_FETCH_ENABLED] ?: false

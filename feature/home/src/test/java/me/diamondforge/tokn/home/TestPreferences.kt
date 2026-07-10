@@ -3,6 +3,7 @@ package me.diamondforge.tokn.home
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
+import me.diamondforge.tokn.data.preferences.FakePreferencesDataStore
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.TapBehavior
@@ -12,16 +13,14 @@ import me.diamondforge.tokn.domain.model.TapBehavior
  * Kept as top-level `internal` classes so individual test files can mutate
  * the public StateFlow fields without each file re-declaring its own copy.
  */
-internal class FakeAppPreferences(context: Context) : AppPreferencesRepository(context) {
+internal class FakeAppPreferences(context: Context) : AppPreferencesRepository(FakePreferencesDataStore()) {
     val fetch = MutableStateFlow(false)
     override val iconFetchEnabled = fetch
 }
 
-internal class FakeUserPreferences(context: Context) : UserPreferencesRepository(context) {
+internal class FakeUserPreferences(context: Context) : UserPreferencesRepository(FakePreferencesDataStore()) {
     val tapReveal = MutableStateFlow(false)
     override val tapToRevealEnabled = tapReveal
-    val stayRevealed = MutableStateFlow(false)
-    override val stayRevealedEnabled = stayRevealed
     val showNext = MutableStateFlow(false)
     override val showNextCodeEnabled = showNext
     val tap = MutableStateFlow(TapBehavior.SINGLE)

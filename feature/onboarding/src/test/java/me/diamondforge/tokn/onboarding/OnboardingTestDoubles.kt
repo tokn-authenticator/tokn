@@ -2,6 +2,7 @@ package me.diamondforge.tokn.onboarding
 
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
+import me.diamondforge.tokn.data.preferences.FakePreferencesDataStore
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.importer.ExternalImporter
 import me.diamondforge.tokn.importer.ImportOutcome
@@ -10,7 +11,7 @@ import me.diamondforge.tokn.security.VaultPasswordManager
 import me.diamondforge.tokn.security.vault.VaultManager
 import me.diamondforge.tokn.security.vault.VaultSession
 
-internal class FakeOnboardingPreferences(context: Context) : UserPreferencesRepository(context) {
+internal class FakeOnboardingPreferences(context: Context) : UserPreferencesRepository(FakePreferencesDataStore()) {
     val encryption = MutableStateFlow<Boolean?>(null)
     val biometric = MutableStateFlow<Boolean?>(null)
     val onboardingDoneFlag = MutableStateFlow(false)

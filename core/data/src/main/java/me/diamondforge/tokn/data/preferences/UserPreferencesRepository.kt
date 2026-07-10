@@ -20,10 +20,10 @@ import javax.inject.Singleton
 private val Context.userPrefsDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 @Singleton
-open class UserPreferencesRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+open class UserPreferencesRepository(
+    private val dataStore: DataStore<Preferences>,
 ) {
-    private val dataStore = context.userPrefsDataStore
+    @Inject constructor(@ApplicationContext context: Context) : this(context.userPrefsDataStore)
 
     open val themeMode: Flow<ThemeMode> = dataStore.data.map { prefs ->
         ThemeMode.valueOf(prefs[Keys.THEME_MODE] ?: ThemeMode.SYSTEM.name)

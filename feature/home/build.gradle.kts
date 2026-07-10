@@ -71,4 +71,5 @@ dependencies {
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.coroutines.test)
     testImplementation(testFixtures(project(":core:domain")))
+    testImplementation(testFixtures(project(":core:data")))
 }
