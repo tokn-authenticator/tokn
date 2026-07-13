@@ -30,6 +30,7 @@ data class OtpAccountEntity(
     @ColumnInfo(name = "icon_pack_file") val iconPackFile: String? = null,
     @ColumnInfo(name = "usage_count", defaultValue = "0") val usageCount: Int = 0,
     @ColumnInfo(name = "last_used_at", defaultValue = "0") val lastUsedAt: Long = 0L,
+    @ColumnInfo(name = "deleted_at", defaultValue = "0") val deletedAt: Long = 0L,
 )
 
 fun OtpAccountEntity.toDomain(): OtpAccount = OtpAccount(

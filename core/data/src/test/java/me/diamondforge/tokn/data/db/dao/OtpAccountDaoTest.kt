@@ -119,4 +119,47 @@ class OtpAccountDaoTest {
         assertEquals(1, dao.getAllAccountsOnce().size)
         assertEquals("replaced", dao.getAccountById(id)?.issuer)
     }
+
+    @Test
+    fun `softDeleteByIds hides rows from active queries and shows them in trash`() = runBlocking {
+        val a = dao.insert(entity())
+        val b = dao.insert(entity())
+        dao.softDeleteByIds(setOf(a), 1_000L)
+
+        assertEquals(listOf(b), dao.getAllAccountsOnce().map { it.id })
+        assertNull(dao.getAccountById(a))
+        assertEquals(listOf(a), dao.getTrashedAccounts().first().map { it.id })
+        assertEquals(1_000L, dao.getTrashedAccounts().first().first().deletedAt)
+    }
+
+    @Test
+    fun `restoreByIds brings a trashed row back`() = runBlocking {
+        val a = dao.insert(entity())
+        dao.softDeleteByIds(setOf(a), 1_000L)
+        dao.restoreByIds(setOf(a))
+
+        assertEquals(listOf(a), dao.getAllAccountsOnce().map { it.id })
+        assertEquals(emptyList<Long>(), dao.getTrashedAccounts().first().map { it.id })
+    }
+
+    @Test
+    fun `purgeExpired removes only rows trashed before the cutoff`() = runBlocking {
+        val old = dao.insert(entity())
+        val fresh = dao.insert(entity())
+        dao.softDeleteByIds(setOf(old), 1_000L)
+        dao.softDeleteByIds(setOf(fresh), 5_000L)
+
+        val removed = dao.purgeExpired(3_000L)
+
+        assertEquals(1, removed)
+        assertEquals(listOf(fresh), dao.getTrashedAccounts().first().map { it.id })
+    }
+
+    @Test
+    fun `purgeExpired leaves active rows alone`() = runBlocking {
+        val active = dao.insert(entity())
+        dao.purgeExpired(Long.MAX_VALUE)
+
+        assertEquals(listOf(active), dao.getAllAccountsOnce().map { it.id })
+    }
 }

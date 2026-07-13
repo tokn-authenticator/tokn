@@ -12,14 +12,17 @@ import me.diamondforge.tokn.data.db.entity.OtpAccountEntity
 @Dao
 interface OtpAccountDao {
 
-    @Query("SELECT * FROM otp_accounts ORDER BY sortOrder ASC")
+    @Query("SELECT * FROM otp_accounts WHERE deleted_at = 0 ORDER BY sortOrder ASC")
     fun getAllAccounts(): Flow<List<OtpAccountEntity>>
 
-    @Query("SELECT * FROM otp_accounts ORDER BY sortOrder ASC")
+    @Query("SELECT * FROM otp_accounts WHERE deleted_at = 0 ORDER BY sortOrder ASC")
     suspend fun getAllAccountsOnce(): List<OtpAccountEntity>
 
-    @Query("SELECT * FROM otp_accounts WHERE id = :id LIMIT 1")
+    @Query("SELECT * FROM otp_accounts WHERE id = :id AND deleted_at = 0 LIMIT 1")
     suspend fun getAccountById(id: Long): OtpAccountEntity?
+
+    @Query("SELECT * FROM otp_accounts WHERE deleted_at != 0 ORDER BY deleted_at DESC")
+    fun getTrashedAccounts(): Flow<List<OtpAccountEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(account: OtpAccountEntity): Long
@@ -35,6 +38,15 @@ interface OtpAccountDao {
 
     @Query("DELETE FROM otp_accounts WHERE id IN (:ids)")
     suspend fun deleteByIds(ids: Set<Long>)
+
+    @Query("UPDATE otp_accounts SET deleted_at = :timestamp WHERE id IN (:ids)")
+    suspend fun softDeleteByIds(ids: Set<Long>, timestamp: Long)
+
+    @Query("UPDATE otp_accounts SET deleted_at = 0 WHERE id IN (:ids)")
+    suspend fun restoreByIds(ids: Set<Long>)
+
+    @Query("DELETE FROM otp_accounts WHERE deleted_at != 0 AND deleted_at < :cutoff")
+    suspend fun purgeExpired(cutoff: Long): Int
 
     @Query("UPDATE otp_accounts SET counter = counter + 1 WHERE id = :id")
     suspend fun incrementCounter(id: Long)

@@ -52,13 +52,15 @@ class MigrationTest {
         AppDatabase.MIGRATION_2_3.migrate(db)
         AppDatabase.MIGRATION_3_4.migrate(db)
         AppDatabase.MIGRATION_4_5.migrate(db)
+        AppDatabase.MIGRATION_5_6.migrate(db)
 
-        db.query("SELECT `group`, usage_count, last_used_at, icon_pack_id FROM otp_accounts").use { c ->
+        db.query("SELECT `group`, usage_count, last_used_at, icon_pack_id, deleted_at FROM otp_accounts").use { c ->
             assertTrue(c.moveToFirst())
             assertEquals("['Work']", c.getString(0))
             assertEquals(0, c.getInt(1))
             assertEquals(0L, c.getLong(2))
             assertTrue(c.isNull(3))
+            assertEquals(0L, c.getLong(4))
         }
     }
 
