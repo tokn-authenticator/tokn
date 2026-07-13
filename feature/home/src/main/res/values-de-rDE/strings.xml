@@ -11,7 +11,8 @@
     <string name="add_from_image">Aus Galerie</string>
     <string name="add_manually">Manuell eingeben</string>
     <string name="delete_confirm_title">Konto löschen?</string>
-    <string name="delete_confirm_message">Dieses Konto wird dauerhaft entfernt.</string>
+    <string name="delete_confirm_message">This account will be moved to the Recycle Bin.</string>
+    <string name="undo">Undo</string>
     <string name="cancel">Abbrechen</string>
     <string name="search">Suchen</string>
     <string name="search_placeholder">Konten durchsuchen…</string>
@@ -61,8 +62,17 @@
         <item quantity="other">%d Konten löschen?</item>
     </plurals>
     <plurals name="delete_count_confirm_message">
-        <item quantity="one">Dieses Konto wird dauerhaft entfernt.</item>
-        <item quantity="other">Diese %d Konten werden dauerhaft entfernt.</item>
+        <item quantity="one">This account will be moved to the Recycle Bin.</item>
+        <item quantity="other">These %d accounts will be moved to the Recycle Bin.</item>
+    </plurals>
+    <plurals name="delete_count_immediate_message">
+        <item quantity="one">This account will be permanently removed and cannot be restored.</item>
+        <item quantity="other">These %d accounts will be permanently removed and cannot be restored.</item>
+    </plurals>
+    <string name="delete_immediately">Delete immediately</string>
+    <plurals name="trash_snackbar_deleted">
+        <item quantity="one">Moved to Recycle Bin</item>
+        <item quantity="other">%d accounts moved to Recycle Bin</item>
     </plurals>
     <string name="edit_error_secret_required">Geheimnis ist erforderlich</string>
     <string name="edit_error_invalid_secret">Ungültiger geheimer Schlüssel: Nur Buchstaben A-Z und Ziffern 2-7 sind erlaubt</string>
