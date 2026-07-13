@@ -3,6 +3,9 @@
     <string name="backup_title">Importieren &amp; Exportieren</string>
     <string name="section_import">Importieren</string>
     <string name="section_export">Exportieren</string>
+    <string name="section_automatic">Automatic</string>
+    <string name="auto_backup_entry_title">Automatic backup</string>
+    <string name="auto_backup_entry_desc">Back up to a folder on every change</string>
     <string name="import_from_file">Konten aus einer Datei lesen</string>
     <string name="import_from_file_desc">Konten aus einem Backup oder einer anderen App importieren</string>
     <string name="import_from_google_auth">Aus Google Authenticator migrieren</string>
