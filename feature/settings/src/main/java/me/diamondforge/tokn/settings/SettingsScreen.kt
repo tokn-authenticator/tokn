@@ -13,7 +13,10 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun SettingsScreen(
@@ -26,7 +29,10 @@ fun SettingsScreen(
     onSync: () -> Unit,
     onRecycleBin: () -> Unit,
     onAbout: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     SettingsScaffold(
         title = stringResource(R.string.settings_title),
         onBack = onBack,
@@ -34,8 +40,8 @@ fun SettingsScreen(
         item { SettingsSectionHeader(stringResource(R.string.settings_section_general)) }
         item {
             SettingsGroup(
-                items = listOf(
-                    {
+                items = buildList {
+                    add {
                         SettingsRow(
                             title = stringResource(R.string.appearance),
                             subtitle = stringResource(R.string.appearance_desc),
@@ -43,8 +49,8 @@ fun SettingsScreen(
                             onClick = onAppearance,
                             trailing = { Chevron() },
                         )
-                    },
-                    {
+                    }
+                    add {
                         SettingsRow(
                             title = stringResource(R.string.app_behavior),
                             subtitle = stringResource(R.string.app_behavior_desc),
@@ -52,8 +58,8 @@ fun SettingsScreen(
                             onClick = onBehavior,
                             trailing = { Chevron() },
                         )
-                    },
-                    {
+                    }
+                    add {
                         SettingsRow(
                             title = stringResource(R.string.security),
                             subtitle = stringResource(R.string.security_desc),
@@ -61,8 +67,8 @@ fun SettingsScreen(
                             onClick = onSecurity,
                             trailing = { Chevron() },
                         )
-                    },
-                    {
+                    }
+                    add {
                         SettingsRow(
                             title = stringResource(R.string.settings_groups_title),
                             subtitle = stringResource(R.string.settings_groups_desc),
@@ -70,17 +76,19 @@ fun SettingsScreen(
                             onClick = onGroups,
                             trailing = { Chevron() },
                         )
-                    },
-                    {
-                        SettingsRow(
-                            title = stringResource(R.string.recycle_bin_title),
-                            subtitle = stringResource(R.string.recycle_bin_desc),
-                            icon = Icons.Default.Delete,
-                            onClick = onRecycleBin,
-                            trailing = { Chevron() },
-                        )
-                    },
-                ),
+                    }
+                    if (uiState.recycleBinEnabled) {
+                        add {
+                            SettingsRow(
+                                title = stringResource(R.string.recycle_bin_title),
+                                subtitle = stringResource(R.string.recycle_bin_desc),
+                                icon = Icons.Default.Delete,
+                                onClick = onRecycleBin,
+                                trailing = { Chevron() },
+                            )
+                        }
+                    }
+                },
             )
         }
 

@@ -27,4 +27,7 @@ internal class FakeUserPreferences(context: Context) : UserPreferencesRepository
     override val tapBehavior = tap
     val sort = MutableStateFlow(AccountSort.CUSTOM)
     override val accountSort = sort
+    val recycleBin = MutableStateFlow(true)
+    override val recycleBinEnabled = recycleBin
+    override suspend fun setRecycleBinEnabled(enabled: Boolean) { recycleBin.value = enabled }
 }

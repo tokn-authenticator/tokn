@@ -57,6 +57,10 @@ open class UserPreferencesRepository(
         prefs[Keys.SHOW_NEXT_CODE_ENABLED] ?: false
     }
 
+    open val recycleBinEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.RECYCLE_BIN_ENABLED] ?: true
+    }
+
     open val dynamicColorEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.DYNAMIC_COLOR_ENABLED] ?: true
     }
@@ -139,6 +143,10 @@ open class UserPreferencesRepository(
         dataStore.edit { it[Keys.SHOW_NEXT_CODE_ENABLED] = enabled }
     }
 
+    open suspend fun setRecycleBinEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.RECYCLE_BIN_ENABLED] = enabled }
+    }
+
     open suspend fun setDynamicColorEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.DYNAMIC_COLOR_ENABLED] = enabled }
     }
@@ -192,6 +200,7 @@ open class UserPreferencesRepository(
         val TAP_TO_REVEAL_ENABLED = booleanPreferencesKey("tap_to_reveal_enabled")
         val STAY_REVEALED_ENABLED = booleanPreferencesKey("stay_revealed_enabled")
         val SHOW_NEXT_CODE_ENABLED = booleanPreferencesKey("show_next_code_enabled")
+        val RECYCLE_BIN_ENABLED = booleanPreferencesKey("recycle_bin_enabled")
         val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")

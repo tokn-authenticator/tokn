@@ -17,6 +17,8 @@ import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.TapBehavior
 import me.diamondforge.tokn.domain.security.PasswordReminderSchedule
+import me.diamondforge.tokn.domain.usecase.GetTrashedAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
 import me.diamondforge.tokn.security.vault.VaultManager
 import javax.inject.Inject
 
@@ -25,7 +27,12 @@ class SettingsViewModel @Inject constructor(
     private val preferences: UserPreferencesRepository,
     private val appPreferences: AppPreferencesRepository,
     private val vaultManager: VaultManager,
+    getTrashedAccountsUseCase: GetTrashedAccountsUseCase,
+    private val purgeAccountsUseCase: PurgeAccountsUseCase,
 ) : ViewModel() {
+
+    private val trashed = getTrashedAccountsUseCase()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _passwordError = MutableStateFlow(false)
 
@@ -57,6 +64,10 @@ class SettingsViewModel @Inject constructor(
         state.copy(dynamicColorEnabled = dynamicColor)
     }.combine(preferences.showNextCodeEnabled) { state, showNextCode ->
         state.copy(showNextCodeEnabled = showNextCode)
+    }.combine(preferences.recycleBinEnabled) { state, recycleBin ->
+        state.copy(recycleBinEnabled = recycleBin)
+    }.combine(trashed) { state, trashedAccounts ->
+        state.copy(trashedCount = trashedAccounts.size)
     }.combine(preferences.passwordReminderEnabled) { state, passwordReminder ->
         state.copy(passwordReminderEnabled = passwordReminder)
     }.combine(preferences.passwordReminderLastShownAt) { state, lastShownAt ->
@@ -118,6 +129,17 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { preferences.setShowNextCodeEnabled(enabled) }
     }
 
+    fun setRecycleBinEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferences.setRecycleBinEnabled(enabled) }
+    }
+
+    fun disableRecycleBin() {
+        viewModelScope.launch {
+            purgeAccountsUseCase(trashed.value.map { it.id }.toSet())
+            preferences.setRecycleBinEnabled(false)
+        }
+    }
+
     fun setupEncryption(password: String) {
         viewModelScope.launch(Dispatchers.IO) {
             vaultManager.setPassword(password)
@@ -159,6 +181,8 @@ data class SettingsUiState(
     val tapBehavior: TapBehavior = TapBehavior.SINGLE,
     val dynamicColorEnabled: Boolean = true,
     val showNextCodeEnabled: Boolean = false,
+    val recycleBinEnabled: Boolean = true,
+    val trashedCount: Int = 0,
     val passwordReminderEnabled: Boolean = true,
     val passwordReminderLastShownAt: Long = 0L,
     val passwordReminderNextDays: Int = 0,

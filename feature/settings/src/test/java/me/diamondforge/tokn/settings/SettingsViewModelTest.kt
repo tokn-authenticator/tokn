@@ -14,7 +14,11 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.diamondforge.tokn.data.preferences.ThemeMode
+import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.TapBehavior
+import me.diamondforge.tokn.domain.testing.FakeAccountRepository
+import me.diamondforge.tokn.domain.usecase.GetTrashedAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -35,6 +39,7 @@ class SettingsViewModelTest {
     private lateinit var prefs: FakeUserPreferences
     private lateinit var appPrefs: FakeAppPreferences
     private lateinit var vault: FakeVaultManager
+    private lateinit var accounts: FakeAccountRepository
 
     @Before
     fun setUp() {
@@ -43,12 +48,22 @@ class SettingsViewModelTest {
         prefs = FakeUserPreferences(context)
         appPrefs = FakeAppPreferences(context)
         vault = FakeVaultManager(context)
+        accounts = FakeAccountRepository()
     }
 
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun newVm() = SettingsViewModel(prefs, appPrefs, vault)
+    private fun newVm() = SettingsViewModel(
+        prefs,
+        appPrefs,
+        vault,
+        GetTrashedAccountsUseCase(accounts),
+        PurgeAccountsUseCase(accounts),
+    )
+
+    private fun account() =
+        OtpAccount(issuer = "i", accountName = "n", secret = "JBSWY3DPEHPK3PXP")
 
     private fun TestScope.state(vm: SettingsViewModel): () -> SettingsUiState {
         var latest = vm.uiState.value
@@ -105,6 +120,44 @@ class SettingsViewModelTest {
         assertEquals(ThemeMode.LIGHT, prefs.theme.value)
         assertTrue(prefs.screenshots.value)
         assertTrue(prefs.showNext.value)
+    }
+
+    @Test
+    fun `setRecycleBinEnabled writes through to preferences`() = runTest(dispatcher) {
+        prefs.recycleBin.value = true
+        val vm = newVm()
+        state(vm)
+
+        vm.setRecycleBinEnabled(false)
+        advanceUntilIdle()
+
+        assertFalse(prefs.recycleBin.value)
+    }
+
+    @Test
+    fun `uiState reports the trashed account count`() = runTest(dispatcher) {
+        val id = accounts.addAccount(account())
+        accounts.deleteAccounts(setOf(id))
+        val current = state(newVm())
+        advanceUntilIdle()
+
+        assertEquals(1, current().trashedCount)
+    }
+
+    @Test
+    fun `disableRecycleBin empties the bin and turns the setting off`() = runTest(dispatcher) {
+        prefs.recycleBin.value = true
+        val id = accounts.addAccount(account())
+        accounts.deleteAccounts(setOf(id))
+        val vm = newVm()
+        state(vm)
+        advanceUntilIdle()
+
+        vm.disableRecycleBin()
+        advanceUntilIdle()
+
+        assertFalse(prefs.recycleBin.value)
+        assertTrue(accounts.trashSnapshot.isEmpty())
     }
 
     @Test

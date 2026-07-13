@@ -293,6 +293,7 @@ fun HomeScreen(
         val undoLabel = stringResource(R.string.undo)
         BulkDeleteDialog(
             count = uiState.selectedIds.size,
+            recycleBinEnabled = uiState.recycleBinEnabled,
             onConfirm = { immediately ->
                 val deletedIds = uiState.selectedIds
                 viewModel.deleteSelected(immediately)

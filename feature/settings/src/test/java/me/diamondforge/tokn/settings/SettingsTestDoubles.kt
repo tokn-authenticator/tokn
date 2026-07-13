@@ -22,6 +22,7 @@ internal class FakeUserPreferences(context: Context) : UserPreferencesRepository
     val tapBehaviorState = MutableStateFlow(TapBehavior.SINGLE)
     val dynamicColor = MutableStateFlow(true)
     val showNext = MutableStateFlow(false)
+    val recycleBin = MutableStateFlow(true)
     val reminderEnabled = MutableStateFlow(true)
     val reminderLastShownAt = MutableStateFlow(0L)
     val reminderStage = MutableStateFlow(0)
@@ -35,6 +36,7 @@ internal class FakeUserPreferences(context: Context) : UserPreferencesRepository
     override val tapBehavior = tapBehaviorState
     override val dynamicColorEnabled = dynamicColor
     override val showNextCodeEnabled = showNext
+    override val recycleBinEnabled = recycleBin
     override val passwordReminderEnabled = reminderEnabled
     override val passwordReminderLastShownAt = reminderLastShownAt
     override val passwordReminderStage = reminderStage
@@ -48,6 +50,7 @@ internal class FakeUserPreferences(context: Context) : UserPreferencesRepository
     override suspend fun setTapBehavior(behavior: TapBehavior) { tapBehaviorState.value = behavior }
     override suspend fun setDynamicColorEnabled(enabled: Boolean) { dynamicColor.value = enabled }
     override suspend fun setShowNextCodeEnabled(enabled: Boolean) { showNext.value = enabled }
+    override suspend fun setRecycleBinEnabled(enabled: Boolean) { recycleBin.value = enabled }
     override suspend fun setPasswordReminderEnabled(enabled: Boolean) { reminderEnabled.value = enabled }
     override suspend fun setPasswordReminderLastShownAt(timestamp: Long) { reminderLastShownAt.value = timestamp }
     override suspend fun setPasswordReminderStage(stage: Int) { reminderStage.value = stage }

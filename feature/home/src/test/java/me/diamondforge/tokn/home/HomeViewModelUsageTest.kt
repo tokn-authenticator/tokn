@@ -31,6 +31,7 @@ import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.RestoreAccountsUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -222,6 +223,15 @@ class HomeViewModelUsageTest {
         val vm = newVm()
         val state = latestState(vm)
         assertEquals(AccountSort.USAGE_COUNT, state().sort)
+        vm.viewModelScope.cancel()
+    }
+
+    @Test
+    fun `recycleBinEnabled preference flows into uiState`() = runTest(dispatcher) {
+        userPrefs.recycleBin.value = false
+        val vm = newVm()
+        val state = latestState(vm)
+        assertFalse(state().recycleBinEnabled)
         vm.viewModelScope.cancel()
     }
 

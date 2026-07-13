@@ -189,6 +189,8 @@ class HomeViewModel @Inject constructor(
                 item.copy(nextCode = next)
             }
         )
+    }.combine(userPreferences.recycleBinEnabled) { state, recycleBinEnabled ->
+        state.copy(recycleBinEnabled = recycleBinEnabled)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
@@ -353,6 +355,7 @@ data class HomeUiState(
     val tapBehavior: TapBehavior = TapBehavior.SINGLE,
     val revealedIds: Set<Long> = emptySet(),
     val sort: AccountSort = AccountSort.CUSTOM,
+    val recycleBinEnabled: Boolean = true,
 ) {
     val selectionMode: Boolean get() = selectedIds.isNotEmpty()
 }

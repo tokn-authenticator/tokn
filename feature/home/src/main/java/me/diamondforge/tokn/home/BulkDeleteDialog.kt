@@ -26,10 +26,12 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun BulkDeleteDialog(
     count: Int,
+    recycleBinEnabled: Boolean,
     onConfirm: (immediately: Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var immediately by remember { mutableStateOf(false) }
+    val permanent = immediately || !recycleBinEnabled
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -38,33 +40,35 @@ internal fun BulkDeleteDialog(
         text = {
             Column {
                 Text(
-                    if (immediately) {
+                    if (permanent) {
                         pluralStringResource(R.plurals.delete_count_immediate_message, count, count)
                     } else {
                         pluralStringResource(R.plurals.delete_count_confirm_message, count, count)
                     },
                 )
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .toggleable(
-                            value = immediately,
-                            role = Role.Switch,
-                            onValueChange = { immediately = it },
-                        ),
-                ) {
-                    Text(
-                        text = stringResource(R.string.delete_immediately),
-                        modifier = Modifier.weight(1f),
-                    )
-                    Switch(checked = immediately, onCheckedChange = null)
+                if (recycleBinEnabled) {
+                    Spacer(Modifier.height(16.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .toggleable(
+                                value = immediately,
+                                role = Role.Switch,
+                                onValueChange = { immediately = it },
+                            ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.delete_immediately),
+                            modifier = Modifier.weight(1f),
+                        )
+                        Switch(checked = immediately, onCheckedChange = null)
+                    }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(immediately) }) {
+            TextButton(onClick = { onConfirm(permanent) }) {
                 Text(
                     text = stringResource(R.string.delete),
                     color = MaterialTheme.colorScheme.error,

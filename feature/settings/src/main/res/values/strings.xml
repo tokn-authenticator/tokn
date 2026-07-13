@@ -182,6 +182,14 @@
     <string name="auto_backup_msg_no_password">Set a backup password first</string>
     <string name="recycle_bin_title">Recycle Bin</string>
     <string name="recycle_bin_desc">Restore or permanently remove deleted accounts</string>
+    <string name="recycle_bin_setting_title">Recycle Bin</string>
+    <string name="recycle_bin_setting_desc">Deleted accounts are kept for 30 days. When off, deletes are permanent.</string>
+    <string name="recycle_bin_disable_title">Disable Recycle Bin?</string>
+    <string name="disable">Disable</string>
+    <plurals name="recycle_bin_disable_body">
+        <item quantity="one">The Recycle Bin still has %d account. Disabling will permanently delete it.</item>
+        <item quantity="other">The Recycle Bin still has %d accounts. Disabling will permanently delete them.</item>
+    </plurals>
     <string name="recycle_bin_empty">Empty Recycle Bin</string>
     <string name="recycle_bin_empty_title">Nothing here yet</string>
     <string name="recycle_bin_empty_hint">Deleted accounts are kept for 30 days before they are removed for good.</string>
