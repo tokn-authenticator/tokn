@@ -2,6 +2,7 @@ package me.diamondforge.tokn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import me.diamondforge.tokn.domain.model.OtpAccount
+import me.diamondforge.tokn.domain.model.TrashedAccount
 
 interface AccountRepository {
     fun getAccounts(): Flow<List<OtpAccount>>
@@ -9,6 +10,11 @@ interface AccountRepository {
     suspend fun updateAccount(account: OtpAccount)
     suspend fun deleteAccount(id: Long)
     suspend fun deleteAccounts(ids: Set<Long>)
+
+    fun getTrashedAccounts(): Flow<List<TrashedAccount>>
+    suspend fun restoreAccounts(ids: Set<Long>)
+    suspend fun purgeAccounts(ids: Set<Long>)
+    suspend fun purgeExpiredTrash(cutoff: Long): Int
     suspend fun reorderAccounts(accounts: List<OtpAccount>)
     suspend fun incrementCounter(id: Long)
     suspend fun recordUsage(id: Long, timestamp: Long)

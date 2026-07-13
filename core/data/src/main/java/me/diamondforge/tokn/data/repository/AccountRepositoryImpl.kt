@@ -8,6 +8,7 @@ import me.diamondforge.tokn.data.db.dao.OtpAccountDao
 import me.diamondforge.tokn.data.db.entity.toDomain
 import me.diamondforge.tokn.data.db.entity.toEntity
 import me.diamondforge.tokn.domain.model.OtpAccount
+import me.diamondforge.tokn.domain.model.TrashedAccount
 import me.diamondforge.tokn.domain.repository.AccountRepository
 import javax.inject.Inject
 
@@ -26,11 +27,27 @@ class AccountRepositoryImpl @Inject constructor(
         dao.update(account.toEntity())
 
     override suspend fun deleteAccount(id: Long) =
-        dao.deleteById(id)
+        dao.softDeleteByIds(setOf(id), System.currentTimeMillis())
 
     override suspend fun deleteAccounts(ids: Set<Long>) {
+        if (ids.isNotEmpty()) dao.softDeleteByIds(ids, System.currentTimeMillis())
+    }
+
+    override fun getTrashedAccounts(): Flow<List<TrashedAccount>> =
+        dao.getTrashedAccounts().map { list ->
+            list.map { TrashedAccount(it.id, it.issuer, it.accountName, it.deletedAt) }
+        }
+
+    override suspend fun restoreAccounts(ids: Set<Long>) {
+        if (ids.isNotEmpty()) dao.restoreByIds(ids)
+    }
+
+    override suspend fun purgeAccounts(ids: Set<Long>) {
         if (ids.isNotEmpty()) dao.deleteByIds(ids)
     }
+
+    override suspend fun purgeExpiredTrash(cutoff: Long): Int =
+        dao.purgeExpired(cutoff)
 
     override suspend fun reorderAccounts(accounts: List<OtpAccount>) {
         accounts.forEachIndexed { index, account ->

@@ -19,11 +19,15 @@ import me.diamondforge.tokn.domain.usecase.DeleteGroupUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.GetTrashedAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
+import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.PurgeExpiredTrashUseCase
 import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
 import me.diamondforge.tokn.domain.usecase.RenameGroupUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.RestoreAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import me.diamondforge.tokn.security.vault.VaultSession
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
@@ -49,6 +53,7 @@ object DataModule {
                 AppDatabase.MIGRATION_2_3,
                 AppDatabase.MIGRATION_3_4,
                 AppDatabase.MIGRATION_4_5,
+                AppDatabase.MIGRATION_5_6,
             )
             .build()
     }
@@ -67,6 +72,18 @@ object DataModule {
 
     @Provides
     fun provideDeleteAccountsUseCase(repo: AccountRepository) = DeleteAccountsUseCase(repo)
+
+    @Provides
+    fun provideGetTrashedAccountsUseCase(repo: AccountRepository) = GetTrashedAccountsUseCase(repo)
+
+    @Provides
+    fun provideRestoreAccountsUseCase(repo: AccountRepository) = RestoreAccountsUseCase(repo)
+
+    @Provides
+    fun providePurgeAccountsUseCase(repo: AccountRepository) = PurgeAccountsUseCase(repo)
+
+    @Provides
+    fun providePurgeExpiredTrashUseCase(repo: AccountRepository) = PurgeExpiredTrashUseCase(repo)
 
     @Provides
     fun provideUpdateAccountUseCase(repo: AccountRepository) = UpdateAccountUseCase(repo)

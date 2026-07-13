@@ -87,6 +87,46 @@ class AccountRepositoryImplTest {
     }
 
     @Test
+    fun `deleteAccounts soft-deletes so rows move to trash and leave the active flow`() = runBlocking {
+        val a = repo.addAccount(account(emptyList()))
+        val b = repo.addAccount(account(emptyList()))
+
+        repo.deleteAccounts(setOf(a))
+
+        assertEquals(listOf(b), repo.getAccounts().first().map { it.id })
+        assertEquals(listOf(a), repo.getTrashedAccounts().first().map { it.id })
+    }
+
+    @Test
+    fun `restoreAccounts returns a trashed account to the active flow`() = runBlocking {
+        val a = repo.addAccount(account(emptyList()))
+        repo.deleteAccounts(setOf(a))
+        repo.restoreAccounts(setOf(a))
+
+        assertEquals(listOf(a), repo.getAccounts().first().map { it.id })
+        assertEquals(emptyList<Long>(), repo.getTrashedAccounts().first().map { it.id })
+    }
+
+    @Test
+    fun `purgeAccounts permanently removes a trashed account`() = runBlocking {
+        val a = repo.addAccount(account(emptyList()))
+        repo.deleteAccounts(setOf(a))
+        repo.purgeAccounts(setOf(a))
+
+        assertEquals(emptyList<Long>(), repo.getTrashedAccounts().first().map { it.id })
+    }
+
+    @Test
+    fun `purgeExpiredTrash removes only rows deleted before the cutoff`() = runBlocking {
+        val a = repo.addAccount(account(emptyList()))
+        repo.deleteAccounts(setOf(a))
+
+        assertEquals(0, repo.purgeExpiredTrash(0L))
+        assertEquals(1, repo.purgeExpiredTrash(System.currentTimeMillis() + 1_000L))
+        assertEquals(emptyList<Long>(), repo.getTrashedAccounts().first().map { it.id })
+    }
+
+    @Test
     fun `reorderAccounts writes sortOrder by list index`() = runBlocking {
         val a = repo.addAccount(account(emptyList()))
         val b = repo.addAccount(account(emptyList()))
