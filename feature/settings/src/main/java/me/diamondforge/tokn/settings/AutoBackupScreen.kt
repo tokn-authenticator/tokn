@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -159,17 +160,21 @@ fun AutoBackupScreen(
         )
     }
 
+    val issues = buildList {
+        if (uiState.location == null) add(stringResource(R.string.auto_backup_issue_no_location))
+        if (uiState.encrypt && !uiState.hasPassword) {
+            add(stringResource(R.string.auto_backup_issue_no_password))
+        }
+    }
+    val issuesTitle = stringResource(R.string.auto_backup_issues_title)
+
     SettingsScaffold(
         title = stringResource(R.string.auto_backup_title),
         onBack = onBack,
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
-        if (uiState.enabled && uiState.location == null) {
-            item {
-                AutoBackupWarningBanner(
-                    text = stringResource(R.string.auto_backup_no_location_warning),
-                )
-            }
+        if (uiState.enabled && issues.isNotEmpty()) {
+            item { AutoBackupWarningBanner(title = issuesTitle, issues = issues) }
         }
         item {
             SettingsGroup(
@@ -331,7 +336,7 @@ private fun lastRunSubtitle(uiState: AutoBackupUiState): String = when {
 }
 
 @Composable
-private fun AutoBackupWarningBanner(text: String) {
+private fun AutoBackupWarningBanner(title: String, issues: List<String>) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -341,7 +346,7 @@ private fun AutoBackupWarningBanner(text: String) {
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
         ) {
             Icon(
                 Icons.Default.Warning,
@@ -349,11 +354,21 @@ private fun AutoBackupWarningBanner(text: String) {
                 tint = MaterialTheme.colorScheme.onErrorContainer,
             )
             Spacer(Modifier.width(16.dp))
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+                issues.forEach { issue ->
+                    Text(
+                        text = "•  $issue",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                    )
+                }
+            }
         }
     }
 }

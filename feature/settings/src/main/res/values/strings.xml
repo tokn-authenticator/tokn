@@ -146,7 +146,9 @@
     <string name="auto_backup_desc">Save the vault to a folder on every change</string>
     <string name="auto_backup_enable">Automatic backup</string>
     <string name="auto_backup_enable_desc">Write a backup whenever your vault changes</string>
-    <string name="auto_backup_no_location_warning">No location set. No backups will be created until you choose one.</string>
+    <string name="auto_backup_issues_title">You need to fix the following issues. Until then no backups will be created:</string>
+    <string name="auto_backup_issue_no_location">No location set</string>
+    <string name="auto_backup_issue_no_password">No backup password</string>
     <string name="auto_backup_location_section">Location</string>
     <string name="auto_backup_mode">Mode</string>
     <string name="auto_backup_mode_multiple">Multiple</string>
