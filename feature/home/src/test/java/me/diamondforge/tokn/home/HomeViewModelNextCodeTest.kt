@@ -24,7 +24,10 @@ import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
 import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
+import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.PurgeExpiredTrashUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.RestoreAccountsUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -83,6 +86,9 @@ class HomeViewModelNextCodeTest {
         getAccountsUseCase = GetAccountsUseCase(repo),
         deleteAccountUseCase = DeleteAccountUseCase(repo),
         deleteAccountsUseCase = DeleteAccountsUseCase(repo),
+        restoreAccountsUseCase = RestoreAccountsUseCase(repo),
+        purgeAccountsUseCase = PurgeAccountsUseCase(repo),
+        purgeExpiredTrashUseCase = PurgeExpiredTrashUseCase(repo),
         reorderAccountsUseCase = ReorderAccountsUseCase(repo),
         generateOtpUseCase = GenerateOtpUseCase(),
         incrementHotpCounterUseCase = IncrementHotpCounterUseCase(repo),

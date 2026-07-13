@@ -9,7 +9,7 @@ import me.diamondforge.tokn.data.db.entity.OtpAccountEntity
 
 @Database(
     entities = [OtpAccountEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -47,6 +47,12 @@ abstract class AppDatabase : RoomDatabase() {
                     "UPDATE otp_accounts SET `group` = '[' || quote(`group`) || ']' " +
                             "WHERE `group` IS NOT NULL"
                 )
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE otp_accounts ADD COLUMN deleted_at INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

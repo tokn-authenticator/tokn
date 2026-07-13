@@ -180,4 +180,30 @@
     <string name="auto_backup_msg_unchanged">Already up to date</string>
     <string name="auto_backup_msg_failed">Backup failed</string>
     <string name="auto_backup_msg_no_password">Set a backup password first</string>
+    <string name="recycle_bin_title">Recycle Bin</string>
+    <string name="recycle_bin_desc">Restore or permanently remove deleted accounts</string>
+    <string name="recycle_bin_empty">Empty Recycle Bin</string>
+    <string name="recycle_bin_empty_title">Nothing here yet</string>
+    <string name="recycle_bin_empty_hint">Deleted accounts are kept for 30 days before they are removed for good.</string>
+    <string name="restore">Restore</string>
+    <string name="delete_forever">Delete forever</string>
+    <string name="empty_bin">Empty bin</string>
+    <string name="recycle_bin_restore_title">Restore account?</string>
+    <string name="recycle_bin_restore_body">%1$s will be moved back to your accounts.</string>
+    <string name="recycle_bin_delete_title">Delete forever?</string>
+    <string name="recycle_bin_delete_body">This account will be permanently removed and cannot be restored.</string>
+    <string name="recycle_bin_empty_confirm_title">Empty Recycle Bin?</string>
+    <string name="recycle_bin_empty_body">All accounts in the Recycle Bin will be permanently removed and cannot be restored.</string>
+    <plurals name="recycle_bin_days_left">
+        <item quantity="one">%d day left</item>
+        <item quantity="other">%d days left</item>
+    </plurals>
+    <plurals name="recycle_bin_hours_left">
+        <item quantity="one">%d hour left</item>
+        <item quantity="other">%d hours left</item>
+    </plurals>
+    <plurals name="recycle_bin_minutes_left">
+        <item quantity="one">%d minute left</item>
+        <item quantity="other">%d minutes left</item>
+    </plurals>
 </resources>

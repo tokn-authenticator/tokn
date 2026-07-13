@@ -33,8 +33,11 @@ import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
 import me.diamondforge.tokn.domain.usecase.OtpResult
+import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.PurgeExpiredTrashUseCase
 import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.RestoreAccountsUseCase
 import me.diamondforge.tokn.home.HomeViewModel.Companion.CLIPBOARD_CLEAR_DELAY_MS
 import javax.inject.Inject
 
@@ -44,6 +47,9 @@ class HomeViewModel @Inject constructor(
     private val getAccountsUseCase: GetAccountsUseCase,
     private val deleteAccountUseCase: DeleteAccountUseCase,
     private val deleteAccountsUseCase: DeleteAccountsUseCase,
+    private val restoreAccountsUseCase: RestoreAccountsUseCase,
+    private val purgeAccountsUseCase: PurgeAccountsUseCase,
+    private val purgeExpiredTrashUseCase: PurgeExpiredTrashUseCase,
     private val reorderAccountsUseCase: ReorderAccountsUseCase,
     private val generateOtpUseCase: GenerateOtpUseCase,
     private val incrementHotpCounterUseCase: IncrementHotpCounterUseCase,
@@ -186,6 +192,7 @@ class HomeViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
+        viewModelScope.launch { purgeExpiredTrashUseCase() }
         viewModelScope.launch {
             while (isActive) {
                 val now = System.currentTimeMillis()
@@ -216,11 +223,18 @@ class HomeViewModel @Inject constructor(
         _selectedIds.value = emptySet()
     }
 
-    fun deleteSelected() {
+    fun deleteSelected(immediately: Boolean = false) {
         val ids = _selectedIds.value
         if (ids.isEmpty()) return
         _selectedIds.value = emptySet()
-        viewModelScope.launch { deleteAccountsUseCase(ids) }
+        viewModelScope.launch {
+            if (immediately) purgeAccountsUseCase(ids) else deleteAccountsUseCase(ids)
+        }
+    }
+
+    fun restoreAccounts(ids: Set<Long>) {
+        if (ids.isEmpty()) return
+        viewModelScope.launch { restoreAccountsUseCase(ids) }
     }
 
     /**

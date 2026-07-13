@@ -20,8 +20,10 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -283,11 +285,31 @@ fun HomeScreen(
     }
 
     if (showBulkDeleteConfirm) {
+        val deletedMessage = pluralStringResource(
+            R.plurals.trash_snackbar_deleted,
+            uiState.selectedIds.size,
+            uiState.selectedIds.size,
+        )
+        val undoLabel = stringResource(R.string.undo)
         BulkDeleteDialog(
             count = uiState.selectedIds.size,
-            onConfirm = {
-                viewModel.deleteSelected()
+            onConfirm = { immediately ->
+                val deletedIds = uiState.selectedIds
+                viewModel.deleteSelected(immediately)
                 showBulkDeleteConfirm = false
+                if (!immediately) {
+                    scope.launch {
+                        val result = snackbarHostState.showSnackbar(
+                            message = deletedMessage,
+                            actionLabel = undoLabel,
+                            withDismissAction = true,
+                            duration = SnackbarDuration.Long,
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel.restoreAccounts(deletedIds)
+                        }
+                    }
+                }
             },
             onDismiss = { showBulkDeleteConfirm = false },
         )
