@@ -73,6 +73,7 @@ fun AutoBackupScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     var showPasswordDialog by remember { mutableStateOf(false) }
+    var showDisableEncryptionDialog by remember { mutableStateOf(false) }
 
     val successMsg = stringResource(R.string.auto_backup_msg_success)
     val unchangedMsg = stringResource(R.string.auto_backup_msg_unchanged)
@@ -131,6 +132,30 @@ fun AutoBackupScreen(
                 showPasswordDialog = false
             },
             onDismiss = { showPasswordDialog = false },
+        )
+    }
+
+    if (showDisableEncryptionDialog) {
+        AlertDialog(
+            onDismissRequest = { showDisableEncryptionDialog = false },
+            title = { Text(stringResource(R.string.auto_backup_unencrypted_warning_title)) },
+            text = { Text(stringResource(R.string.auto_backup_disable_encryption_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.setEncrypt(false)
+                    showDisableEncryptionDialog = false
+                }) {
+                    Text(
+                        stringResource(R.string.auto_backup_disable_encryption_confirm),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDisableEncryptionDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
         )
     }
 
@@ -236,7 +261,10 @@ fun AutoBackupScreen(
                                     trailing = {
                                         SettingsSwitch(
                                             checked = uiState.encrypt,
-                                            onCheckedChange = viewModel::setEncrypt,
+                                            onCheckedChange = { on ->
+                                                if (on) viewModel.setEncrypt(true)
+                                                else showDisableEncryptionDialog = true
+                                            },
                                         )
                                     },
                                 )

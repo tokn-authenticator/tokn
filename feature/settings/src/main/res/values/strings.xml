@@ -166,6 +166,8 @@
     <string name="auto_backup_password_save">Save</string>
     <string name="auto_backup_unencrypted_warning_title">Backups are not encrypted</string>
     <string name="auto_backup_unencrypted_warning">Your secrets are written as plain text and anyone with access to the folder can read them.</string>
+    <string name="auto_backup_disable_encryption_body">Your backups will be written as plain text and anyone with access to the folder can read your secrets. Only turn this off if you know what you are doing.</string>
+    <string name="auto_backup_disable_encryption_confirm">Disable anyway</string>
     <string name="auto_backup_status_section">Status</string>
     <string name="auto_backup_last_run">Last backup</string>
     <string name="auto_backup_last_never">No backup yet</string>
