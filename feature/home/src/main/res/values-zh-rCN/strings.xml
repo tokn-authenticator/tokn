@@ -11,7 +11,8 @@
     <string name="add_from_image">从图片导入</string>
     <string name="add_manually">手动输入</string>
     <string name="delete_confirm_title">删除帐户？</string>
-    <string name="delete_confirm_message">此帐户将被永久移除。</string>
+    <string name="delete_confirm_message">This account will be moved to the Recycle Bin.</string>
+    <string name="undo">Undo</string>
     <string name="cancel">取消</string>
     <string name="search">搜索</string>
     <string name="search_placeholder">搜索账户…</string>
@@ -60,7 +61,14 @@
         <item quantity="other">是否删除 %d 帐户？</item>
     </plurals>
     <plurals name="delete_count_confirm_message">
-        <item quantity="other">%d 个账户将被永久移除。</item>
+        <item quantity="other">These %d accounts will be moved to the Recycle Bin.</item>
+    </plurals>
+    <plurals name="delete_count_immediate_message">
+        <item quantity="other">These %d accounts will be permanently removed and cannot be restored.</item>
+    </plurals>
+    <string name="delete_immediately">Delete immediately</string>
+    <plurals name="trash_snackbar_deleted">
+        <item quantity="other">%d accounts moved to Recycle Bin</item>
     </plurals>
     <string name="edit_error_secret_required">请输入密钥</string>
     <string name="edit_error_invalid_secret">密钥无效：只允许字母A-Z和数字 2-7</string>
