@@ -85,6 +85,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
     implementation(project(":core:security"))
+    implementation(project(":core:backup"))
     implementation(project(":feature:home"))
     implementation(project(":feature:add"))
     implementation(project(":feature:settings"))

@@ -8,7 +8,7 @@ import me.diamondforge.tokn.importer.otpauth.toOtpAuthUri
 import org.json.JSONArray
 import org.json.JSONObject
 
-internal fun serializeAccountsToJson(accounts: List<OtpAccount>): String {
+fun serializeAccountsToJson(accounts: List<OtpAccount>): String {
     val array = JSONArray()
     accounts.forEach { account ->
         array.put(
@@ -39,7 +39,7 @@ internal fun serializeAccountsToJson(accounts: List<OtpAccount>): String {
     return JSONObject().apply { put("accounts", array); put("version", 1) }.toString()
 }
 
-internal fun deserializeAccountsFromJson(json: String): List<OtpAccount> {
+fun deserializeAccountsFromJson(json: String): List<OtpAccount> {
     val root = JSONObject(json)
     val array = root.getJSONArray("accounts")
     return (0 until array.length()).map { i ->
@@ -88,7 +88,7 @@ private fun readBackupGroups(obj: JSONObject): List<String> {
  * encrypted ones are a wrapper with `ciphertext` + `iv` + `salt`. Both are JSON
  * at the top level; the key set decides the path.
  */
-internal fun classifyToknBackup(raw: ByteArray): ToknBackupShape? = runCatching {
+fun classifyToknBackup(raw: ByteArray): ToknBackupShape? = runCatching {
     val obj = JSONObject(raw.toString(Charsets.UTF_8))
     when {
         obj.has("ciphertext") && obj.has("iv") && obj.has("salt") -> ToknBackupShape.Encrypted
@@ -97,7 +97,7 @@ internal fun classifyToknBackup(raw: ByteArray): ToknBackupShape? = runCatching 
     }
 }.getOrNull()
 
-internal enum class ToknBackupShape { Plain, Encrypted }
+enum class ToknBackupShape { Plain, Encrypted }
 
 /**
  * Each account becomes one `otpauth://{type}/{issuer}:{name}?...` line; the
@@ -105,7 +105,7 @@ internal enum class ToknBackupShape { Plain, Encrypted }
  * spec so labels containing `:`, `/`, `?` or `#` round-trip back through
  * `OtpAuthParser`.
  */
-internal fun serializeAccountsAsOtpAuthUriList(accounts: List<OtpAccount>): String =
+fun serializeAccountsAsOtpAuthUriList(accounts: List<OtpAccount>): String =
     accounts.joinToString(separator = "\n", postfix = "\n") { it.toOtpAuthUri() }
 
 /**
@@ -114,7 +114,7 @@ internal fun serializeAccountsAsOtpAuthUriList(accounts: List<OtpAccount>): Stri
  * parser for this format; callers who want re-import should pick otpauth or
  * the Tokn vault format.
  */
-internal fun serializeAccountsAsPlainText(accounts: List<OtpAccount>): String =
+fun serializeAccountsAsPlainText(accounts: List<OtpAccount>): String =
     accounts.joinToString(separator = "\n\n", postfix = "\n") { it.toPlainTextBlock() }
 
 private fun OtpAccount.toPlainTextBlock(): String = buildString {
@@ -130,4 +130,3 @@ private fun OtpAccount.toPlainTextBlock(): String = buildString {
     }
     if (groups.isNotEmpty()) appendLine("Groups: ${groups.joinToString(", ")}")
 }.trimEnd()
-
