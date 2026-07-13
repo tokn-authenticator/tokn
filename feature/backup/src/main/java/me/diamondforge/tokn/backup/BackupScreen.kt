@@ -20,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.QrCodeScanner
@@ -71,6 +73,7 @@ import me.diamondforge.tokn.ui.auth.VaultAuthGate
 fun BackupScreen(
     onBack: () -> Unit,
     onScanMigration: () -> Unit = {},
+    onAutoBackup: () -> Unit = {},
     onAuthenticate: suspend () -> Boolean = { true },
     viewModel: BackupViewModel = hiltViewModel(),
 ) {
@@ -392,6 +395,30 @@ fun BackupScreen(
                         ),
                     )
                 }
+                item {
+                    BackupSectionHeader(stringResource(R.string.section_automatic))
+                }
+                item {
+                    BackupGroup(
+                        items = listOf(
+                            {
+                                BackupRow(
+                                    title = stringResource(R.string.auto_backup_entry_title),
+                                    subtitle = stringResource(R.string.auto_backup_entry_desc),
+                                    icon = Icons.Default.Autorenew,
+                                    onClick = onAutoBackup,
+                                    trailing = {
+                                        Icon(
+                                            Icons.AutoMirrored.Filled.ArrowForwardIos,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    },
+                                )
+                            },
+                        ),
+                    )
+                }
             }
         }
     }
@@ -527,6 +554,7 @@ private fun BackupRow(
     icon: ImageVector,
     onClick: () -> Unit,
     enabled: Boolean = true,
+    trailing: @Composable (() -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier
@@ -553,6 +581,10 @@ private fun BackupRow(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+        if (trailing != null) {
+            Spacer(Modifier.width(16.dp))
+            trailing()
         }
     }
 }
