@@ -3,6 +3,9 @@
     <string name="backup_title">导入与导出</string>
     <string name="section_import">导入</string>
     <string name="section_export">导出</string>
+    <string name="section_automatic">Automatic</string>
+    <string name="auto_backup_entry_title">Automatic backup</string>
+    <string name="auto_backup_entry_desc">Back up to a folder on every change</string>
     <string name="import_from_file">从文件读取帐户</string>
     <string name="import_from_file_desc">从备份文件或其他应用导入账户</string>
     <string name="import_from_google_auth">从Google Authenticator迁移</string>
