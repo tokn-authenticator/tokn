@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Security
@@ -23,6 +24,7 @@ fun SettingsScreen(
     onGroups: () -> Unit,
     onBackup: () -> Unit,
     onSync: () -> Unit,
+    onRecycleBin: () -> Unit,
     onAbout: () -> Unit,
 ) {
     SettingsScaffold(
@@ -66,6 +68,15 @@ fun SettingsScreen(
                             subtitle = stringResource(R.string.settings_groups_desc),
                             icon = Icons.AutoMirrored.Filled.Label,
                             onClick = onGroups,
+                            trailing = { Chevron() },
+                        )
+                    },
+                    {
+                        SettingsRow(
+                            title = stringResource(R.string.recycle_bin_title),
+                            subtitle = stringResource(R.string.recycle_bin_desc),
+                            icon = Icons.Default.Delete,
+                            onClick = onRecycleBin,
                             trailing = { Chevron() },
                         )
                     },
