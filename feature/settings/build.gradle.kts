@@ -70,6 +70,7 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.coroutines.test)
+    testImplementation(libs.room.runtime)
     testImplementation(testFixtures(project(":core:domain")))
     testImplementation(testFixtures(project(":core:data")))
 }
