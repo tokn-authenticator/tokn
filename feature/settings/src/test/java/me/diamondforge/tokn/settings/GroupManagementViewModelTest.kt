@@ -47,7 +47,13 @@ class GroupManagementViewModelTest {
     fun tearDown() = Dispatchers.resetMain()
 
     private fun account(id: Long, groups: List<String>) =
-        OtpAccount(id = id, issuer = "i$id", accountName = "n$id", secret = "JBSWY3DPEHPK3PXP", groups = groups)
+        OtpAccount(
+            id = id,
+            issuer = "i$id",
+            accountName = "n$id",
+            secret = "JBSWY3DPEHPK3PXP",
+            groups = groups
+        )
 
     private fun newVm() = GroupManagementViewModel(
         getAccountsUseCase = GetAccountsUseCase(repo),

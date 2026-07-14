@@ -89,7 +89,10 @@ class AddAccountViewModelTest {
         vm.saveAccount { fail() }
         advanceUntilIdle()
 
-        assertEquals(context.getString(R.string.add_error_account_name_required), vm.uiState.value.error)
+        assertEquals(
+            context.getString(R.string.add_error_account_name_required),
+            vm.uiState.value.error
+        )
     }
 
     @Test
@@ -131,18 +134,19 @@ class AddAccountViewModelTest {
     }
 
     @Test
-    fun `applying a parsed account fills the form and clears the pending parse`() = runTest(dispatcher) {
-        val vm = newVm()
-        vm.onQrScanned("otpauth://totp/ACME:alice?secret=JBSWY3DPEHPK3PXP&issuer=ACME&digits=8")
-        vm.applyParsedAccount()
+    fun `applying a parsed account fills the form and clears the pending parse`() =
+        runTest(dispatcher) {
+            val vm = newVm()
+            vm.onQrScanned("otpauth://totp/ACME:alice?secret=JBSWY3DPEHPK3PXP&issuer=ACME&digits=8")
+            vm.applyParsedAccount()
 
-        val state = vm.uiState.value
-        assertEquals("alice", state.accountName)
-        assertEquals("JBSWY3DPEHPK3PXP", state.secret)
-        assertEquals(8, state.digits)
-        assertEquals(OtpType.TOTP, state.type)
-        assertNull(state.parsedAccount)
-    }
+            val state = vm.uiState.value
+            assertEquals("alice", state.accountName)
+            assertEquals("JBSWY3DPEHPK3PXP", state.secret)
+            assertEquals(8, state.digits)
+            assertEquals(OtpType.TOTP, state.type)
+            assertNull(state.parsedAccount)
+        }
 
     @Test
     fun `field setters update the form state`() = runTest(dispatcher) {

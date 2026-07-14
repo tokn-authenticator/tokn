@@ -14,7 +14,8 @@ class AuditLoggerImpl(
     private val scope: CoroutineScope,
 ) : AuditLogger {
 
-    @Inject constructor(dao: AuditLogDao) : this(dao, CoroutineScope(SupervisorJob() + Dispatchers.IO))
+    @Inject
+    constructor(dao: AuditLogDao) : this(dao, CoroutineScope(SupervisorJob() + Dispatchers.IO))
 
     private val enabled = MutableStateFlow(true)
     private val disabledCategories = MutableStateFlow<Set<AuditCategory>>(emptySet())

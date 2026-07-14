@@ -78,10 +78,16 @@ class BackupViewModel @Inject constructor(
     }
 
     fun exportOtpAuthUriList(uri: Uri) =
-        exportText(uri, AuditEventType.BACKUP_EXPORTED_OTPAUTH_LIST) { serializeAccountsAsOtpAuthUriList(it) }
+        exportText(
+            uri,
+            AuditEventType.BACKUP_EXPORTED_OTPAUTH_LIST
+        ) { serializeAccountsAsOtpAuthUriList(it) }
 
     fun exportPlainText(uri: Uri) =
-        exportText(uri, AuditEventType.BACKUP_EXPORTED_PLAIN_TEXT) { serializeAccountsAsPlainText(it) }
+        exportText(
+            uri,
+            AuditEventType.BACKUP_EXPORTED_PLAIN_TEXT
+        ) { serializeAccountsAsPlainText(it) }
 
     private fun exportText(uri: Uri, event: AuditEventType, render: (List<OtpAccount>) -> String) {
         viewModelScope.launch {

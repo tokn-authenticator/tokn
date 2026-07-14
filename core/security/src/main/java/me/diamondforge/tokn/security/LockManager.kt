@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import me.diamondforge.tokn.audit.AuditEventType
 import me.diamondforge.tokn.audit.AuditLogger
-import me.diamondforge.tokn.audit.NoopAuditLogger
 import javax.inject.Inject
 import javax.inject.Singleton
 

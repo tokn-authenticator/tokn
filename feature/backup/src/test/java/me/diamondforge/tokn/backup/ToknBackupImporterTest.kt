@@ -54,14 +54,20 @@ class ToknBackupImporterTest {
 
     @Test
     fun `an encrypted vault without a password asks for one`() {
-        assertEquals(ImportOutcome.NeedsPassword, importer.parse(encryptedBytes("pw"), password = null))
+        assertEquals(
+            ImportOutcome.NeedsPassword,
+            importer.parse(encryptedBytes("pw"), password = null)
+        )
     }
 
     @Test
     fun `an encrypted vault decrypts with the right password`() {
         val outcome = importer.parse(encryptedBytes("pw"), password = "pw")
         assertTrue(outcome is ImportOutcome.Success)
-        assertEquals("JBSWY3DPEHPK3PXP", (outcome as ImportOutcome.Success).accounts.single().secret)
+        assertEquals(
+            "JBSWY3DPEHPK3PXP",
+            (outcome as ImportOutcome.Success).accounts.single().secret
+        )
     }
 
     @Test

@@ -63,7 +63,10 @@ class PasswordReminderScheduleTest {
         // One full day has passed: one day remains.
         assertEquals(1, PasswordReminderSchedule.daysUntilDue(now, now - 1 * day, 0))
         // A partial day left still rounds up to one.
-        assertEquals(1, PasswordReminderSchedule.daysUntilDue(now, now - 1 * day - 12 * 60 * 60 * 1000L, 0))
+        assertEquals(
+            1,
+            PasswordReminderSchedule.daysUntilDue(now, now - 1 * day - 12 * 60 * 60 * 1000L, 0)
+        )
     }
 
     @Test

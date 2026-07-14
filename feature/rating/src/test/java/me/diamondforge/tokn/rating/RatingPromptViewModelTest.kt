@@ -152,7 +152,8 @@ class RatingPromptViewModelTest {
         override fun isFromPlayStore(): Boolean = playStore
     }
 
-    private class FakePrefs(context: Context) : UserPreferencesRepository(FakePreferencesDataStore()) {
+    private class FakePrefs(context: Context) :
+        UserPreferencesRepository(FakePreferencesDataStore()) {
         val launchCount = MutableStateFlow(5)
         val handled = MutableStateFlow(false)
         val snoozedUntil = MutableStateFlow(0L)

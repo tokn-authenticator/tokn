@@ -174,48 +174,51 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `disableEncryption with the correct password clears password and biometric`() = runTest(dispatcher) {
-        prefs.encryption.value = true
-        prefs.biometric.value = true
-        vault.verifyResult = true
-        val vm = newVm()
+    fun `disableEncryption with the correct password clears password and biometric`() =
+        runTest(dispatcher) {
+            prefs.encryption.value = true
+            prefs.biometric.value = true
+            vault.verifyResult = true
+            val vm = newVm()
 
-        vm.disableEncryption("hunter2")
-        prefs.biometric.first { !it }
+            vm.disableEncryption("hunter2")
+            prefs.biometric.first { !it }
 
-        assertTrue(vault.passwordRemoved.value)
-        assertFalse(prefs.encryption.value)
-    }
-
-    @Test
-    fun `disableEncryption with a wrong password raises the error and changes nothing`() = runTest(dispatcher) {
-        prefs.encryption.value = true
-        vault.verifyResult = false
-        val vm = newVm()
-
-        vm.disableEncryption("wrong")
-        vm.uiState.first { it.passwordVerificationFailed }
-
-        assertFalse(vault.passwordRemoved.value)
-        assertTrue(prefs.encryption.value)
-
-        vm.clearPasswordError()
-        advanceUntilIdle()
-        assertFalse(vm.uiState.value.passwordVerificationFailed)
-    }
+            assertTrue(vault.passwordRemoved.value)
+            assertFalse(prefs.encryption.value)
+        }
 
     @Test
-    fun `disabling biometric flips the pref and tears down the keystore slot`() = runTest(dispatcher) {
-        prefs.biometric.value = true
-        val vm = newVm()
+    fun `disableEncryption with a wrong password raises the error and changes nothing`() =
+        runTest(dispatcher) {
+            prefs.encryption.value = true
+            vault.verifyResult = false
+            val vm = newVm()
 
-        vm.setBiometricEnabled(false)
-        advanceUntilIdle()
-        vault.biometricDisabled.first { it }
+            vm.disableEncryption("wrong")
+            vm.uiState.first { it.passwordVerificationFailed }
 
-        assertFalse(prefs.biometric.value)
-        assertTrue(vault.biometricDisabled.value)
-    }
+            assertFalse(vault.passwordRemoved.value)
+            assertTrue(prefs.encryption.value)
+
+            vm.clearPasswordError()
+            advanceUntilIdle()
+            assertFalse(vm.uiState.value.passwordVerificationFailed)
+        }
+
+    @Test
+    fun `disabling biometric flips the pref and tears down the keystore slot`() =
+        runTest(dispatcher) {
+            prefs.biometric.value = true
+            val vm = newVm()
+
+            vm.setBiometricEnabled(false)
+            advanceUntilIdle()
+            vault.biometricDisabled.first { it }
+
+            assertFalse(prefs.biometric.value)
+            assertTrue(vault.biometricDisabled.value)
+        }
 
     @Test
     fun `enabling biometric only flips the pref`() = runTest(dispatcher) {

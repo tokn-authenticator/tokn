@@ -87,15 +87,16 @@ class AccountRepositoryImplTest {
     }
 
     @Test
-    fun `deleteAccounts soft-deletes so rows move to trash and leave the active flow`() = runBlocking {
-        val a = repo.addAccount(account(emptyList()))
-        val b = repo.addAccount(account(emptyList()))
+    fun `deleteAccounts soft-deletes so rows move to trash and leave the active flow`() =
+        runBlocking {
+            val a = repo.addAccount(account(emptyList()))
+            val b = repo.addAccount(account(emptyList()))
 
-        repo.deleteAccounts(setOf(a))
+            repo.deleteAccounts(setOf(a))
 
-        assertEquals(listOf(b), repo.getAccounts().first().map { it.id })
-        assertEquals(listOf(a), repo.getTrashedAccounts().first().map { it.id })
-    }
+            assertEquals(listOf(b), repo.getAccounts().first().map { it.id })
+            assertEquals(listOf(a), repo.getTrashedAccounts().first().map { it.id })
+        }
 
     @Test
     fun `restoreAccounts returns a trashed account to the active flow`() = runBlocking {

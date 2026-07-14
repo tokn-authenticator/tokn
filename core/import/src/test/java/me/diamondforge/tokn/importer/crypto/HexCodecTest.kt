@@ -8,7 +8,10 @@ class HexCodecTest {
 
     @Test
     fun `decodes lower and upper case hex`() {
-        assertArrayEquals(byteArrayOf(0x00, 0xFF.toByte(), 0x10, 0xAB.toByte()), HexCodec.decode("00ff10ab"))
+        assertArrayEquals(
+            byteArrayOf(0x00, 0xFF.toByte(), 0x10, 0xAB.toByte()),
+            HexCodec.decode("00ff10ab")
+        )
         assertArrayEquals(byteArrayOf(0xAB.toByte(), 0xCD.toByte()), HexCodec.decode("ABCD"))
         assertArrayEquals(byteArrayOf(0xAb.toByte()), HexCodec.decode("aB"))
     }

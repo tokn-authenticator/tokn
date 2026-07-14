@@ -134,7 +134,8 @@ class PasswordReminderViewModelTest {
         assertFalse(vm.verify("nope"))
     }
 
-    private class FakePrefs(context: Context) : UserPreferencesRepository(FakePreferencesDataStore()) {
+    private class FakePrefs(context: Context) :
+        UserPreferencesRepository(FakePreferencesDataStore()) {
         val enabled = MutableStateFlow(true)
         val lastShownAt = MutableStateFlow(0L)
         val stage = MutableStateFlow(0)

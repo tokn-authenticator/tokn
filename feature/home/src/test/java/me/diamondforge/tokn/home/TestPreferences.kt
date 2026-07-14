@@ -13,12 +13,14 @@ import me.diamondforge.tokn.domain.model.TapBehavior
  * Kept as top-level `internal` classes so individual test files can mutate
  * the public StateFlow fields without each file re-declaring its own copy.
  */
-internal class FakeAppPreferences(context: Context) : AppPreferencesRepository(FakePreferencesDataStore()) {
+internal class FakeAppPreferences(context: Context) :
+    AppPreferencesRepository(FakePreferencesDataStore()) {
     val fetch = MutableStateFlow(false)
     override val iconFetchEnabled = fetch
 }
 
-internal class FakeUserPreferences(context: Context) : UserPreferencesRepository(FakePreferencesDataStore()) {
+internal class FakeUserPreferences(context: Context) :
+    UserPreferencesRepository(FakePreferencesDataStore()) {
     val tapReveal = MutableStateFlow(false)
     override val tapToRevealEnabled = tapReveal
     val showNext = MutableStateFlow(false)
@@ -29,5 +31,7 @@ internal class FakeUserPreferences(context: Context) : UserPreferencesRepository
     override val accountSort = sort
     val recycleBin = MutableStateFlow(true)
     override val recycleBinEnabled = recycleBin
-    override suspend fun setRecycleBinEnabled(enabled: Boolean) { recycleBin.value = enabled }
+    override suspend fun setRecycleBinEnabled(enabled: Boolean) {
+        recycleBin.value = enabled
+    }
 }

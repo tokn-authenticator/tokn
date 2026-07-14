@@ -56,15 +56,16 @@ class OnboardingViewModelTest {
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun newVm(registry: ImporterRegistry = ImporterRegistry(emptySet())) = OnboardingViewModel(
-        context = context,
-        preferences = prefs,
-        vaultManager = vault,
-        addAccountUseCase = AddAccountUseCase(repo),
-        lockManager = LockManager(NoopAuditLogger),
-        importerRegistry = registry,
-        biometricHelper = BiometricHelper(context),
-    )
+    private fun newVm(registry: ImporterRegistry = ImporterRegistry(emptySet())) =
+        OnboardingViewModel(
+            context = context,
+            preferences = prefs,
+            vaultManager = vault,
+            addAccountUseCase = AddAccountUseCase(repo),
+            lockManager = LockManager(NoopAuditLogger),
+            importerRegistry = registry,
+            biometricHelper = BiometricHelper(context),
+        )
 
     private fun registryOf(vararg importers: FakeImporter) = ImporterRegistry(importers.toSet())
 
@@ -75,20 +76,21 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `finish with no encryption disables the vault and marks onboarding done`() = runTest(dispatcher) {
-        val vm = newVm()
-        vm.setCryptType(CryptType.NONE)
+    fun `finish with no encryption disables the vault and marks onboarding done`() =
+        runTest(dispatcher) {
+            val vm = newVm()
+            vm.setCryptType(CryptType.NONE)
 
-        val done = MutableStateFlow(false)
-        vm.finish { done.value = true }
-        done.first { it }
+            val done = MutableStateFlow(false)
+            vm.finish { done.value = true }
+            done.first { it }
 
-        assertFalse(vault.passwordSet.value)
-        assertTrue(vault.biometricDisabled.value)
-        assertEquals(false, prefs.encryption.value)
-        assertEquals(false, prefs.biometric.value)
-        assertTrue(prefs.onboardingDoneFlag.value)
-    }
+            assertFalse(vault.passwordSet.value)
+            assertTrue(vault.biometricDisabled.value)
+            assertEquals(false, prefs.encryption.value)
+            assertEquals(false, prefs.biometric.value)
+            assertTrue(prefs.onboardingDoneFlag.value)
+        }
 
     @Test
     fun `finish with a password enables encryption and seeds the reminder`() = runTest(dispatcher) {
@@ -172,7 +174,8 @@ class OnboardingViewModelTest {
 
     @Test
     fun `a foreign export is redirected to settings`() = runTest(dispatcher) {
-        val accounts = listOf(OtpAccount(issuer = "x", accountName = "y", secret = "JBSWY3DPEHPK3PXP"))
+        val accounts =
+            listOf(OtpAccount(issuer = "x", accountName = "y", secret = "JBSWY3DPEHPK3PXP"))
         val vm = newVm(registryOf(FakeImporter("aegis", ImportOutcome.Success(accounts))))
 
         vm.importBackup(uriFor("payload".toByteArray()))

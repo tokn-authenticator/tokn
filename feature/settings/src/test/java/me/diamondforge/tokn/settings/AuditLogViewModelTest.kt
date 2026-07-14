@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import java.util.concurrent.Executor
 import me.diamondforge.tokn.audit.AuditCategory
 import me.diamondforge.tokn.audit.AuditDatabase
 import me.diamondforge.tokn.audit.AuditEventType
@@ -33,6 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.concurrent.Executor
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -109,7 +109,13 @@ class AuditLogViewModelTest {
 
     @Test
     fun `rows resolve the issuer of a still-existing account`() = runTest(dispatcher) {
-        val id = accounts.addAccount(OtpAccount(issuer = "GitHub", accountName = "me", secret = "JBSWY3DPEHPK3PXP"))
+        val id = accounts.addAccount(
+            OtpAccount(
+                issuer = "GitHub",
+                accountName = "me",
+                secret = "JBSWY3DPEHPK3PXP"
+            )
+        )
         insert(AuditEventType.ITEM_ADDED, targetId = id)
         val current = rows(newVm())
         advanceUntilIdle()
@@ -234,7 +240,9 @@ class AuditLogViewModelTest {
         advanceUntilIdle()
 
         assertEquals(30, current().retentionDays)
-        assertEquals(AuditEventType.AUDIT_LOG_RETENTION_CHANGED to "30", auditLogger.logged.last().let { it.type to it.detail })
+        assertEquals(
+            AuditEventType.AUDIT_LOG_RETENTION_CHANGED to "30",
+            auditLogger.logged.last().let { it.type to it.detail })
     }
 
     @Test

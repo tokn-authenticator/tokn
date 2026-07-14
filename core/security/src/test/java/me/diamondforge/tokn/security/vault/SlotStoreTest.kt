@@ -22,7 +22,8 @@ class SlotStoreTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        context.getSharedPreferences("vault_slots_prefs", Context.MODE_PRIVATE).edit().clear().commit()
+        context.getSharedPreferences("vault_slots_prefs", Context.MODE_PRIVATE).edit().clear()
+            .commit()
         store = SlotStore(context)
     }
 

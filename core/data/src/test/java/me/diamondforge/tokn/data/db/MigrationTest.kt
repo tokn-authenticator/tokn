@@ -27,7 +27,8 @@ class MigrationTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val callback = object : SupportSQLiteOpenHelper.Callback(1) {
             override fun onCreate(db: SupportSQLiteDatabase) = db.execSQL(CREATE_V1)
-            override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+            override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) =
+                Unit
         }
         val config = SupportSQLiteOpenHelper.Configuration.builder(context)
             .name(null)
@@ -43,8 +44,8 @@ class MigrationTest {
     fun `chain from 1 to 5 keeps the row and adds the new columns`() {
         db.execSQL(
             "INSERT INTO otp_accounts " +
-                "(issuer,accountName,secret,algorithm,digits,period,counter,type,sortOrder) " +
-                "VALUES ('ACME','alice','SEC','SHA1',6,30,0,'TOTP',0)",
+                    "(issuer,accountName,secret,algorithm,digits,period,counter,type,sortOrder) " +
+                    "VALUES ('ACME','alice','SEC','SHA1',6,30,0,'TOTP',0)",
         )
 
         AppDatabase.MIGRATION_1_2.migrate(db)
@@ -54,14 +55,15 @@ class MigrationTest {
         AppDatabase.MIGRATION_4_5.migrate(db)
         AppDatabase.MIGRATION_5_6.migrate(db)
 
-        db.query("SELECT `group`, usage_count, last_used_at, icon_pack_id, deleted_at FROM otp_accounts").use { c ->
-            assertTrue(c.moveToFirst())
-            assertEquals("['Work']", c.getString(0))
-            assertEquals(0, c.getInt(1))
-            assertEquals(0L, c.getLong(2))
-            assertTrue(c.isNull(3))
-            assertEquals(0L, c.getLong(4))
-        }
+        db.query("SELECT `group`, usage_count, last_used_at, icon_pack_id, deleted_at FROM otp_accounts")
+            .use { c ->
+                assertTrue(c.moveToFirst())
+                assertEquals("['Work']", c.getString(0))
+                assertEquals(0, c.getInt(1))
+                assertEquals(0L, c.getLong(2))
+                assertTrue(c.isNull(3))
+                assertEquals(0L, c.getLong(4))
+            }
     }
 
     @Test
@@ -108,8 +110,8 @@ class MigrationTest {
     private fun insertWithGroup(group: String?) {
         db.execSQL(
             "INSERT INTO otp_accounts " +
-                "(issuer,accountName,secret,algorithm,digits,period,counter,type,sortOrder,`group`) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    "(issuer,accountName,secret,algorithm,digits,period,counter,type,sortOrder,`group`) " +
+                    "VALUES (?,?,?,?,?,?,?,?,?,?)",
             arrayOf<Any?>("i", "n", "s", "SHA1", 6, 30, 0, "TOTP", 0, group),
         )
     }
@@ -137,15 +139,15 @@ class MigrationTest {
     private companion object {
         const val CREATE_V1 =
             "CREATE TABLE otp_accounts (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                "issuer TEXT NOT NULL, " +
-                "accountName TEXT NOT NULL, " +
-                "secret TEXT NOT NULL, " +
-                "algorithm TEXT NOT NULL, " +
-                "digits INTEGER NOT NULL, " +
-                "period INTEGER NOT NULL, " +
-                "counter INTEGER NOT NULL, " +
-                "type TEXT NOT NULL, " +
-                "sortOrder INTEGER NOT NULL)"
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "issuer TEXT NOT NULL, " +
+                    "accountName TEXT NOT NULL, " +
+                    "secret TEXT NOT NULL, " +
+                    "algorithm TEXT NOT NULL, " +
+                    "digits INTEGER NOT NULL, " +
+                    "period INTEGER NOT NULL, " +
+                    "counter INTEGER NOT NULL, " +
+                    "type TEXT NOT NULL, " +
+                    "sortOrder INTEGER NOT NULL)"
     }
 }

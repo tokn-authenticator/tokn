@@ -222,8 +222,18 @@ private fun timeLeftLabel(remainingMillis: Long): String {
     val hours = minutes / 60
     val days = hours / 24
     return when {
-        days >= 1 -> pluralStringResource(R.plurals.recycle_bin_days_left, days.toInt(), days.toInt())
-        hours >= 1 -> pluralStringResource(R.plurals.recycle_bin_hours_left, hours.toInt(), hours.toInt())
+        days >= 1 -> pluralStringResource(
+            R.plurals.recycle_bin_days_left,
+            days.toInt(),
+            days.toInt()
+        )
+
+        hours >= 1 -> pluralStringResource(
+            R.plurals.recycle_bin_hours_left,
+            hours.toInt(),
+            hours.toInt()
+        )
+
         else -> {
             val m = minutes.coerceAtLeast(1).toInt()
             pluralStringResource(R.plurals.recycle_bin_minutes_left, m, m)

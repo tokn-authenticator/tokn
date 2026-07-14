@@ -7,6 +7,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,10 +17,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -30,8 +31,6 @@ import androidx.compose.material.icons.filled.FilterAltOff
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,9 +67,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.diamondforge.tokn.audit.AuditCategory
@@ -79,10 +79,10 @@ import me.diamondforge.tokn.domain.model.TapBehavior
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
-import java.time.ZoneOffset
 import java.util.Locale
 
 @Composable
@@ -142,13 +142,19 @@ fun AuditLogScreen(
                         },
                         navigationIcon = {
                             IconButton(onClick = closeSearch) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.audit_log_exit_search))
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.audit_log_exit_search)
+                                )
                             }
                         },
                         actions = {
                             if (uiState.searchQuery.isNotEmpty()) {
                                 IconButton(onClick = { viewModel.setSearchQuery("") }) {
-                                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.audit_log_clear_search))
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = stringResource(R.string.audit_log_clear_search)
+                                    )
                                 }
                             }
                         },
@@ -164,22 +170,37 @@ fun AuditLogScreen(
                         },
                         actions = {
                             IconButton(onClick = { showSettingsSheet = true }) {
-                                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.audit_log_settings_title))
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = stringResource(R.string.audit_log_settings_title)
+                                )
                             }
                             IconButton(onClick = { searchVisible = true }) {
-                                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.audit_log_search_hint))
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = stringResource(R.string.audit_log_search_hint)
+                                )
                             }
                             IconButton(onClick = { showDateRangeDialog = true }) {
-                                Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.audit_log_date_range_title))
+                                Icon(
+                                    Icons.Default.DateRange,
+                                    contentDescription = stringResource(R.string.audit_log_date_range_title)
+                                )
                             }
                             if (uiState.hasActiveFilters) {
                                 IconButton(onClick = { viewModel.clearFilters() }) {
-                                    Icon(Icons.Default.FilterAltOff, contentDescription = stringResource(R.string.audit_log_filter_clear))
+                                    Icon(
+                                        Icons.Default.FilterAltOff,
+                                        contentDescription = stringResource(R.string.audit_log_filter_clear)
+                                    )
                                 }
                             }
                             if (uiState.items.isNotEmpty() || uiState.hasActiveFilters) {
                                 IconButton(onClick = { showClearConfirm = true }) {
-                                    Icon(Icons.Default.DeleteSweep, contentDescription = stringResource(R.string.audit_log_clear_action))
+                                    Icon(
+                                        Icons.Default.DeleteSweep,
+                                        contentDescription = stringResource(R.string.audit_log_clear_action)
+                                    )
                                 }
                             }
                         },
@@ -215,7 +236,10 @@ fun AuditLogScreen(
                                         text = label,
                                         style = MaterialTheme.typography.labelLarge,
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                        modifier = Modifier.padding(
+                                            horizontal = 16.dp,
+                                            vertical = 8.dp
+                                        ),
                                     )
                                 }
                                 items(rows, key = { it.id }) { row ->
@@ -339,7 +363,10 @@ private fun AuditLogSettingsSheet(
                             title = stringResource(R.string.audit_log_enable_title),
                             subtitle = stringResource(R.string.audit_log_enable_desc),
                             trailing = {
-                                SettingsSwitch(checked = state.enabled, onCheckedChange = onEnabledChange)
+                                SettingsSwitch(
+                                    checked = state.enabled,
+                                    onCheckedChange = onEnabledChange
+                                )
                             },
                         )
                     }
@@ -371,7 +398,12 @@ private fun AuditLogSettingsSheet(
                                 trailing = {
                                     SettingsSwitch(
                                         checked = category !in state.disabledCategories,
-                                        onCheckedChange = { enabled -> onCategoryToggle(category, enabled) },
+                                        onCheckedChange = { enabled ->
+                                            onCategoryToggle(
+                                                category,
+                                                enabled
+                                            )
+                                        },
                                     )
                                 },
                             )
@@ -451,7 +483,10 @@ private fun AuditDateRangeDialog(
         initialSelectedStartDateMillis = initialRange?.first,
         initialSelectedEndDateMillis = initialRange?.last,
     )
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Row(
@@ -473,10 +508,13 @@ private fun AuditDateRangeDialog(
                                 val end = state.selectedEndDateMillis
                                 val zone = ZoneId.systemDefault()
                                 val range = if (start != null && end != null) {
-                                    val startLocal = Instant.ofEpochMilli(start).atZone(ZoneOffset.UTC)
-                                        .toLocalDate().atStartOfDay(zone).toInstant().toEpochMilli()
+                                    val startLocal =
+                                        Instant.ofEpochMilli(start).atZone(ZoneOffset.UTC)
+                                            .toLocalDate().atStartOfDay(zone).toInstant()
+                                            .toEpochMilli()
                                     val endLocal = Instant.ofEpochMilli(end).atZone(ZoneOffset.UTC)
-                                        .toLocalDate().plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() - 1
+                                        .toLocalDate().plusDays(1).atStartOfDay(zone).toInstant()
+                                        .toEpochMilli() - 1
                                     startLocal..endLocal
                                 } else {
                                     null
@@ -507,8 +545,15 @@ private fun groupByDate(rows: List<AuditLogRow>): List<Pair<String, List<AuditLo
             when {
                 days == 0L -> BucketKey(0, todayLabel)
                 days == 1L -> BucketKey(1, yesterdayLabel)
-                days in 2..6 -> BucketKey(days, date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()))
-                else -> BucketKey(days, date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)))
+                days in 2..6 -> BucketKey(
+                    days,
+                    date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                )
+
+                else -> BucketKey(
+                    days,
+                    date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                )
             }
         }
         .toSortedMap(compareBy { it.sortKey })
@@ -595,24 +640,32 @@ private fun detailText(row: AuditLogRow): String? {
             300 -> stringResource(R.string.lock_5m)
             else -> detail
         }
+
         AuditEventType.THEME_CHANGED -> when (detail) {
             "LIGHT" -> stringResource(R.string.theme_light)
             "DARK" -> stringResource(R.string.theme_dark)
             else -> stringResource(R.string.theme_system)
         }
+
         AuditEventType.TAP_BEHAVIOR_CHANGED -> when (runCatching { TapBehavior.valueOf(detail) }.getOrNull()) {
             TapBehavior.NONE -> stringResource(R.string.tap_none)
             TapBehavior.SINGLE -> stringResource(R.string.tap_single)
             TapBehavior.DOUBLE -> stringResource(R.string.tap_double)
             null -> detail
         }
+
         AuditEventType.ITEM_PURGED_AUTO, AuditEventType.RECYCLE_BIN_EMPTIED ->
-            detail.toIntOrNull()?.let { pluralStringResource(R.plurals.audit_log_detail_count, it, it) } ?: detail
+            detail.toIntOrNull()
+                ?.let { pluralStringResource(R.plurals.audit_log_detail_count, it, it) } ?: detail
+
         AuditEventType.AUDIT_LOG_RETENTION_CHANGED ->
-            detail.toIntOrNull()?.let { pluralStringResource(R.plurals.audit_log_retention_days, it, it) } ?: detail
+            detail.toIntOrNull()
+                ?.let { pluralStringResource(R.plurals.audit_log_retention_days, it, it) } ?: detail
+
         AuditEventType.AUDIT_LOG_CATEGORY_ENABLED, AuditEventType.AUDIT_LOG_CATEGORY_DISABLED ->
             runCatching { AuditCategory.valueOf(detail) }.getOrNull()
                 ?.let { stringResource(categoryLabel(it)) } ?: detail
+
         else -> detail
     }
 }

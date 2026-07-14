@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Description
@@ -52,7 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -210,9 +210,9 @@ fun AutoBackupScreen(
                                     icon = Icons.Default.Backup,
                                     options = listOf(
                                         AutoBackupStrategy.ROTATING to
-                                            stringResource(R.string.auto_backup_mode_multiple),
+                                                stringResource(R.string.auto_backup_mode_multiple),
                                         AutoBackupStrategy.SINGLE to
-                                            stringResource(R.string.auto_backup_mode_single),
+                                                stringResource(R.string.auto_backup_mode_single),
                                     ),
                                     selected = if (rotating) AutoBackupStrategy.ROTATING
                                     else AutoBackupStrategy.SINGLE,

@@ -21,7 +21,8 @@ private val Context.autoBackupPrefsDataStore: DataStore<Preferences> by preferen
 open class AutoBackupPreferencesRepository(
     private val dataStore: DataStore<Preferences>,
 ) {
-    @Inject constructor(@ApplicationContext context: Context) : this(context.autoBackupPrefsDataStore)
+    @Inject
+    constructor(@ApplicationContext context: Context) : this(context.autoBackupPrefsDataStore)
 
     open val enabled: Flow<Boolean> = dataStore.data.map { it[Keys.ENABLED] ?: false }
 

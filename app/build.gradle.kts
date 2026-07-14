@@ -63,7 +63,7 @@ android {
     packaging {
         jniLibs.useLegacyPackaging = false
     }
-    
+
     bundle {
         language {
             enableSplit = false

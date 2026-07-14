@@ -35,7 +35,9 @@ class RatingPromptViewModel @Inject constructor(
     private val firstInstallTime = installInfo.firstInstallTime()
 
     private val hasTokens: Flow<Boolean> = vaultSession.state.flatMapLatest { state ->
-        if (state == VaultState.UNLOCKED) getAccounts.get()().map { it.isNotEmpty() } else flowOf(false)
+        if (state == VaultState.UNLOCKED) getAccounts.get()().map { it.isNotEmpty() } else flowOf(
+            false
+        )
     }
 
     val shouldPrompt: StateFlow<Boolean> = combine(

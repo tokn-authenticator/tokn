@@ -11,7 +11,14 @@ class Argon2KeyDeriverTest {
     private val salt = ByteArray(16) { it.toByte() }
 
     private fun derive(password: ByteArray, salt: ByteArray, keyLength: Int = 32) =
-        Argon2KeyDeriver.derive(password, salt, memoryKib = 256, iterations = 1, parallelism = 1, keyLength = keyLength)
+        Argon2KeyDeriver.derive(
+            password,
+            salt,
+            memoryKib = 256,
+            iterations = 1,
+            parallelism = 1,
+            keyLength = keyLength
+        )
 
     @Test
     fun `same inputs produce the same key`() {

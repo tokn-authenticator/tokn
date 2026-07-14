@@ -31,11 +31,23 @@ open class AutoBackupWriter @Inject constructor(
         }
     }
 
-    open fun write(uri: Uri, bytes: ByteArray, encrypted: Boolean, versionsToKeep: Int, timestamp: Long) {
+    open fun write(
+        uri: Uri,
+        bytes: ByteArray,
+        encrypted: Boolean,
+        versionsToKeep: Int,
+        timestamp: Long
+    ) {
         if (!hasPersistedPermission(uri)) throw AutoBackupPermissionException()
         when (strategyFor(uri)) {
             AutoBackupStrategy.SINGLE -> writeSingle(uri, bytes)
-            AutoBackupStrategy.ROTATING -> writeRotating(uri, bytes, encrypted, versionsToKeep, timestamp)
+            AutoBackupStrategy.ROTATING -> writeRotating(
+                uri,
+                bytes,
+                encrypted,
+                versionsToKeep,
+                timestamp
+            )
         }
     }
 
@@ -51,7 +63,8 @@ open class AutoBackupWriter @Inject constructor(
         versionsToKeep: Int,
         timestamp: Long,
     ) {
-        val dir = DocumentFile.fromTreeUri(context, treeUri) ?: throw AutoBackupPermissionException()
+        val dir =
+            DocumentFile.fromTreeUri(context, treeUri) ?: throw AutoBackupPermissionException()
         if (!dir.canWrite()) throw AutoBackupPermissionException()
         val name = backupFileName(encrypted, timestamp)
         dir.findFile(name)?.delete()

@@ -33,7 +33,11 @@ class OtpAuthUriBuilderTest {
     @Test
     fun `plain TOTP round-trips`() {
         assertRoundTrips(
-            OtpAccount(issuer = "ACME", accountName = "alice@example.com", secret = "JBSWY3DPEHPK3PXP"),
+            OtpAccount(
+                issuer = "ACME",
+                accountName = "alice@example.com",
+                secret = "JBSWY3DPEHPK3PXP"
+            ),
         )
     }
 

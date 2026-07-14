@@ -25,7 +25,8 @@ private val Context.userPrefsDataStore: DataStore<Preferences> by preferencesDat
 open class UserPreferencesRepository(
     private val dataStore: DataStore<Preferences>,
 ) {
-    @Inject constructor(@ApplicationContext context: Context) : this(context.userPrefsDataStore)
+    @Inject
+    constructor(@ApplicationContext context: Context) : this(context.userPrefsDataStore)
 
     open val themeMode: Flow<ThemeMode> = dataStore.data.map { prefs ->
         ThemeMode.valueOf(prefs[Keys.THEME_MODE] ?: ThemeMode.SYSTEM.name)

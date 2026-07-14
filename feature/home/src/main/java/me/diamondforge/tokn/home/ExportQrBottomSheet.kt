@@ -1,8 +1,8 @@
 package me.diamondforge.tokn.home
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.Image
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.importer.otpauth.toOtpAuthUri
 import me.diamondforge.tokn.ui.qr.QrRenderer

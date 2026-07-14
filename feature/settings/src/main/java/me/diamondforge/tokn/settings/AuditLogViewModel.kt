@@ -52,7 +52,8 @@ class AuditLogViewModel @Inject constructor(
             }
         }
         entries.mapNotNull { entry ->
-            val type = runCatching { AuditEventType.valueOf(entry.type) }.getOrNull() ?: return@mapNotNull null
+            val type = runCatching { AuditEventType.valueOf(entry.type) }.getOrNull()
+                ?: return@mapNotNull null
             AuditLogRow(
                 id = entry.id,
                 type = type,
@@ -72,8 +73,8 @@ class AuditLogViewModel @Inject constructor(
     ) { allRows, categories, query, range ->
         val filtered = allRows.filter { row ->
             (categories.isEmpty() || row.type.category in categories) &&
-                (range == null || row.timestamp in range) &&
-                (query.isBlank() || row.matches(query))
+                    (range == null || row.timestamp in range) &&
+                    (query.isBlank() || row.matches(query))
         }
         AuditLogUiState(
             items = filtered,
@@ -82,7 +83,11 @@ class AuditLogViewModel @Inject constructor(
             searchQuery = query,
             dateRange = range,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AuditLogUiState(isLoading = true))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        AuditLogUiState(isLoading = true)
+    )
 
     val settingsState: StateFlow<AuditLogSettingsState> = combine(
         preferences.auditLoggingEnabled,
@@ -161,8 +166,8 @@ data class AuditLogRow(
         val needle = query.trim()
         if (needle.isEmpty()) return true
         return targetName?.contains(needle, ignoreCase = true) == true ||
-            detail?.contains(needle, ignoreCase = true) == true ||
-            type.name.replace('_', ' ').contains(needle, ignoreCase = true)
+                detail?.contains(needle, ignoreCase = true) == true ||
+                type.name.replace('_', ' ').contains(needle, ignoreCase = true)
     }
 }
 

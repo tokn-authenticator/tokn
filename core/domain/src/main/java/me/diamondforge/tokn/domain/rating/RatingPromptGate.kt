@@ -18,11 +18,11 @@ object RatingPromptGate {
         snoozedUntil: Long,
     ): Boolean =
         !handled &&
-            fromPlayStore &&
-            hasTokens &&
-            launchCount >= MIN_LAUNCHES &&
-            now - firstInstallTime >= MIN_DAYS_INSTALLED * MILLIS_PER_DAY &&
-            now >= snoozedUntil
+                fromPlayStore &&
+                hasTokens &&
+                launchCount >= MIN_LAUNCHES &&
+                now - firstInstallTime >= MIN_DAYS_INSTALLED * MILLIS_PER_DAY &&
+                now >= snoozedUntil
 
     fun snoozedUntil(now: Long): Long = now + SNOOZE_DAYS * MILLIS_PER_DAY
 }

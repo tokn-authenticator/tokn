@@ -127,7 +127,10 @@ fun LanSendScreen(
                             modifier = Modifier.fillMaxWidth(),
                         ) { Text(stringResource(R.string.sync_wfd_grant)) }
                     } else {
-                        Button(onClick = viewModel::startLanSend, modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = viewModel::startLanSend,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             Text(stringResource(R.string.sync_start))
                         }
                     }

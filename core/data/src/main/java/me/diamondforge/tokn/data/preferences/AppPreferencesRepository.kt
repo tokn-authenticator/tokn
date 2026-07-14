@@ -18,7 +18,8 @@ private val Context.appPrefsDataStore: DataStore<Preferences> by preferencesData
 open class AppPreferencesRepository(
     private val dataStore: DataStore<Preferences>,
 ) {
-    @Inject constructor(@ApplicationContext context: Context) : this(context.appPrefsDataStore)
+    @Inject
+    constructor(@ApplicationContext context: Context) : this(context.appPrefsDataStore)
 
     open val iconFetchEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.ICON_FETCH_ENABLED] ?: false

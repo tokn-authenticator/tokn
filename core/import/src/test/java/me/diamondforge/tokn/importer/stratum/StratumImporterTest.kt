@@ -124,8 +124,8 @@ class StratumImporterTest {
         val backup = JSONObject().apply {
             put(
                 "Authenticators", JSONArray().put(
-                StratumFixtureWriter.totp().apply { put("Icon", "@$iconId") }
-            ))
+                    StratumFixtureWriter.totp().apply { put("Icon", "@$iconId") }
+                ))
             put("Categories", JSONArray())
             put("AuthenticatorCategories", JSONArray())
             put("CustomIcons", JSONArray().put(JSONObject().apply {
