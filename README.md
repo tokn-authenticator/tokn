@@ -28,6 +28,7 @@ stay on the device, encrypted. No sign-up, no sync server, no analytics.
 - **Keeps an audit log.** Vault unlocks, settings changes, account and backup
   activity all get a timestamped entry, filterable by category, search, or
   date. Configurable.
+- **Optional recycle bin.** Deleted accounts can be kept for 30 days.
 - **Standards based.** TOTP and HOTP per [RFC 6238][totp-rfc] and
   [RFC 4226][hotp-rfc], with SHA-1, SHA-256 and SHA-512. Compatible with
   Google Authenticator URIs.
