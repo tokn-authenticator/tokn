@@ -5,6 +5,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Security
@@ -28,6 +29,7 @@ fun SettingsScreen(
     onBackup: () -> Unit,
     onSync: () -> Unit,
     onRecycleBin: () -> Unit,
+    onAuditLog: () -> Unit,
     onAbout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -89,6 +91,23 @@ fun SettingsScreen(
                         }
                     }
                 },
+            )
+        }
+
+        item { SettingsSectionHeader(stringResource(R.string.settings_audit_row_title)) }
+        item {
+            SettingsGroup(
+                items = listOf(
+                    {
+                        SettingsRow(
+                            title = stringResource(R.string.settings_audit_row_title),
+                            subtitle = stringResource(R.string.audit_log_setting_desc),
+                            icon = Icons.Default.History,
+                            onClick = onAuditLog,
+                            trailing = { Chevron() },
+                        )
+                    },
+                ),
             )
         }
 
