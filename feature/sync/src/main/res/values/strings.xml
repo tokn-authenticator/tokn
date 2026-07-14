@@ -23,6 +23,7 @@
     <string name="sync_wfd_scan">Scan for nearby</string>
     <string name="sync_wfd_unsupported">Wi-Fi Direct is not supported on this device.</string>
     <string name="sync_wfd_permission">Permission is needed to discover nearby devices.</string>
+    <string name="sync_lan_permission">Permission is needed to discover and connect to devices on your local network.</string>
     <string name="sync_wfd_grant">Grant permission</string>
     <string name="sync_wfd_no_peers">Looking for nearby devices…</string>
 

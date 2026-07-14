@@ -4,6 +4,7 @@ package me.diamondforge.tokn.sync.ui
 
 import android.Manifest
 import android.os.Build
+import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
@@ -64,13 +66,33 @@ internal fun wfdPermissionName(): String = when {
     else -> Manifest.permission.ACCESS_FINE_LOCATION
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.CINNAMON_BUN)
+internal fun localNetworkPermissionRequired(): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN
+
+
+@ExperimentalPermissionsApi
+@Composable
+internal fun rememberLocalNetworkPermissionState(): PermissionState? =
+    if (localNetworkPermissionRequired()) {
+        rememberPermissionState(Manifest.permission.ACCESS_LOCAL_NETWORK)
+    } else {
+        null
+    }
+
+@ExperimentalPermissionsApi
+internal val PermissionState?.isLocalNetworkGranted: Boolean
+    get() = this?.status?.isGranted ?: true
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun LanSendScreen(
     onBack: () -> Unit,
     viewModel: SendViewModel,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val lanPermissionState = rememberLocalNetworkPermissionState()
+    val lanPermissionGranted = lanPermissionState.isLocalNetworkGranted
     SendScaffold(
         titleRes = R.string.sync_method_lan_title,
         onBack = {
@@ -94,8 +116,20 @@ fun LanSendScreen(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Spacer(Modifier.height(24.dp))
-                    Button(onClick = viewModel::startLanSend, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.sync_start))
+                    if (!lanPermissionGranted) {
+                        Text(
+                            stringResource(R.string.sync_lan_permission),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Button(
+                            onClick = { lanPermissionState?.launchPermissionRequest() },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text(stringResource(R.string.sync_wfd_grant)) }
+                    } else {
+                        Button(onClick = viewModel::startLanSend, modifier = Modifier.fillMaxWidth()) {
+                            Text(stringResource(R.string.sync_start))
+                        }
                     }
                 }
 
@@ -119,6 +153,8 @@ fun WfdSendScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val permissionState = rememberPermissionState(wfdPermissionName())
+    val lanPermissionState = rememberLocalNetworkPermissionState()
+    val lanPermissionGranted = lanPermissionState.isLocalNetworkGranted
 
     SendScaffold(
         titleRes = R.string.sync_method_wfd_title,
@@ -161,6 +197,16 @@ fun WfdSendScreen(
                         Spacer(Modifier.height(12.dp))
                         Button(
                             onClick = { permissionState.launchPermissionRequest() },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) { Text(stringResource(R.string.sync_wfd_grant)) }
+                    } else if (!lanPermissionGranted) {
+                        Text(
+                            stringResource(R.string.sync_lan_permission),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Button(
+                            onClick = { lanPermissionState?.launchPermissionRequest() },
                             modifier = Modifier.fillMaxWidth(),
                         ) { Text(stringResource(R.string.sync_wfd_grant)) }
                     } else {

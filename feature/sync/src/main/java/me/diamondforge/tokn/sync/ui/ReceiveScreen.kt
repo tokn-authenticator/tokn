@@ -56,14 +56,15 @@ import me.diamondforge.tokn.sync.R
 import me.diamondforge.tokn.sync.lan.DiscoveredPeer
 import me.diamondforge.tokn.sync.qr.QrSyncScannerPreview
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun LanReceiveScreen(
     onBack: () -> Unit,
     viewModel: ReceiveViewModel,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val peers by viewModel.peers.collectAsStateWithLifecycle()
+    val lanPermissionState = rememberLocalNetworkPermissionState()
+    val lanPermissionGranted = lanPermissionState.isLocalNetworkGranted
     var pendingPeer by remember { mutableStateOf<DiscoveredPeer?>(null) }
     var code by rememberSaveable { mutableStateOf("") }
 
@@ -74,12 +75,20 @@ fun LanReceiveScreen(
         onDismissError = viewModel::clearError,
         onDismissVersionMismatch = viewModel::clearVersionMismatch,
     ) {
-        when (state.status) {
-            ReceiveUiState.Status.Connecting,
-            ReceiveUiState.Status.Importing -> ConnectingView(state)
+        when {
+            !lanPermissionGranted -> PermissionRequestView(
+                explanation = stringResource(R.string.sync_lan_permission),
+                button = stringResource(R.string.sync_wfd_grant),
+                onGrant = { lanPermissionState?.launchPermissionRequest() },
+            )
 
-            ReceiveUiState.Status.Done -> ImportSuccessView(state) { viewModel.reset() }
-            ReceiveUiState.Status.Idle -> {
+            state.status == ReceiveUiState.Status.Connecting ||
+                    state.status == ReceiveUiState.Status.Importing -> ConnectingView(state)
+
+            state.status == ReceiveUiState.Status.Done -> ImportSuccessView(state) { viewModel.reset() }
+
+            else -> {
+                val peers by viewModel.peers.collectAsStateWithLifecycle()
                 if (peers.isEmpty()) {
                     LookingView(stringResource(R.string.sync_looking_for_senders))
                 } else {
@@ -129,6 +138,8 @@ fun WfdReceiveScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val wfdPeers by viewModel.wfdPeers.collectAsStateWithLifecycle()
     val permissionState = rememberPermissionState(wfdPermissionName())
+    val lanPermissionState = rememberLocalNetworkPermissionState()
+    val lanPermissionGranted = lanPermissionState.isLocalNetworkGranted
     var pending by remember { mutableStateOf<WifiP2pDevice?>(null) }
     var code by rememberSaveable { mutableStateOf("") }
 
@@ -145,6 +156,12 @@ fun WfdReceiveScreen(
                 explanation = stringResource(R.string.sync_wfd_permission),
                 button = stringResource(R.string.sync_wfd_grant),
                 onGrant = { permissionState.launchPermissionRequest() },
+            )
+
+            !lanPermissionGranted -> PermissionRequestView(
+                explanation = stringResource(R.string.sync_lan_permission),
+                button = stringResource(R.string.sync_wfd_grant),
+                onGrant = { lanPermissionState?.launchPermissionRequest() },
             )
 
             state.status == ReceiveUiState.Status.Connecting ||

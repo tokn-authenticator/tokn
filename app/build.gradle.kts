@@ -18,7 +18,7 @@ android {
     defaultConfig {
         applicationId = "me.diamondforge.tokn"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 20
         versionName = "1.8.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
