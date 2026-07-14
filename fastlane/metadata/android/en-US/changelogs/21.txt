@@ -1,0 +1,6 @@
+Translation Hotfix release
+* New: recycle bin for deleted accounts, with an undo option. Enabled by default (Settings > App behavior).
+* New: automatic local backups, with an entry in Backup & Restore.
+* New: audit log in Settings showing vault, account, and backup activity.
+* New: export a single account as a QR code from its menu.
+* New: stay revealed setting to keep a code visible after copying (Settings > Security).
