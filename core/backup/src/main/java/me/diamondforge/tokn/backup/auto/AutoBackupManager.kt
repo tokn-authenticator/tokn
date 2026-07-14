@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import me.diamondforge.tokn.audit.AuditEventType
+import me.diamondforge.tokn.audit.AuditLogger
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import me.diamondforge.tokn.backup.EncryptedBackupManager
 import me.diamondforge.tokn.backup.serializeAccountsToJson
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
@@ -30,6 +33,7 @@ class AutoBackupManager @Inject constructor(
     private val encryptedBackupManager: EncryptedBackupManager,
     private val keystoreManager: KeystoreManager,
     private val session: VaultSession,
+    private val auditLogger: AuditLogger = NoopAuditLogger,
 ) {
     suspend fun setPassword(password: String) {
         prefs.setPasswordWrapped(keystoreManager.encrypt(password.toByteArray(Charsets.UTF_8)))
@@ -58,6 +62,7 @@ class AutoBackupManager @Inject constructor(
             val now = System.currentTimeMillis()
             writer.write(Uri.parse(location), bytes, encrypt, prefs.versionsToKeep.first(), now)
             prefs.setLastResult(hash, now, null)
+            auditLogger.log(AuditEventType.AUTO_BACKUP_CREATED)
             AutoBackupResult.Success
         } catch (e: Exception) {
             prefs.setLastResult(
