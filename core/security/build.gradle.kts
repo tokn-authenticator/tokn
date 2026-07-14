@@ -32,6 +32,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:audit"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.coroutines.android)
     implementation(libs.biometric)
