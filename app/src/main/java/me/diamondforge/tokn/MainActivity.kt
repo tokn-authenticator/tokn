@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.Lazy
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import me.diamondforge.tokn.audit.AuditLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -62,6 +63,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var vaultSession: VaultSession
 
+    @Inject
+    lateinit var auditLogger: AuditLogger
+
     // Lazy: eager injection would open the encrypted DB during onCreate, before
     // the vault is unlocked.
     @Inject
@@ -79,6 +83,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         enableEdgeToEdge()
+        lifecycleScope.launch {
+            userPreferencesRepository.auditLoggingEnabled.collect(auditLogger::setEnabled)
+        }
+        lifecycleScope.launch {
+            userPreferencesRepository.auditDisabledCategories.collect(auditLogger::setDisabledCategories)
+        }
         lifecycleScope.launch {
             // Migrate to the slot-based vault and, when no password/biometric is
             // configured, transparently unlock from the no-auth keystore slot so
