@@ -21,6 +21,7 @@
     <string name="sync_wfd_scan">扫描附近设备</string>
     <string name="sync_wfd_unsupported">此设备不支持 Wi-Fi 直连。</string>
     <string name="sync_wfd_permission">需要权限来发现附近的设备。</string>
+    <string name="sync_lan_permission">Permission is needed to discover and connect to devices on your local network.</string>
     <string name="sync_wfd_grant">授权</string>
     <string name="sync_wfd_no_peers">正在寻找附近的设备…</string>
     <string name="sync_pairing_code">配对码</string>
