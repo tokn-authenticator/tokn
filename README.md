@@ -25,6 +25,9 @@ stay on the device, encrypted. No sign-up, no sync server, no analytics.
   independently, so losing one does not lock you out of the others.
 - **Hide on demand.** Optional screenshot protection keeps codes out of the
   recents preview and blocks screen capture.
+- **Keeps an audit log.** Vault unlocks, settings changes, account and backup
+  activity all get a timestamped entry, filterable by category, search, or
+  date. Configurable.
 - **Standards based.** TOTP and HOTP per [RFC 6238][totp-rfc] and
   [RFC 4226][hotp-rfc], with SHA-1, SHA-256 and SHA-512. Compatible with
   Google Authenticator URIs.
