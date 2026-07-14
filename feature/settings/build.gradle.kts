@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":core:security"))
     implementation(project(":core:data"))
     implementation(project(":core:backup"))
+    implementation(project(":core:audit"))
 
     implementation(libs.appcompat)
     implementation(libs.documentfile)
