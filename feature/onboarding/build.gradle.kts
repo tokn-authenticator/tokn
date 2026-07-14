@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:security"))
     implementation(project(":core:import"))
+    implementation(project(":core:audit"))
 
     implementation(libs.appcompat)
     implementation(libs.androidx.core.ktx)

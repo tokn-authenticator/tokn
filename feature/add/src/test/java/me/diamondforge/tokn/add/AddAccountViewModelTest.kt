@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
@@ -49,7 +50,7 @@ class AddAccountViewModelTest {
     private fun newVm() = AddAccountViewModel(
         context = context,
         addAccountUseCase = AddAccountUseCase(repo),
-        lockManager = LockManager(),
+        lockManager = LockManager(NoopAuditLogger),
         iconPackManager = IconPackManager(context),
         getAccountsUseCase = GetAccountsUseCase(repo),
     )

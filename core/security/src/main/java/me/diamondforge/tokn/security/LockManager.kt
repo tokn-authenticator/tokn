@@ -3,11 +3,16 @@ package me.diamondforge.tokn.security
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import me.diamondforge.tokn.audit.AuditEventType
+import me.diamondforge.tokn.audit.AuditLogger
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LockManager @Inject constructor() {
+class LockManager @Inject constructor(
+    private val auditLogger: AuditLogger,
+) {
     // null = auth check not yet completed, true = locked, false = unlocked
     private val _isLocked = MutableStateFlow<Boolean?>(null)
     val isLocked: StateFlow<Boolean?> = _isLocked.asStateFlow()
@@ -44,6 +49,7 @@ class LockManager @Inject constructor() {
         val elapsed = (now - backgroundedAt) / 1000
         if (timeoutSeconds == 0 || elapsed >= timeoutSeconds) {
             _isLocked.value = true
+            auditLogger.log(AuditEventType.VAULT_LOCKED_AUTO)
         }
     }
 
