@@ -91,6 +91,9 @@ class FakeAccountRepository(
     override suspend fun getAccountById(id: Long): OtpAccount? =
         state.value.firstOrNull { it.id == id }
 
+    override suspend fun getAccountsByIds(ids: Set<Long>): List<OtpAccount> =
+        state.value.filter { it.id in ids }
+
     override suspend fun renameGroup(from: String, to: String): Int {
         val target = to.trim()
         val source = from.trim()

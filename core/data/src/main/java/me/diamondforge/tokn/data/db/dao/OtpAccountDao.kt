@@ -21,6 +21,9 @@ interface OtpAccountDao {
     @Query("SELECT * FROM otp_accounts WHERE id = :id AND deleted_at = 0 LIMIT 1")
     suspend fun getAccountById(id: Long): OtpAccountEntity?
 
+    @Query("SELECT * FROM otp_accounts WHERE id IN (:ids)")
+    suspend fun getAccountsByIds(ids: Set<Long>): List<OtpAccountEntity>
+
     @Query("SELECT * FROM otp_accounts WHERE deleted_at != 0 ORDER BY deleted_at DESC")
     fun getTrashedAccounts(): Flow<List<OtpAccountEntity>>
 

@@ -18,6 +18,7 @@ import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteGroupUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
+import me.diamondforge.tokn.domain.usecase.GetAccountsByIdsUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GetTrashedAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
@@ -93,6 +94,9 @@ object DataModule {
 
     @Provides
     fun provideGetAccountByIdUseCase(repo: AccountRepository) = GetAccountByIdUseCase(repo)
+
+    @Provides
+    fun provideGetAccountsByIdsUseCase(repo: AccountRepository) = GetAccountsByIdsUseCase(repo)
 
     @Provides
     fun provideIncrementHotpCounterUseCase(repo: AccountRepository) =

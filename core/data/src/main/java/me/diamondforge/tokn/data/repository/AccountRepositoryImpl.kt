@@ -3,6 +3,9 @@ package me.diamondforge.tokn.data.repository
 import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import me.diamondforge.tokn.audit.AuditEventType
+import me.diamondforge.tokn.audit.AuditLogger
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import me.diamondforge.tokn.data.db.AppDatabase
 import me.diamondforge.tokn.data.db.dao.OtpAccountDao
 import me.diamondforge.tokn.data.db.entity.toDomain
@@ -15,22 +18,32 @@ import javax.inject.Inject
 class AccountRepositoryImpl @Inject constructor(
     private val dao: OtpAccountDao,
     private val db: AppDatabase,
+    private val auditLogger: AuditLogger = NoopAuditLogger,
 ) : AccountRepository {
 
     override fun getAccounts(): Flow<List<OtpAccount>> =
         dao.getAllAccounts().map { list -> list.map { it.toDomain() } }
 
-    override suspend fun addAccount(account: OtpAccount): Long =
-        dao.insert(account.toEntity())
+    override suspend fun addAccount(account: OtpAccount): Long {
+        val id = dao.insert(account.toEntity())
+        auditLogger.log(AuditEventType.ITEM_ADDED, targetId = id)
+        return id
+    }
 
-    override suspend fun updateAccount(account: OtpAccount) =
+    override suspend fun updateAccount(account: OtpAccount) {
         dao.update(account.toEntity())
+        auditLogger.log(AuditEventType.ITEM_EDITED, targetId = account.id)
+    }
 
-    override suspend fun deleteAccount(id: Long) =
+    override suspend fun deleteAccount(id: Long) {
         dao.softDeleteByIds(setOf(id), System.currentTimeMillis())
+        auditLogger.log(AuditEventType.ITEM_DELETED, targetId = id)
+    }
 
     override suspend fun deleteAccounts(ids: Set<Long>) {
-        if (ids.isNotEmpty()) dao.softDeleteByIds(ids, System.currentTimeMillis())
+        if (ids.isEmpty()) return
+        dao.softDeleteByIds(ids, System.currentTimeMillis())
+        ids.forEach { auditLogger.log(AuditEventType.ITEM_DELETED, targetId = it) }
     }
 
     override fun getTrashedAccounts(): Flow<List<TrashedAccount>> =
@@ -39,15 +52,24 @@ class AccountRepositoryImpl @Inject constructor(
         }
 
     override suspend fun restoreAccounts(ids: Set<Long>) {
-        if (ids.isNotEmpty()) dao.restoreByIds(ids)
+        if (ids.isEmpty()) return
+        dao.restoreByIds(ids)
+        ids.forEach { auditLogger.log(AuditEventType.ITEM_RESTORED, targetId = it) }
     }
 
     override suspend fun purgeAccounts(ids: Set<Long>) {
-        if (ids.isNotEmpty()) dao.deleteByIds(ids)
+        if (ids.isEmpty()) return
+        dao.deleteByIds(ids)
+        ids.forEach { auditLogger.log(AuditEventType.ITEM_PURGED, targetId = it) }
     }
 
-    override suspend fun purgeExpiredTrash(cutoff: Long): Int =
-        dao.purgeExpired(cutoff)
+    override suspend fun purgeExpiredTrash(cutoff: Long): Int {
+        val count = dao.purgeExpired(cutoff)
+        if (count > 0) {
+            auditLogger.log(AuditEventType.ITEM_PURGED_AUTO, detail = count.toString())
+        }
+        return count
+    }
 
     override suspend fun reorderAccounts(accounts: List<OtpAccount>) {
         accounts.forEachIndexed { index, account ->
@@ -64,36 +86,49 @@ class AccountRepositoryImpl @Inject constructor(
     override suspend fun getAccountById(id: Long): OtpAccount? =
         dao.getAccountById(id)?.toDomain()
 
+    override suspend fun getAccountsByIds(ids: Set<Long>): List<OtpAccount> {
+        if (ids.isEmpty()) return emptyList()
+        return dao.getAccountsByIds(ids).map { it.toDomain() }
+    }
+
     override suspend fun renameGroup(from: String, to: String): Int {
         val target = to.trim()
         val source = from.trim()
         if (target.isEmpty() || source.isEmpty()) return 0
-        return db.withTransaction {
-            var changed = 0
+        val changed = db.withTransaction {
+            var count = 0
             dao.getAllAccountsOnce().forEach { entity ->
                 val account = entity.toDomain()
                 val updated = renameInList(account.groups, source, target) ?: return@forEach
                 dao.update(account.copy(groups = updated).toEntity())
-                changed++
+                count++
             }
-            changed
+            count
         }
+        if (changed > 0) {
+            auditLogger.log(AuditEventType.GROUP_RENAMED, detail = "$source -> $target")
+        }
+        return changed
     }
 
     override suspend fun removeGroup(name: String): Int {
         val target = name.trim()
         if (target.isEmpty()) return 0
-        return db.withTransaction {
-            var changed = 0
+        val changed = db.withTransaction {
+            var count = 0
             dao.getAllAccountsOnce().forEach { entity ->
                 val account = entity.toDomain()
                 if (account.groups.none { it.equals(target, ignoreCase = true) }) return@forEach
                 val pruned = account.groups.filterNot { it.equals(target, ignoreCase = true) }
                 dao.update(account.copy(groups = pruned).toEntity())
-                changed++
+                count++
             }
-            changed
+            count
         }
+        if (changed > 0) {
+            auditLogger.log(AuditEventType.GROUP_REMOVED, detail = target)
+        }
+        return changed
     }
 }
 
