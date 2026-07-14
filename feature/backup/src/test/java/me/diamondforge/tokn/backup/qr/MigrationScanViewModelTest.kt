@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
 import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
@@ -48,7 +49,7 @@ class MigrationScanViewModelTest {
     private fun newVm() = MigrationScanViewModel(
         importer = OtpAuthMigrationImporter(),
         importAccountsUseCase = ImportAccountsUseCase(repo),
-        lockManager = LockManager(),
+        lockManager = LockManager(NoopAuditLogger),
     )
 
     private fun entry(secret: String, name: String, issuer: String = "Issuer") =

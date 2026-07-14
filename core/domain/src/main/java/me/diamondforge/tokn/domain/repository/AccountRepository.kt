@@ -19,6 +19,7 @@ interface AccountRepository {
     suspend fun incrementCounter(id: Long)
     suspend fun recordUsage(id: Long, timestamp: Long)
     suspend fun getAccountById(id: Long): OtpAccount?
+    suspend fun getAccountsByIds(ids: Set<Long>): List<OtpAccount>
 
     /**
      * Replace every case-insensitive occurrence of [from] in any account's

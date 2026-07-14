@@ -8,10 +8,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import me.diamondforge.tokn.audit.AuditCategory
 import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.TapBehavior
 import javax.inject.Inject
@@ -111,6 +113,20 @@ open class UserPreferencesRepository(
         prefs[Keys.RATING_PROMPT_SNOOZED_UNTIL] ?: 0L
     }
 
+    open val auditLoggingEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.AUDIT_LOGGING_ENABLED] ?: true
+    }
+
+    open val auditRetentionDays: Flow<Int> = dataStore.data.map { prefs ->
+        prefs[Keys.AUDIT_RETENTION_DAYS] ?: 90
+    }
+
+    open val auditDisabledCategories: Flow<Set<AuditCategory>> = dataStore.data.map { prefs ->
+        (prefs[Keys.AUDIT_DISABLED_CATEGORIES] ?: emptySet())
+            .mapNotNull { name -> runCatching { AuditCategory.valueOf(name) }.getOrNull() }
+            .toSet()
+    }
+
     open suspend fun setThemeMode(mode: ThemeMode) {
         dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     }
@@ -191,6 +207,18 @@ open class UserPreferencesRepository(
         dataStore.edit { it[Keys.RATING_PROMPT_SNOOZED_UNTIL] = timestamp }
     }
 
+    open suspend fun setAuditLoggingEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.AUDIT_LOGGING_ENABLED] = enabled }
+    }
+
+    open suspend fun setAuditRetentionDays(days: Int) {
+        dataStore.edit { it[Keys.AUDIT_RETENTION_DAYS] = days }
+    }
+
+    open suspend fun setAuditDisabledCategories(categories: Set<AuditCategory>) {
+        dataStore.edit { it[Keys.AUDIT_DISABLED_CATEGORIES] = categories.map { it.name }.toSet() }
+    }
+
     private object Keys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val AUTO_LOCK_TIMEOUT = intPreferencesKey("auto_lock_timeout")
@@ -212,6 +240,9 @@ open class UserPreferencesRepository(
         val RATING_PROMPT_LAUNCH_COUNT = intPreferencesKey("rating_prompt_launch_count")
         val RATING_PROMPT_HANDLED = booleanPreferencesKey("rating_prompt_handled")
         val RATING_PROMPT_SNOOZED_UNTIL = longPreferencesKey("rating_prompt_snoozed_until")
+        val AUDIT_LOGGING_ENABLED = booleanPreferencesKey("audit_logging_enabled")
+        val AUDIT_RETENTION_DAYS = intPreferencesKey("audit_retention_days")
+        val AUDIT_DISABLED_CATEGORIES = stringSetPreferencesKey("audit_disabled_categories")
     }
 }
 

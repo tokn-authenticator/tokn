@@ -66,6 +66,7 @@ import me.diamondforge.tokn.home.HomeScreen
 import me.diamondforge.tokn.onboarding.OnboardingScreen
 import me.diamondforge.tokn.settings.AboutScreen
 import me.diamondforge.tokn.settings.AppearanceScreen
+import me.diamondforge.tokn.settings.AuditLogScreen
 import me.diamondforge.tokn.settings.AutoBackupScreen
 import me.diamondforge.tokn.settings.BehaviorScreen
 import me.diamondforge.tokn.settings.GroupManagementScreen
@@ -209,6 +210,7 @@ fun AppNavHost(
                 onBackup = { entry.navigateOnce(navController, Screen.Backup.route) },
                 onSync = { entry.navigateOnce(navController, Screen.Sync.route) },
                 onRecycleBin = { entry.navigateOnce(navController, Screen.RecycleBin.route) },
+                onAuditLog = { entry.navigateOnce(navController, Screen.AuditLog.route) },
                 onAbout = { entry.navigateOnce(navController, Screen.About.route) },
             )
         }
@@ -312,6 +314,9 @@ fun AppNavHost(
         }
         composable(Screen.SecuritySettings.route) {
             SecurityScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.AuditLog.route) {
+            AuditLogScreen(onBack = { navController.popBackStack() })
         }
         composable(Screen.About.route) { entry ->
             AboutScreen(
@@ -496,6 +501,7 @@ sealed class Screen(val route: String) {
     data object SecuritySettings : Screen("security_settings")
     data object GroupManagement : Screen("settings/groups")
     data object RecycleBin : Screen("settings/recycle_bin")
+    data object AuditLog : Screen("settings/audit_log")
     data object About : Screen("about")
     data object ThirdPartyLicenses : Screen("about/third_party")
     data object Backup : Screen("backup")

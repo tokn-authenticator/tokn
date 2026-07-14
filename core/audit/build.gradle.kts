@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "me.diamondforge.tokn.security"
+    namespace = "me.diamondforge.tokn.audit"
     compileSdk = 37
 
     defaultConfig {
@@ -32,18 +32,19 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:audit"))
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.coroutines.android)
-    implementation(libs.biometric)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
     implementation(libs.hilt.android)
-    implementation(libs.bouncycastle)
     ksp(libs.hilt.compiler)
     ksp(libs.kotlin.metadata.jvm)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
-    testImplementation(libs.org.json)
+    testImplementation(libs.coroutines.test)
 }

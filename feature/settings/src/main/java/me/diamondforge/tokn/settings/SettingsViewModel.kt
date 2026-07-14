@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.diamondforge.tokn.audit.AuditEventType
+import me.diamondforge.tokn.audit.AuditLogger
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
@@ -29,6 +32,7 @@ class SettingsViewModel @Inject constructor(
     private val vaultManager: VaultManager,
     getTrashedAccountsUseCase: GetTrashedAccountsUseCase,
     private val purgeAccountsUseCase: PurgeAccountsUseCase,
+    private val auditLogger: AuditLogger = NoopAuditLogger,
 ) : ViewModel() {
 
     private val trashed = getTrashedAccountsUseCase()
@@ -84,11 +88,17 @@ class SettingsViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     fun setThemeMode(mode: ThemeMode) {
-        viewModelScope.launch { preferences.setThemeMode(mode) }
+        viewModelScope.launch {
+            preferences.setThemeMode(mode)
+            auditLogger.log(AuditEventType.THEME_CHANGED, detail = mode.name)
+        }
     }
 
     fun setAutoLockTimeout(seconds: Int) {
-        viewModelScope.launch { preferences.setAutoLockTimeout(seconds) }
+        viewModelScope.launch {
+            preferences.setAutoLockTimeout(seconds)
+            auditLogger.log(AuditEventType.AUTO_LOCK_TIMEOUT_CHANGED, detail = seconds.toString())
+        }
     }
 
     fun setBiometricEnabled(enabled: Boolean) {
@@ -102,41 +112,82 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setScreenshotsEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setScreenshotsEnabled(enabled) }
+        viewModelScope.launch {
+            preferences.setScreenshotsEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.SCREENSHOT_PROTECTION_DISABLED
+                else AuditEventType.SCREENSHOT_PROTECTION_ENABLED,
+            )
+        }
     }
 
     fun setIconFetchEnabled(enabled: Boolean) {
-        viewModelScope.launch { appPreferences.setIconFetchEnabled(enabled) }
+        viewModelScope.launch {
+            appPreferences.setIconFetchEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.ICON_FETCH_ENABLED else AuditEventType.ICON_FETCH_DISABLED,
+            )
+        }
     }
 
     fun setTapToRevealEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setTapToRevealEnabled(enabled) }
+        viewModelScope.launch {
+            preferences.setTapToRevealEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.TAP_TO_REVEAL_ENABLED else AuditEventType.TAP_TO_REVEAL_DISABLED,
+            )
+        }
     }
 
     fun setStayRevealedEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setStayRevealedEnabled(enabled) }
+        viewModelScope.launch {
+            preferences.setStayRevealedEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.STAY_REVEALED_ENABLED else AuditEventType.STAY_REVEALED_DISABLED,
+            )
+        }
     }
 
     fun setTapBehavior(behavior: TapBehavior) {
-        viewModelScope.launch { preferences.setTapBehavior(behavior) }
+        viewModelScope.launch {
+            preferences.setTapBehavior(behavior)
+            auditLogger.log(AuditEventType.TAP_BEHAVIOR_CHANGED, detail = behavior.name)
+        }
     }
 
     fun setDynamicColorEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setDynamicColorEnabled(enabled) }
+        viewModelScope.launch {
+            preferences.setDynamicColorEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.DYNAMIC_COLOR_ENABLED else AuditEventType.DYNAMIC_COLOR_DISABLED,
+            )
+        }
     }
 
     fun setShowNextCodeEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setShowNextCodeEnabled(enabled) }
+        viewModelScope.launch {
+            preferences.setShowNextCodeEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.SHOW_NEXT_CODE_ENABLED else AuditEventType.SHOW_NEXT_CODE_DISABLED,
+            )
+        }
     }
 
     fun setRecycleBinEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setRecycleBinEnabled(enabled) }
+        viewModelScope.launch {
+            preferences.setRecycleBinEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.RECYCLE_BIN_SETTING_ENABLED
+                else AuditEventType.RECYCLE_BIN_SETTING_DISABLED,
+            )
+        }
     }
 
     fun disableRecycleBin() {
         viewModelScope.launch {
             purgeAccountsUseCase(trashed.value.map { it.id }.toSet())
             preferences.setRecycleBinEnabled(false)
+            auditLogger.log(AuditEventType.RECYCLE_BIN_SETTING_DISABLED)
         }
     }
 
@@ -163,7 +214,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setPasswordReminderEnabled(enabled: Boolean) {
-        viewModelScope.launch { preferences.setPasswordReminderEnabled(enabled) }
+        viewModelScope.launch {
+            preferences.setPasswordReminderEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.PASSWORD_REMINDER_ENABLED
+                else AuditEventType.PASSWORD_REMINDER_DISABLED,
+            )
+        }
     }
 
     fun clearPasswordError() = _passwordError.update { false }

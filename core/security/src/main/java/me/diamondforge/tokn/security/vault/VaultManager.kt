@@ -2,6 +2,9 @@ package me.diamondforge.tokn.security.vault
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import me.diamondforge.tokn.audit.AuditEventType
+import me.diamondforge.tokn.audit.AuditLogger
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import me.diamondforge.tokn.security.KeystoreManager
 import me.diamondforge.tokn.security.VaultPasswordManager
 import me.diamondforge.tokn.security.crypto.Argon2KeyDeriver
@@ -19,6 +22,7 @@ open class VaultManager @Inject constructor(
     private val keystoreManager: KeystoreManager,
     private val session: VaultSession,
     private val legacyPassword: VaultPasswordManager,
+    private val auditLogger: AuditLogger = NoopAuditLogger,
 ) {
     private val slotStore = SlotStore(context)
 
@@ -91,6 +95,15 @@ open class VaultManager @Inject constructor(
 
     @Synchronized
     open fun unlockWithPassword(password: String): Boolean {
+        val result = unlockWithPasswordLocked(password)
+        auditLogger.log(
+            if (result) AuditEventType.VAULT_UNLOCKED_PASSWORD
+            else AuditEventType.VAULT_UNLOCK_FAILED_PASSWORD,
+        )
+        return result
+    }
+
+    private fun unlockWithPasswordLocked(password: String): Boolean {
         val slots = slotStore.load()
         val passwordSlot = slots.firstOrNull { it is PasswordSlot } as? PasswordSlot
 
@@ -148,11 +161,22 @@ open class VaultManager @Inject constructor(
         } finally {
             Arrays.fill(masterKey, 0)
         }
+        auditLogger.log(AuditEventType.BIOMETRIC_ENABLED)
+        auditLogger.log(AuditEventType.VAULT_UNLOCKED_BIOMETRIC)
         return true
     }
 
     @Synchronized
     open fun finishBiometricUnlock(authenticatedCipher: Cipher): Boolean {
+        val result = finishBiometricUnlockLocked(authenticatedCipher)
+        auditLogger.log(
+            if (result) AuditEventType.VAULT_UNLOCKED_BIOMETRIC
+            else AuditEventType.VAULT_UNLOCK_FAILED_BIOMETRIC,
+        )
+        return result
+    }
+
+    private fun finishBiometricUnlockLocked(authenticatedCipher: Cipher): Boolean {
         val slot = biometricSlot() ?: return false
         val masterKey = runCatching {
             keystoreManager.biometricUnwrap(authenticatedCipher, slot.wrappedKey)
@@ -167,6 +191,7 @@ open class VaultManager @Inject constructor(
 
     @Synchronized
     open fun setPassword(password: String) {
+        val wasSet = hasPassword()
         val masterKey = session.requireKey()
         try {
             val slots = slotStore.load()
@@ -178,6 +203,7 @@ open class VaultManager @Inject constructor(
         } finally {
             Arrays.fill(masterKey, 0)
         }
+        auditLogger.log(if (wasSet) AuditEventType.PASSWORD_CHANGED else AuditEventType.PASSWORD_SET)
     }
 
     @Synchronized
@@ -191,6 +217,7 @@ open class VaultManager @Inject constructor(
         } finally {
             Arrays.fill(masterKey, 0)
         }
+        auditLogger.log(AuditEventType.PASSWORD_REMOVED)
     }
 
     @Synchronized
@@ -203,6 +230,7 @@ open class VaultManager @Inject constructor(
         } finally {
             Arrays.fill(masterKey, 0)
         }
+        auditLogger.log(AuditEventType.BIOMETRIC_ENABLED)
     }
 
     @Synchronized
@@ -210,6 +238,7 @@ open class VaultManager @Inject constructor(
         val slots = slotStore.load().filterNot { it is KeystoreSlot && it.requiresAuth }
         slotStore.save(slots)
         keystoreManager.deleteBiometricKey()
+        auditLogger.log(AuditEventType.BIOMETRIC_DISABLED)
     }
 
     private fun biometricSlot(): KeystoreSlot? =

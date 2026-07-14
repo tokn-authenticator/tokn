@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":core:security"))
     implementation(project(":core:data"))
     implementation(project(":core:backup"))
+    implementation(project(":core:audit"))
 
     implementation(libs.appcompat)
     implementation(libs.documentfile)
@@ -69,6 +70,7 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.coroutines.test)
+    testImplementation(libs.room.runtime)
     testImplementation(testFixtures(project(":core:domain")))
     testImplementation(testFixtures(project(":core:data")))
 }

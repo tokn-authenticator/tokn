@@ -38,6 +38,7 @@ android {
 dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:security"))
+    implementation(project(":core:audit"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.coroutines.android)

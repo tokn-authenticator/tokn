@@ -14,6 +14,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.diamondforge.tokn.audit.AuditEventType
+import me.diamondforge.tokn.audit.AuditLogger
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import me.diamondforge.tokn.data.security.VaultAuthGate
 import me.diamondforge.tokn.data.security.VaultAuthMode
 import me.diamondforge.tokn.domain.model.OtpAccount
@@ -34,6 +37,7 @@ class BackupViewModel @Inject constructor(
     private val lockManager: LockManager,
     private val importerRegistry: ImporterRegistry,
     private val vaultAuthGate: VaultAuthGate,
+    private val auditLogger: AuditLogger = NoopAuditLogger,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BackupUiState())
@@ -58,6 +62,7 @@ class BackupViewModel @Inject constructor(
                 }
             }.onSuccess {
                 _uiState.update { it.copy(isLoading = false, exportSuccess = true) }
+                auditLogger.log(AuditEventType.BACKUP_EXPORTED_UNENCRYPTED)
             }.onFailure {
                 _uiState.update {
                     it.copy(
@@ -73,12 +78,12 @@ class BackupViewModel @Inject constructor(
     }
 
     fun exportOtpAuthUriList(uri: Uri) =
-        exportText(uri) { serializeAccountsAsOtpAuthUriList(it) }
+        exportText(uri, AuditEventType.BACKUP_EXPORTED_OTPAUTH_LIST) { serializeAccountsAsOtpAuthUriList(it) }
 
     fun exportPlainText(uri: Uri) =
-        exportText(uri) { serializeAccountsAsPlainText(it) }
+        exportText(uri, AuditEventType.BACKUP_EXPORTED_PLAIN_TEXT) { serializeAccountsAsPlainText(it) }
 
-    private fun exportText(uri: Uri, render: (List<OtpAccount>) -> String) {
+    private fun exportText(uri: Uri, event: AuditEventType, render: (List<OtpAccount>) -> String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             runCatching {
@@ -90,6 +95,7 @@ class BackupViewModel @Inject constructor(
                 }
             }.onSuccess {
                 _uiState.update { it.copy(isLoading = false, exportSuccess = true) }
+                auditLogger.log(event)
             }.onFailure {
                 _uiState.update {
                     it.copy(
@@ -114,6 +120,7 @@ class BackupViewModel @Inject constructor(
                 }
             }.onSuccess {
                 _uiState.update { it.copy(isLoading = false, exportSuccess = true) }
+                auditLogger.log(AuditEventType.BACKUP_EXPORTED_ENCRYPTED)
             }.onFailure { e ->
                 val error = when {
                     e.message?.contains("output stream") == true ->
@@ -178,6 +185,7 @@ class BackupViewModel @Inject constructor(
                             pendingExternal = null,
                         )
                     }
+                    auditLogger.log(AuditEventType.VAULT_IMPORTED, detail = importer.displayName)
                 }
             }
 

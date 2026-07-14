@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":core:import"))
     implementation(project(":core:backup"))
     implementation(project(":core:ui"))
+    implementation(project(":core:audit"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

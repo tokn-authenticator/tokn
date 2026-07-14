@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import me.diamondforge.tokn.audit.AuditEventType
+import me.diamondforge.tokn.audit.AuditLogger
+import me.diamondforge.tokn.audit.NoopAuditLogger
 import me.diamondforge.tokn.domain.usecase.GetTrashedAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.PurgeExpiredTrashUseCase
@@ -21,6 +24,7 @@ class RecycleBinViewModel @Inject constructor(
     private val restoreAccountsUseCase: RestoreAccountsUseCase,
     private val purgeAccountsUseCase: PurgeAccountsUseCase,
     private val purgeExpiredTrashUseCase: PurgeExpiredTrashUseCase,
+    private val auditLogger: AuditLogger = NoopAuditLogger,
 ) : ViewModel() {
 
     init {
@@ -59,7 +63,10 @@ class RecycleBinViewModel @Inject constructor(
     fun emptyBin() {
         val ids = uiState.value.items.map { it.id }.toSet()
         if (ids.isEmpty()) return
-        viewModelScope.launch { purgeAccountsUseCase(ids) }
+        viewModelScope.launch {
+            purgeAccountsUseCase(ids)
+            auditLogger.log(AuditEventType.RECYCLE_BIN_EMPTIED, detail = ids.size.toString())
+        }
     }
 }
 
