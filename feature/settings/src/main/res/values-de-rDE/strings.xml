@@ -24,6 +24,9 @@
     <string name="material_you_desc">Verwendet die Hintergrund-basierte Farbpalette vom System</string>
     <string name="show_next_code">Nächsten Code anzeigen</string>
     <string name="show_next_code_desc">Nächsten code unter dem bestehenden anzeigen</string>
+    <string name="settings_section_groups">Groups</string>
+    <string name="show_group_chip">Show group chip</string>
+    <string name="show_group_chip_desc">Display a colored group chip next to each account</string>
     <string name="account_icons">Konto-Icons</string>
     <string name="account_icons_desc">Service-Logos aus dem Internet laden (Simple Icons)</string>
     <string name="account_icons_privacy_title">Icons aus dem Internet laden?</string>
@@ -94,9 +97,18 @@
     <string name="open">Öffnen</string>
     <string name="data">Daten</string>
     <string name="settings_groups_title">Gruppen</string>
-    <string name="settings_groups_desc">Accountgruppen umbenennen oder entfernen</string>
+    <string name="settings_groups_desc">Create, color and reorder your groups</string>
     <string name="groups_empty_title">Noch keine Gruppen</string>
     <string name="groups_empty_body">Gruppen beim Hinzufügen oder Bearbeiten eines Kontos zuweisen.</string>
+    <string name="groups_add_cd">Add group</string>
+    <string name="groups_create_title">New group</string>
+    <string name="groups_create_confirm">Create</string>
+    <string name="groups_color_title">Color for %1$s</string>
+    <string name="cd_drag_handle">Drag to reorder</string>
+    <string name="groups_sort_cd">Sort groups</string>
+    <string name="groups_sort_custom">Custom</string>
+    <string name="groups_sort_name_asc">A to Z</string>
+    <string name="groups_sort_name_desc">Z to A</string>
     <string name="groups_overflow_cd">Weitere Optionen</string>
     <string name="groups_action_rename">Umbenennen</string>
     <string name="groups_action_delete">Löschen</string>
@@ -259,6 +271,8 @@
     <string name="audit_event_item_purged_auto">Kunden wurden automatisch aus dem Papierkorb entfernt</string>
     <string name="audit_event_group_renamed">Gruppe wurde umbenannt</string>
     <string name="audit_event_group_removed">Gruppe entfernt</string>
+    <string name="audit_event_group_created">Group created</string>
+    <string name="audit_event_accounts_added_to_group">Accounts added to group</string>
     <string name="audit_event_theme_changed">Design geändert</string>
     <string name="audit_event_dynamic_color_enabled">\"Material You\" Farben aktiviert</string>
     <string name="audit_event_dynamic_color_disabled">\"Material You\" Farben deaktiviert</string>
@@ -278,6 +292,8 @@
     <string name="audit_event_password_reminder_disabled">Passwort-Erinnerungen deaktiviert</string>
     <string name="audit_event_recycle_bin_setting_enabled">Papierkorb aktiviert</string>
     <string name="audit_event_recycle_bin_setting_disabled">Papierkorb deaktiviert</string>
+    <string name="audit_event_show_group_chip_enabled">Account group chip enabled</string>
+    <string name="audit_event_show_group_chip_disabled">Account group chip disabled</string>
     <string name="audit_event_audit_log_enabled">Audit-Log aktiviert</string>
     <string name="audit_event_audit_log_disabled">Audit-Log deaktiviert</string>
     <string name="audit_event_audit_log_retention_changed">Speicherungszeitraum des Audit-Logs geändert</string>
