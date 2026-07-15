@@ -14,6 +14,7 @@ import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.security.EncryptionManager
 import me.diamondforge.tokn.sync.AppInfo
 import me.diamondforge.tokn.sync.SyncProtocol
@@ -133,6 +134,7 @@ class ReceiveViewModelTest {
         val sendVm = SendViewModel(
             context = context,
             getAccountsUseCase = GetAccountsUseCase(sendRepo),
+            listGroupsUseCase = ListGroupsUseCase(sendRepo),
             encryptionManager = EncryptionManager(),
             appInfo = AppInfo(context),
             vaultAuthGate = newVaultAuthGate(context),

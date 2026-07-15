@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,11 +41,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -51,6 +56,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import me.diamondforge.tokn.domain.model.OtpType
+import me.diamondforge.tokn.ui.readableOnColor
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import java.io.File
 import kotlin.math.absoluteValue
@@ -69,6 +75,8 @@ internal fun ReorderableCollectionItemScope.AccountCard(
     isSelected: Boolean,
     canReorder: Boolean,
     isMasked: Boolean,
+    groups: List<String>,
+    groupColorFor: (String) -> Int?,
     onTap: () -> Unit,
     onDoubleTap: (() -> Unit)?,
     onLongPress: () -> Unit,
@@ -112,14 +120,27 @@ internal fun ReorderableCollectionItemScope.AccountCard(
 
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.account.issuer,
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = MaterialTheme.colorScheme.primary,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = item.account.issuer,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false),
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    if (groups.isNotEmpty()) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        GroupChipsOverflowRow(
+                            groups = groups,
+                            colorFor = groupColorFor,
+                            modifier = Modifier.widthIn(max = 120.dp),
+                        )
+                    }
+                }
                 Text(
                     text = item.account.accountName,
                     maxLines = 1,
@@ -207,6 +228,102 @@ internal fun ReorderableCollectionItemScope.AccountCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun GroupChipsOverflowRow(
+    groups: List<String>,
+    colorFor: (String) -> Int?,
+    modifier: Modifier = Modifier,
+) {
+    if (groups.isEmpty()) return
+    val spacing = 6.dp
+    SubcomposeLayout(modifier = modifier) { constraints ->
+        val spacingPx = spacing.roundToPx()
+        val loose = Constraints(maxWidth = constraints.maxWidth)
+
+        val allChips = groups.indices.map { index ->
+            subcompose("g$index") {
+                AccountGroupChip(label = groups[index], colorArgb = colorFor(groups[index]))
+            }.first().measure(loose)
+        }
+
+        fun widthOf(placeables: List<Placeable>): Int =
+            placeables.sumOf { it.width } + spacingPx * (placeables.size - 1).coerceAtLeast(0)
+
+        fun measureBadge(count: Int, maxWidth: Int = constraints.maxWidth): Placeable =
+            subcompose("overflow$count") {
+                AccountGroupChip(label = "+$count", colorArgb = null)
+            }.first().measure(Constraints(maxWidth = maxWidth))
+
+        var shown = allChips
+        var overflow: Placeable? = null
+        var totalWidth = widthOf(shown)
+
+        if (totalWidth > constraints.maxWidth) {
+            var placed = false
+            var lastBadge: Placeable? = null
+            for (k in groups.size - 1 downTo 1) {
+                val candidate = allChips.subList(0, k)
+                val overflowCount = groups.size - k
+                val badge = measureBadge(overflowCount)
+                lastBadge = badge
+                val width = widthOf(candidate) + spacingPx + badge.width
+                if (width <= constraints.maxWidth) {
+                    shown = candidate
+                    overflow = badge
+                    totalWidth = width
+                    placed = true
+                    break
+                }
+            }
+            if (!placed) {
+                val badge = requireNotNull(lastBadge)
+                val chipBudget = (constraints.maxWidth - spacingPx - badge.width).coerceAtLeast(0)
+                val squeezed = subcompose("g0-squeezed") {
+                    AccountGroupChip(label = groups[0], colorArgb = colorFor(groups[0]))
+                }.first().measure(Constraints(maxWidth = chipBudget))
+                shown = listOf(squeezed)
+                overflow = badge
+                totalWidth = squeezed.width + spacingPx + badge.width
+            }
+        }
+
+        val height = (shown + listOfNotNull(overflow)).maxOf { it.height }
+        layout(totalWidth.coerceAtMost(constraints.maxWidth), height) {
+            var x = 0
+            shown.forEach { placeable ->
+                placeable.placeRelative(x, (height - placeable.height) / 2)
+                x += placeable.width + spacingPx
+            }
+            overflow?.placeRelative(x, (height - overflow.height) / 2)
+        }
+    }
+}
+
+@Composable
+private fun AccountGroupChip(
+    label: String,
+    colorArgb: Int?,
+    modifier: Modifier = Modifier,
+) {
+    val containerColor = colorArgb?.let { Color(it) } ?: MaterialTheme.colorScheme.secondaryContainer
+    val contentColor = colorArgb?.let { Color(it).readableOnColor() }
+        ?: MaterialTheme.colorScheme.onSecondaryContainer
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(50),
+        color = containerColor,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = contentColor,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
     }
 }
 

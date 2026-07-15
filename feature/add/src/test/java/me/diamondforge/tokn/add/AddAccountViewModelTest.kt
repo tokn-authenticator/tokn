@@ -14,7 +14,7 @@ import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
 import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
-import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.security.LockManager
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -52,7 +52,7 @@ class AddAccountViewModelTest {
         addAccountUseCase = AddAccountUseCase(repo),
         lockManager = LockManager(NoopAuditLogger),
         iconPackManager = IconPackManager(context),
-        getAccountsUseCase = GetAccountsUseCase(repo),
+        listGroupsUseCase = ListGroupsUseCase(repo),
     )
 
     @Test

@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -48,6 +50,8 @@ import kotlinx.coroutines.launch
 import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.TapBehavior
+import me.diamondforge.tokn.ui.horizontalFadingEdges
+import me.diamondforge.tokn.ui.readableOnColor
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -63,6 +67,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val declaredGroups by viewModel.declaredGroups.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -70,6 +75,7 @@ fun HomeScreen(
     var fabMenuOpen by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
     var showBulkDeleteConfirm by remember { mutableStateOf(false) }
+    var showAddToGroupDialog by remember { mutableStateOf(false) }
     var exportAccount by remember { mutableStateOf<OtpAccount?>(null) }
 
     val selectionMode = uiState.selectionMode
@@ -136,6 +142,7 @@ fun HomeScreen(
                     },
                     onDeleteSelected = { showBulkDeleteConfirm = true },
                     onSelectAll = { viewModel.selectAll() },
+                    onAddToGroup = { showAddToGroupDialog = true },
                     sort = uiState.sort,
                     onSetSort = viewModel::setSort,
                     scrollBehavior = scrollBehavior,
@@ -143,16 +150,23 @@ fun HomeScreen(
             },
             snackbarHost = { SnackbarHost(snackbarHostState) },
         ) { padding ->
+            val groupColors = remember(declaredGroups) {
+                declaredGroups.associateBy({ it.name.lowercase() }, { it.colorArgb })
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
             ) {
                 if (uiState.availableGroups.isNotEmpty()) {
+                    val groupFilterListState = rememberLazyListState()
                     LazyRow(
+                        state = groupFilterListState,
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .horizontalFadingEdges(groupFilterListState),
                     ) {
                         item(key = "__all__") {
                             FilterChip(
@@ -165,10 +179,23 @@ fun HomeScreen(
                             val isOn = uiState.selectedGroups.any {
                                 it.equals(group, ignoreCase = true)
                             }
+                            val colorArgb = groupColors[group.lowercase()]
+                            val chipColors = if (colorArgb != null) {
+                                val base = Color(colorArgb)
+                                FilterChipDefaults.filterChipColors(
+                                    containerColor = base.copy(alpha = 0.24f),
+                                    labelColor = base,
+                                    selectedContainerColor = base,
+                                    selectedLabelColor = base.readableOnColor(),
+                                )
+                            } else {
+                                FilterChipDefaults.filterChipColors()
+                            }
                             FilterChip(
                                 selected = isOn,
                                 onClick = { viewModel.toggleGroupFilter(group) },
                                 label = { Text(group) },
+                                colors = chipColors,
                             )
                         }
                     }
@@ -202,6 +229,11 @@ fun HomeScreen(
                                 val canReorder = canDrag && uiState.selectedIds.size == 1
                                 val isMasked = uiState.tapToRevealEnabled &&
                                         item.account.id !in uiState.revealedIds
+                                val cardGroups = if (uiState.showGroupChipEnabled) {
+                                    item.account.groups
+                                } else {
+                                    emptyList()
+                                }
                                 AccountCard(
                                     item = item,
                                     isDragging = isDragging,
@@ -210,6 +242,8 @@ fun HomeScreen(
                                     isSelected = isSelected,
                                     canReorder = canReorder,
                                     isMasked = isMasked,
+                                    groups = cardGroups,
+                                    groupColorFor = { groupColors[it.lowercase()] },
                                     onTap = {
                                         if (selectionMode) {
                                             viewModel.toggleSelection(item.account.id)
@@ -313,6 +347,23 @@ fun HomeScreen(
                 }
             },
             onDismiss = { showBulkDeleteConfirm = false },
+        )
+    }
+
+    if (showAddToGroupDialog) {
+        val addedMessage = pluralStringResource(
+            R.plurals.add_to_group_snackbar,
+            uiState.selectedIds.size,
+            uiState.selectedIds.size,
+        )
+        AddToGroupDialog(
+            groups = declaredGroups,
+            onConfirm = { names ->
+                viewModel.addSelectedToGroups(names)
+                showAddToGroupDialog = false
+                scope.launch { snackbarHostState.showSnackbar(addedMessage) }
+            },
+            onDismiss = { showAddToGroupDialog = false },
         )
     }
 

@@ -24,14 +24,18 @@ import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.AccountSort
+import me.diamondforge.tokn.domain.model.Group
+import me.diamondforge.tokn.domain.model.GroupSort
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.model.TapBehavior
+import me.diamondforge.tokn.domain.usecase.AddAccountsToGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.OtpResult
 import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.PurgeExpiredTrashUseCase
@@ -45,6 +49,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getAccountsUseCase: GetAccountsUseCase,
+    private val listGroupsUseCase: ListGroupsUseCase,
+    private val addAccountsToGroupsUseCase: AddAccountsToGroupsUseCase,
     private val deleteAccountUseCase: DeleteAccountUseCase,
     private val deleteAccountsUseCase: DeleteAccountsUseCase,
     private val restoreAccountsUseCase: RestoreAccountsUseCase,
@@ -191,6 +197,22 @@ class HomeViewModel @Inject constructor(
         )
     }.combine(userPreferences.recycleBinEnabled) { state, recycleBinEnabled ->
         state.copy(recycleBinEnabled = recycleBinEnabled)
+    }.combine(userPreferences.showGroupChipEnabled) { state, showGroupChipEnabled ->
+        state.copy(showGroupChipEnabled = showGroupChipEnabled)
+    }.combine(
+        combine(listGroupsUseCase(), userPreferences.groupSort, ::Pair),
+    ) { state, (groups, sort) ->
+        val ordered = when (sort) {
+            GroupSort.CUSTOM -> groups.map { it.name }
+            GroupSort.NAME_ASC -> groups.sortedBy { it.name.lowercase() }.map { it.name }
+            GroupSort.NAME_DESC -> groups.sortedByDescending { it.name.lowercase() }.map { it.name }
+        }
+        val orderIndex = ordered.withIndex().associate { (i, name) -> name.lowercase() to i }
+        state.copy(
+            availableGroups = state.availableGroups.sortedWith(
+                compareBy { orderIndex[it.lowercase()] ?: Int.MAX_VALUE },
+            ),
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
@@ -219,6 +241,16 @@ class HomeViewModel @Inject constructor(
 
     fun selectAll() {
         _selectedIds.value = uiState.value.items.map { it.account.id }.toSet()
+    }
+
+    val declaredGroups: StateFlow<List<Group>> = listGroupsUseCase()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun addSelectedToGroups(names: Set<String>) {
+        val ids = _selectedIds.value
+        if (ids.isEmpty() || names.isEmpty()) return
+        _selectedIds.value = emptySet()
+        viewModelScope.launch { addAccountsToGroupsUseCase(ids, names) }
     }
 
     fun clearSelection() {
@@ -356,6 +388,7 @@ data class HomeUiState(
     val revealedIds: Set<Long> = emptySet(),
     val sort: AccountSort = AccountSort.CUSTOM,
     val recycleBinEnabled: Boolean = true,
+    val showGroupChipEnabled: Boolean = false,
 ) {
     val selectionMode: Boolean get() = selectedIds.isNotEmpty()
 }

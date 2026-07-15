@@ -1,5 +1,6 @@
 package me.diamondforge.tokn.sync
 
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
@@ -148,5 +149,32 @@ class SyncPayloadTest {
         val restored = SyncPayload.deserialize(json.toString())[0]
         assertEquals(0, restored.usageCount)
         assertEquals(0L, restored.lastUsedAt)
+    }
+
+    @Test
+    fun `old payload without declaredGroups still restores accounts and yields no declared groups`() {
+        val raw = """
+            {"version":1,"accounts":[{"issuer":"GitHub","accountName":"alice","secret":"X","groups":["Work"]}]}
+        """.trimIndent()
+        val restored = SyncPayload.deserialize(raw)
+        assertEquals(listOf("Work"), restored.first().groups)
+        assertTrue(SyncPayload.readDeclaredGroups(raw).isEmpty())
+    }
+
+    @Test
+    fun `declaredGroups round trips name color and order`() {
+        val groups = listOf(
+            Group(name = "Work", colorArgb = 0xFF1155CC.toInt(), sortOrder = 0),
+            Group(name = "Empty", colorArgb = null, sortOrder = 1),
+        )
+        val json = SyncPayload.serialize(emptyList(), groups)
+        val restored = SyncPayload.readDeclaredGroups(json)
+        assertEquals(2, restored.size)
+        assertEquals("Work", restored[0].name)
+        assertEquals(0xFF1155CC.toInt(), restored[0].colorArgb)
+        assertEquals(0, restored[0].sortOrder)
+        assertEquals("Empty", restored[1].name)
+        assertEquals(null, restored[1].colorArgb)
+        assertEquals(1, restored[1].sortOrder)
     }
 }

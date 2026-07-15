@@ -72,7 +72,11 @@ fun ManualEntryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val installedPacks by viewModel.installedPacks.collectAsStateWithLifecycle()
-    val availableGroups by viewModel.availableGroups.collectAsStateWithLifecycle()
+    val declaredGroups by viewModel.declaredGroups.collectAsStateWithLifecycle()
+    val availableGroups = remember(declaredGroups) { declaredGroups.map { it.name } }
+    val groupColors = remember(declaredGroups) {
+        declaredGroups.associateBy({ it.name.lowercase() }, { it.colorArgb })
+    }
     val snackbarHostState = remember { SnackbarHostState() }
     var advancedExpanded by remember { mutableStateOf(false) }
     var pickerOpen by remember { mutableStateOf(false) }
@@ -176,6 +180,7 @@ fun ManualEntryScreen(
                 label = stringResource(R.string.group_optional),
                 modifier = Modifier.fillMaxWidth(),
                 suggestions = availableGroups,
+                colorFor = { groupColors[it.lowercase()] },
             )
 
             HorizontalDivider()

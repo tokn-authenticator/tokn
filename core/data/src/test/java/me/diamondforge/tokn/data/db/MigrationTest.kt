@@ -67,6 +67,32 @@ class MigrationTest {
     }
 
     @Test
+    fun `migration 6 to 7 creates an empty groups table and leaves otp_accounts untouched`() {
+        db.execSQL(
+            "INSERT INTO otp_accounts " +
+                    "(issuer,accountName,secret,algorithm,digits,period,counter,type,sortOrder) " +
+                    "VALUES ('ACME','alice','SEC','SHA1',6,30,0,'TOTP',0)",
+        )
+
+        AppDatabase.MIGRATION_1_2.migrate(db)
+        db.execSQL("UPDATE otp_accounts SET `group` = 'Work'")
+        AppDatabase.MIGRATION_2_3.migrate(db)
+        AppDatabase.MIGRATION_3_4.migrate(db)
+        AppDatabase.MIGRATION_4_5.migrate(db)
+        AppDatabase.MIGRATION_5_6.migrate(db)
+        AppDatabase.MIGRATION_6_7.migrate(db)
+
+        db.query("SELECT `group` FROM otp_accounts").use { c ->
+            assertTrue(c.moveToFirst())
+            assertEquals("['Work']", c.getString(0))
+        }
+        db.query("SELECT COUNT(*) FROM groups").use { c ->
+            assertTrue(c.moveToFirst())
+            assertEquals(0, c.getInt(0))
+        }
+    }
+
+    @Test
     fun `migration 4 to 5 wraps a plain group as a json list and decodes back`() {
         toV4()
         insertWithGroup("Work")

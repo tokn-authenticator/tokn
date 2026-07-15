@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.TrashedAccount
 import me.diamondforge.tokn.domain.repository.AccountRepository
@@ -21,6 +22,9 @@ class FakeAccountRepository(
     private val state = MutableStateFlow(initial.toList())
     private val trash = MutableStateFlow<List<Pair<OtpAccount, Long>>>(emptyList())
     private var nextId: Long = (initial.maxOfOrNull { it.id } ?: 0L) + 1
+
+    private val groupsState = MutableStateFlow<List<Group>>(emptyList())
+    private var nextGroupId: Long = 1
 
     val snapshot: List<OtpAccount> get() = state.value
     val trashSnapshot: List<OtpAccount> get() = trash.value.map { it.first }
@@ -104,6 +108,7 @@ class FakeAccountRepository(
             changed++
             account.copy(groups = updated)
         }
+        renameGroupEntity(source, target)
         return changed
     }
 
@@ -116,7 +121,85 @@ class FakeAccountRepository(
             changed++
             account.copy(groups = account.groups.filterNot { it.equals(target, ignoreCase = true) })
         }
+        groupsState.value = groupsState.value.filterNot { it.name.equals(target, ignoreCase = true) }
         return changed
+    }
+
+    override fun listGroups(): Flow<List<Group>> {
+        materializeGroupsFromAccounts()
+        return groupsState.map { list -> list.sortedBy { it.sortOrder } }
+    }
+
+    override suspend fun createGroup(name: String, colorArgb: Int?): Long {
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return 0
+        val existing = groupsState.value.firstOrNull { it.name.equals(trimmed, ignoreCase = true) }
+        if (existing != null) return existing.id
+        val id = nextGroupId++
+        groupsState.value = groupsState.value +
+            Group(id = id, name = trimmed, colorArgb = colorArgb, sortOrder = groupsState.value.size)
+        return id
+    }
+
+    override suspend fun setGroupColor(name: String, colorArgb: Int?) {
+        val trimmed = name.trim()
+        groupsState.value = groupsState.value.map {
+            if (it.name.equals(trimmed, ignoreCase = true)) it.copy(colorArgb = colorArgb) else it
+        }
+    }
+
+    override suspend fun reorderGroups(orderedNames: List<String>) {
+        if (orderedNames.isEmpty()) return
+        val byLower = groupsState.value.associateBy { it.name.lowercase() }
+        val order = orderedNames.withIndex()
+            .mapNotNull { (index, name) -> byLower[name.lowercase()]?.let { it.id to index } }
+            .toMap()
+        groupsState.value = groupsState.value.map { row ->
+            order[row.id]?.let { row.copy(sortOrder = it) } ?: row
+        }
+    }
+
+    override suspend fun addAccountsToGroups(ids: Set<Long>, groupNames: Set<String>): Int {
+        if (ids.isEmpty() || groupNames.isEmpty()) return 0
+        val trimmedNames = groupNames.map { it.trim() }.filter { it.isNotEmpty() }
+        if (trimmedNames.isEmpty()) return 0
+        trimmedNames.forEach { createGroup(it) }
+        var count = 0
+        state.value = state.value.map { account ->
+            if (account.id !in ids) return@map account
+            val currentLower = account.groups.mapTo(mutableSetOf()) { it.lowercase() }
+            val toAdd = trimmedNames.filter { it.lowercase() !in currentLower }
+            if (toAdd.isEmpty()) return@map account
+            count++
+            account.copy(groups = account.groups + toAdd)
+        }
+        return count
+    }
+
+    private fun renameGroupEntity(from: String, to: String) {
+        val all = groupsState.value
+        val sourceRow = all.firstOrNull { it.name.equals(from, ignoreCase = true) }
+        val targetRow = all.firstOrNull { it.name.equals(to, ignoreCase = true) }
+        groupsState.value = when {
+            sourceRow == null -> all
+            targetRow != null && targetRow.id != sourceRow.id ->
+                all.filterNot { it.id == sourceRow.id }
+
+            else -> all.map { if (it.id == sourceRow.id) it.copy(name = to) else it }
+        }
+    }
+
+    private fun materializeGroupsFromAccounts() {
+        val existingLower = groupsState.value.mapTo(mutableSetOf()) { it.name.lowercase() }
+        val accountGroupNames = state.value.flatMap { it.groups }.distinctBy { it.lowercase() }
+        var nextOrder = groupsState.value.size
+        val toAdd = mutableListOf<Group>()
+        accountGroupNames.forEach { name ->
+            if (existingLower.add(name.lowercase())) {
+                toAdd += Group(id = nextGroupId++, name = name, sortOrder = nextOrder++)
+            }
+        }
+        if (toAdd.isNotEmpty()) groupsState.value = groupsState.value + toAdd
     }
 }
 

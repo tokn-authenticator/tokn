@@ -1,5 +1,6 @@
 package me.diamondforge.tokn.sync
 
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
@@ -14,7 +15,7 @@ import org.json.JSONObject
 object SyncPayload {
     const val VERSION = 1
 
-    fun serialize(accounts: List<OtpAccount>): String {
+    fun serialize(accounts: List<OtpAccount>, groups: List<Group> = emptyList()): String {
         val arr = JSONArray()
         accounts.forEach { account ->
             arr.put(
@@ -49,6 +50,22 @@ object SyncPayload {
         return JSONObject().apply {
             put("accounts", arr)
             put("version", VERSION)
+            if (groups.isNotEmpty()) {
+                put(
+                    "declaredGroups",
+                    JSONArray().apply {
+                        groups.forEach { g ->
+                            put(
+                                JSONObject().apply {
+                                    put("name", g.name)
+                                    g.colorArgb?.let { put("colorArgb", it) }
+                                    put("sortOrder", g.sortOrder)
+                                },
+                            )
+                        }
+                    },
+                )
+            }
         }.toString()
     }
 
@@ -94,5 +111,24 @@ object SyncPayload {
             }
         }
         return emptyList()
+    }
+
+    fun readDeclaredGroups(json: String): List<Group> {
+        val root = JSONObject(json)
+        val array = root.optJSONArray("declaredGroups") ?: return emptyList()
+        return (0 until array.length()).mapNotNull { i ->
+            val obj = array.optJSONObject(i) ?: return@mapNotNull null
+            val name = obj.optString("name")
+            if (name.isBlank()) return@mapNotNull null
+            Group(
+                name = name,
+                colorArgb = if (obj.has("colorArgb") && !obj.isNull("colorArgb")) {
+                    obj.optInt("colorArgb")
+                } else {
+                    null
+                },
+                sortOrder = obj.optInt("sortOrder", 0),
+            )
+        }
     }
 }

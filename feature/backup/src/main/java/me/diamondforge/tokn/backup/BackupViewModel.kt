@@ -22,6 +22,7 @@ import me.diamondforge.tokn.data.security.VaultAuthMode
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.importer.ExternalImporter
 import me.diamondforge.tokn.importer.ImportOutcome
 import me.diamondforge.tokn.importer.ImporterRegistry
@@ -32,6 +33,7 @@ import javax.inject.Inject
 class BackupViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getAccountsUseCase: GetAccountsUseCase,
+    private val listGroupsUseCase: ListGroupsUseCase,
     private val importAccountsUseCase: ImportAccountsUseCase,
     private val encryptedBackupManager: EncryptedBackupManager,
     private val lockManager: LockManager,
@@ -55,7 +57,10 @@ class BackupViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
             runCatching {
                 withContext(Dispatchers.IO) {
-                    val json = serializeAccountsToJson(getAccountsUseCase().first())
+                    val json = serializeAccountsToJson(
+                        getAccountsUseCase().first(),
+                        listGroupsUseCase().first(),
+                    )
                     context.contentResolver.openOutputStream(uri)?.use { stream ->
                         stream.write(json.toByteArray(Charsets.UTF_8))
                     } ?: error("Cannot open output stream")
@@ -121,7 +126,10 @@ class BackupViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
             runCatching {
                 withContext(Dispatchers.IO) {
-                    val json = serializeAccountsToJson(getAccountsUseCase().first())
+                    val json = serializeAccountsToJson(
+                        getAccountsUseCase().first(),
+                        listGroupsUseCase().first(),
+                    )
                     encryptedBackupManager.exportToUri(context, uri, json, password)
                 }
             }.onSuccess {
@@ -179,7 +187,9 @@ class BackupViewModel @Inject constructor(
             is ImportOutcome.Success -> {
                 viewModelScope.launch {
                     val summary =
-                        withContext(Dispatchers.IO) { importAccountsUseCase(outcome.accounts) }
+                        withContext(Dispatchers.IO) {
+                            importAccountsUseCase(outcome.accounts, outcome.declaredGroups)
+                        }
                     _uiState.update {
                         it.copy(
                             isLoading = false,
