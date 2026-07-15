@@ -196,6 +196,8 @@ class HomeViewModel @Inject constructor(
         )
     }.combine(userPreferences.recycleBinEnabled) { state, recycleBinEnabled ->
         state.copy(recycleBinEnabled = recycleBinEnabled)
+    }.combine(userPreferences.showGroupChipEnabled) { state, showGroupChipEnabled ->
+        state.copy(showGroupChipEnabled = showGroupChipEnabled)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {
@@ -371,6 +373,7 @@ data class HomeUiState(
     val revealedIds: Set<Long> = emptySet(),
     val sort: AccountSort = AccountSort.CUSTOM,
     val recycleBinEnabled: Boolean = true,
+    val showGroupChipEnabled: Boolean = false,
 ) {
     val selectionMode: Boolean get() = selectedIds.isNotEmpty()
 }

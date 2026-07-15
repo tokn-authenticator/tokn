@@ -27,6 +27,9 @@
     <string name="material_you_desc">Use the wallpaper-based color palette from your system</string>
     <string name="show_next_code">Show next code</string>
     <string name="show_next_code_desc">Preview the upcoming code beneath the current one</string>
+    <string name="settings_section_groups">Groups</string>
+    <string name="show_group_chip">Show group chip</string>
+    <string name="show_group_chip_desc">Display a colored group chip next to each account</string>
     <string name="account_icons">Account icons</string>
     <string name="account_icons_desc">Load service logos from the internet (Simple Icons)</string>
     <string name="account_icons_privacy_title">Load icons from the internet?</string>

@@ -70,6 +70,8 @@ class SettingsViewModel @Inject constructor(
         state.copy(showNextCodeEnabled = showNextCode)
     }.combine(preferences.recycleBinEnabled) { state, recycleBin ->
         state.copy(recycleBinEnabled = recycleBin)
+    }.combine(preferences.showGroupChipEnabled) { state, showGroupChip ->
+        state.copy(showGroupChipEnabled = showGroupChip)
     }.combine(trashed) { state, trashedAccounts ->
         state.copy(trashedCount = trashedAccounts.size)
     }.combine(preferences.passwordReminderEnabled) { state, passwordReminder ->
@@ -183,6 +185,16 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setShowGroupChipEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferences.setShowGroupChipEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.SHOW_GROUP_CHIP_ENABLED
+                else AuditEventType.SHOW_GROUP_CHIP_DISABLED,
+            )
+        }
+    }
+
     fun disableRecycleBin() {
         viewModelScope.launch {
             purgeAccountsUseCase(trashed.value.map { it.id }.toSet())
@@ -239,6 +251,7 @@ data class SettingsUiState(
     val dynamicColorEnabled: Boolean = true,
     val showNextCodeEnabled: Boolean = false,
     val recycleBinEnabled: Boolean = true,
+    val showGroupChipEnabled: Boolean = false,
     val trashedCount: Int = 0,
     val passwordReminderEnabled: Boolean = true,
     val passwordReminderLastShownAt: Long = 0L,

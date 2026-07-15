@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Language
@@ -168,6 +169,27 @@ fun AppearanceScreen(
                 }
             }
             SettingsGroup(items = generalItems)
+        }
+
+        item { SettingsSectionHeader(stringResource(R.string.settings_section_groups)) }
+        item {
+            SettingsGroup(
+                items = listOf(
+                    {
+                        SettingsRow(
+                            title = stringResource(R.string.show_group_chip),
+                            subtitle = stringResource(R.string.show_group_chip_desc),
+                            icon = Icons.AutoMirrored.Filled.Label,
+                            trailing = {
+                                SettingsSwitch(
+                                    checked = uiState.showGroupChipEnabled,
+                                    onCheckedChange = { viewModel.setShowGroupChipEnabled(it) },
+                                )
+                            },
+                        )
+                    },
+                ),
+            )
         }
 
         item { SettingsSectionHeader(stringResource(R.string.settings_section_icons)) }

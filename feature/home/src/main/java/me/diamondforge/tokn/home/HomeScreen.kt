@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -48,6 +50,7 @@ import kotlinx.coroutines.launch
 import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.TapBehavior
+import me.diamondforge.tokn.ui.readableOnColor
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -146,6 +149,9 @@ fun HomeScreen(
             },
             snackbarHost = { SnackbarHost(snackbarHostState) },
         ) { padding ->
+            val groupColors = remember(declaredGroups) {
+                declaredGroups.associateBy({ it.name.lowercase() }, { it.colorArgb })
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -168,10 +174,23 @@ fun HomeScreen(
                             val isOn = uiState.selectedGroups.any {
                                 it.equals(group, ignoreCase = true)
                             }
+                            val colorArgb = groupColors[group.lowercase()]
+                            val chipColors = if (colorArgb != null) {
+                                val base = Color(colorArgb)
+                                FilterChipDefaults.filterChipColors(
+                                    containerColor = base.copy(alpha = 0.24f),
+                                    labelColor = base,
+                                    selectedContainerColor = base,
+                                    selectedLabelColor = base.readableOnColor(),
+                                )
+                            } else {
+                                FilterChipDefaults.filterChipColors()
+                            }
                             FilterChip(
                                 selected = isOn,
                                 onClick = { viewModel.toggleGroupFilter(group) },
                                 label = { Text(group) },
+                                colors = chipColors,
                             )
                         }
                     }
@@ -205,6 +224,11 @@ fun HomeScreen(
                                 val canReorder = canDrag && uiState.selectedIds.size == 1
                                 val isMasked = uiState.tapToRevealEnabled &&
                                         item.account.id !in uiState.revealedIds
+                                val cardGroups = if (uiState.showGroupChipEnabled) {
+                                    item.account.groups
+                                } else {
+                                    emptyList()
+                                }
                                 AccountCard(
                                     item = item,
                                     isDragging = isDragging,
@@ -213,6 +237,8 @@ fun HomeScreen(
                                     isSelected = isSelected,
                                     canReorder = canReorder,
                                     isMasked = isMasked,
+                                    groups = cardGroups,
+                                    groupColorFor = { groupColors[it.lowercase()] },
                                     onTap = {
                                         if (selectionMode) {
                                             viewModel.toggleSelection(item.account.id)

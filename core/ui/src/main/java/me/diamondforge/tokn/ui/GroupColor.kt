@@ -38,6 +38,11 @@ object GroupColorPalette {
     )
 }
 
+fun Color.readableOnColor(): Color {
+    val luminance = 0.299f * red + 0.587f * green + 0.114f * blue
+    return if (luminance > 0.6f) Color.Black else Color.White
+}
+
 @Composable
 fun GroupColorDot(
     colorArgb: Int?,
