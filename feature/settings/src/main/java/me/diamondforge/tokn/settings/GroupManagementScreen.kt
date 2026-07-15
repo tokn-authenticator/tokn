@@ -5,20 +5,24 @@ package me.diamondforge.tokn.settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
@@ -45,6 +49,11 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.diamondforge.tokn.ui.GroupColorDot
+import me.diamondforge.tokn.ui.GroupColorPicker
+import sh.calvin.reorderable.ReorderableCollectionItemScope
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +65,18 @@ fun GroupManagementScreen(
 
     var renameTarget by remember { mutableStateOf<GroupRow?>(null) }
     var deleteTarget by remember { mutableStateOf<GroupRow?>(null) }
+    var colorTarget by remember { mutableStateOf<GroupRow?>(null) }
+    var showCreateDialog by remember { mutableStateOf(false) }
+
+    var groups by remember(uiState.groups) { mutableStateOf(uiState.groups) }
+    val lazyListState = rememberLazyListState()
+    val reorderableState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
+        onMove = { from, to ->
+            groups = groups.toMutableList().apply { add(to.index, removeAt(from.index)) }
+            viewModel.reorder(groups.map { it.name })
+        },
+    )
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
@@ -71,6 +92,11 @@ fun GroupManagementScreen(
                 scrollBehavior = scrollBehavior,
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showCreateDialog = true }) {
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.groups_add_cd))
+            }
+        },
     ) { padding ->
         Box(
             modifier = Modifier
@@ -80,18 +106,31 @@ fun GroupManagementScreen(
         ) {
             when {
                 uiState.isLoading -> LoadingIndicator()
-                uiState.groups.isEmpty() -> GroupsEmpty()
-                else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(uiState.groups, key = { it.name.lowercase() }) { row ->
-                        GroupListRow(
-                            row = row,
-                            onRename = { renameTarget = row },
-                            onDelete = { deleteTarget = row },
-                        )
+                groups.isEmpty() -> GroupsEmpty()
+                else -> LazyColumn(state = lazyListState, modifier = Modifier.fillMaxSize()) {
+                    items(groups, key = { it.name.lowercase() }) { row ->
+                        ReorderableItem(reorderableState, key = row.name.lowercase()) {
+                            GroupListRow(
+                                row = row,
+                                onColorTap = { colorTarget = row },
+                                onRename = { renameTarget = row },
+                                onDelete = { deleteTarget = row },
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+
+    if (showCreateDialog) {
+        CreateGroupDialog(
+            onDismiss = { showCreateDialog = false },
+            onConfirm = { name, colorArgb ->
+                viewModel.create(name, colorArgb)
+                showCreateDialog = false
+            },
+        )
     }
 
     renameTarget?.let { row ->
@@ -101,6 +140,17 @@ fun GroupManagementScreen(
             onConfirm = { newName ->
                 viewModel.rename(row.name, newName)
                 renameTarget = null
+            },
+        )
+    }
+
+    colorTarget?.let { row ->
+        EditGroupColorDialog(
+            row = row,
+            onDismiss = { colorTarget = null },
+            onConfirm = { colorArgb ->
+                viewModel.setColor(row.name, colorArgb)
+                colorTarget = null
             },
         )
     }
@@ -128,8 +178,9 @@ fun GroupManagementScreen(
 }
 
 @Composable
-private fun GroupListRow(
+private fun ReorderableCollectionItemScope.GroupListRow(
     row: GroupRow,
+    onColorTap: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -146,35 +197,114 @@ private fun GroupListRow(
             )
         },
         leadingContent = {
-            Icon(Icons.AutoMirrored.Filled.Label, contentDescription = null)
+            IconButton(onClick = onColorTap) {
+                GroupColorDot(colorArgb = row.colorArgb)
+            }
         },
         trailingContent = {
-            Box {
-                IconButton(onClick = { menuExpanded = true }) {
-                    Icon(
-                        Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.groups_overflow_cd),
-                    )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box {
+                    IconButton(onClick = { menuExpanded = true }) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.groups_overflow_cd),
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.groups_action_rename)) },
+                            onClick = {
+                                menuExpanded = false
+                                onRename()
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.groups_action_delete)) },
+                            onClick = {
+                                menuExpanded = false
+                                onDelete()
+                            },
+                        )
+                    }
                 }
-                DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false },
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.groups_action_rename)) },
-                        onClick = {
-                            menuExpanded = false
-                            onRename()
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.groups_action_delete)) },
-                        onClick = {
-                            menuExpanded = false
-                            onDelete()
-                        },
-                    )
-                }
+                Icon(
+                    Icons.Default.DragHandle,
+                    contentDescription = stringResource(R.string.cd_drag_handle),
+                    modifier = Modifier.draggableHandle(),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
+    )
+}
+
+@Composable
+private fun CreateGroupDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (name: String, colorArgb: Int?) -> Unit,
+) {
+    var name by remember { mutableStateOf("") }
+    var colorArgb by remember { mutableStateOf<Int?>(null) }
+    val trimmed = name.trim()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.groups_create_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(stringResource(R.string.groups_rename_label)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        imeAction = ImeAction.Done,
+                    ),
+                )
+                GroupColorPicker(selected = colorArgb, onSelect = { colorArgb = it })
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(trimmed, colorArgb) },
+                enabled = trimmed.isNotEmpty(),
+            ) {
+                Text(stringResource(R.string.groups_create_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun EditGroupColorDialog(
+    row: GroupRow,
+    onDismiss: () -> Unit,
+    onConfirm: (Int?) -> Unit,
+) {
+    var colorArgb by remember(row.name) { mutableStateOf(row.colorArgb) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.groups_color_title, row.name)) },
+        text = { GroupColorPicker(selected = colorArgb, onSelect = { colorArgb = it }) },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(colorArgb) }) {
+                Text(stringResource(R.string.groups_rename_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
             }
         },
     )

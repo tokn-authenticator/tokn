@@ -100,9 +100,14 @@
     <string name="data">Data</string>
 
     <string name="settings_groups_title">Groups</string>
-    <string name="settings_groups_desc">Rename or remove account groups</string>
+    <string name="settings_groups_desc">Create, color and reorder your groups</string>
     <string name="groups_empty_title">No groups yet</string>
     <string name="groups_empty_body">Assign groups when adding or editing an account.</string>
+    <string name="groups_add_cd">Add group</string>
+    <string name="groups_create_title">New group</string>
+    <string name="groups_create_confirm">Create</string>
+    <string name="groups_color_title">Color for %1$s</string>
+    <string name="cd_drag_handle">Drag to reorder</string>
     <string name="groups_overflow_cd">More options</string>
     <string name="groups_action_rename">Rename</string>
     <string name="groups_action_delete">Delete</string>

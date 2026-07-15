@@ -1,5 +1,7 @@
 package me.diamondforge.tokn.settings
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -12,9 +14,13 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
+import me.diamondforge.tokn.domain.usecase.CreateGroupUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteGroupUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.RenameGroupUseCase
+import me.diamondforge.tokn.domain.usecase.ReorderGroupsUseCase
+import me.diamondforge.tokn.domain.usecase.SetGroupColorUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -29,11 +35,13 @@ import org.robolectric.annotation.Config
 class GroupManagementViewModelTest {
 
     private val dispatcher = StandardTestDispatcher()
+    private lateinit var context: Context
     private lateinit var repo: FakeAccountRepository
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
+        context = ApplicationProvider.getApplicationContext()
         repo = FakeAccountRepository(
             listOf(
                 account(1, listOf("Work", "Personal")),
@@ -57,8 +65,12 @@ class GroupManagementViewModelTest {
 
     private fun newVm() = GroupManagementViewModel(
         getAccountsUseCase = GetAccountsUseCase(repo),
+        listGroupsUseCase = ListGroupsUseCase(repo),
+        createGroupUseCase = CreateGroupUseCase(repo),
         renameGroupUseCase = RenameGroupUseCase(repo),
         deleteGroupUseCase = DeleteGroupUseCase(repo),
+        setGroupColorUseCase = SetGroupColorUseCase(repo),
+        reorderGroupsUseCase = ReorderGroupsUseCase(repo),
     )
 
     private fun TestScope.state(vm: GroupManagementViewModel): () -> GroupManagementUiState {
@@ -69,14 +81,15 @@ class GroupManagementViewModelTest {
     }
 
     @Test
-    fun `groups are aggregated case-insensitively, counted and sorted`() = runTest(dispatcher) {
-        val current = state(newVm())
+    fun `groups are aggregated case-insensitively and counted, ordered by first appearance`() =
+        runTest(dispatcher) {
+            val current = state(newVm())
 
-        val rows = current().groups
-        assertEquals(listOf("Personal", "VIP", "Work"), rows.map { it.name })
-        assertEquals(2, rows.first { it.name == "Work" }.accountCount)
-        assertEquals(1, rows.first { it.name == "VIP" }.accountCount)
-    }
+            val rows = current().groups
+            assertEquals(listOf("Work", "Personal", "VIP"), rows.map { it.name })
+            assertEquals(2, rows.first { it.name == "Work" }.accountCount)
+            assertEquals(1, rows.first { it.name == "VIP" }.accountCount)
+        }
 
     @Test
     fun `rename routes through the use case`() = runTest(dispatcher) {
