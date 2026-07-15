@@ -37,6 +37,15 @@
     <string name="export_copy_uri">otpauth URI kopieren</string>
     <string name="export_copied">In die Zwischenablage kopiert</string>
     <string name="select_all">Alle auswählen</string>
+    <string name="add_to_group">Add to group</string>
+    <string name="add_to_group_title">Add to group</string>
+    <string name="add_to_group_new_group_label">New group</string>
+    <string name="add_to_group_confirm">Add</string>
+    <string name="add_to_group_empty">No groups yet. Create one below.</string>
+    <plurals name="add_to_group_snackbar">
+        <item quantity="one">Added 1 account to group</item>
+        <item quantity="other">Added %d accounts to group</item>
+    </plurals>
     <string name="cd_exit_selection">Auswahl beenden</string>
     <string name="cd_exit_search">Suche schließen</string>
     <string name="cd_clear_search">Suche leeren</string>
