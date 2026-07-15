@@ -24,6 +24,9 @@
     <string name="material_you_desc">Использовать палитру цветов на основе обоев из вашей системы</string>
     <string name="show_next_code">Показывать следующий код</string>
     <string name="show_next_code_desc">Предпросмотр следующего кода под текущим</string>
+    <string name="settings_section_groups">Groups</string>
+    <string name="show_group_chip">Show group chip</string>
+    <string name="show_group_chip_desc">Display a colored group chip next to each account</string>
     <string name="account_icons">Значки аккаунтов</string>
     <string name="account_icons_desc">Загружать логотипы сервисов из интернета (Simple Icons)</string>
     <string name="account_icons_privacy_title">Загружать значки из интернета?</string>
@@ -96,9 +99,18 @@
     <string name="open">Открыть</string>
     <string name="data">Данные</string>
     <string name="settings_groups_title">Группы</string>
-    <string name="settings_groups_desc">Переименование или удаление групп аккаунтов</string>
+    <string name="settings_groups_desc">Create, color and reorder your groups</string>
     <string name="groups_empty_title">Пока нет групп</string>
     <string name="groups_empty_body">Назначить группы при добавлении или редактировании аккаунта.</string>
+    <string name="groups_add_cd">Add group</string>
+    <string name="groups_create_title">New group</string>
+    <string name="groups_create_confirm">Create</string>
+    <string name="groups_color_title">Color for %1$s</string>
+    <string name="cd_drag_handle">Drag to reorder</string>
+    <string name="groups_sort_cd">Sort groups</string>
+    <string name="groups_sort_custom">Custom</string>
+    <string name="groups_sort_name_asc">A to Z</string>
+    <string name="groups_sort_name_desc">Z to A</string>
     <string name="groups_overflow_cd">Больше параметров</string>
     <string name="groups_action_rename">Переименовать</string>
     <string name="groups_action_delete">Удалить</string>
@@ -271,6 +283,8 @@
     <string name="audit_event_item_purged_auto">Accounts auto-removed from Recycle Bin</string>
     <string name="audit_event_group_renamed">Group renamed</string>
     <string name="audit_event_group_removed">Group removed</string>
+    <string name="audit_event_group_created">Group created</string>
+    <string name="audit_event_accounts_added_to_group">Accounts added to group</string>
     <string name="audit_event_theme_changed">Theme changed</string>
     <string name="audit_event_dynamic_color_enabled">Material You colors enabled</string>
     <string name="audit_event_dynamic_color_disabled">Material You colors disabled</string>
@@ -290,6 +304,8 @@
     <string name="audit_event_password_reminder_disabled">Password reminder disabled</string>
     <string name="audit_event_recycle_bin_setting_enabled">Recycle Bin enabled</string>
     <string name="audit_event_recycle_bin_setting_disabled">Recycle Bin disabled</string>
+    <string name="audit_event_show_group_chip_enabled">Account group chip enabled</string>
+    <string name="audit_event_show_group_chip_disabled">Account group chip disabled</string>
     <string name="audit_event_audit_log_enabled">Audit log enabled</string>
     <string name="audit_event_audit_log_disabled">Audit log disabled</string>
     <string name="audit_event_audit_log_retention_changed">Audit log retention changed</string>

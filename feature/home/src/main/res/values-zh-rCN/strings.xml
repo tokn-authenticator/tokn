@@ -37,6 +37,14 @@
     <string name="export_copy_uri">Copy otpauth URI</string>
     <string name="export_copied">Copied to clipboard</string>
     <string name="select_all">全选</string>
+    <string name="add_to_group">Add to group</string>
+    <string name="add_to_group_title">Add to group</string>
+    <string name="add_to_group_new_group_label">New group</string>
+    <string name="add_to_group_confirm">Add</string>
+    <string name="add_to_group_empty">No groups yet. Create one below.</string>
+    <plurals name="add_to_group_snackbar">
+        <item quantity="other">Added %d accounts to group</item>
+    </plurals>
     <string name="cd_exit_selection">退出选择</string>
     <string name="cd_exit_search">关闭搜索</string>
     <string name="cd_clear_search">清除搜索</string>
