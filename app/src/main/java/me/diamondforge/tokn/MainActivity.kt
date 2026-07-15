@@ -147,8 +147,6 @@ class MainActivity : AppCompatActivity() {
                 initialValue = null
             )
             val migrated by migrationComplete.collectAsStateWithLifecycle()
-            // Hold the UI at the "loading" state (null) until migration finishes,
-            // so old-install upgrades never briefly render the OOBE flow.
             val onboardingDone = if (migrated) onboardingDoneRaw else null
 
             LaunchedEffect(screenshotsEnabled) {
@@ -313,9 +311,6 @@ class MainActivity : AppCompatActivity() {
         lockManager.onAppBackground()
     }
 
-    // Pre-OOBE installs ship without an onboarding flag. If the user already has accounts
-    // or a vault password from before this version, treat onboarding as done so updates
-    // don't push them through the OOBE.
     private suspend fun migrateOnboardingFlag() {
         if (userPreferencesRepository.onboardingDone.first()) return
         val hasExistingData = withContext(Dispatchers.IO) {
@@ -349,8 +344,6 @@ class MainActivity : AppCompatActivity() {
                 unlockWithBiometric()
                 return@launch
             }
-            // Migrated biometric users without a slot yet: provision and unlock
-            // from one fingerprint prompt, no password needed.
             val canProvision = withContext(Dispatchers.IO) {
                 vaultManager.canProvisionBiometricFromKeystore()
             }
@@ -366,7 +359,6 @@ class MainActivity : AppCompatActivity() {
         lockManager.lock()
         val cipher = withContext(Dispatchers.IO) { vaultManager.biometricDecryptCipher() }
         if (cipher == null) {
-            // Biometric key invalidated (e.g. new fingerprint) — fall back to password.
             return
         }
         biometricHelper.authenticateForCrypto(
@@ -417,11 +409,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    // Identity confirmation before a sensitive action (exporting a backup,
-    // sending the vault to another device). The vault is already unlocked here,
-    // so this only proves the fingerprint still maps to the vault key; it
-    // deliberately does not touch the session or lock state. Returns false on
-    // cancel/error so the caller can fall back to the vault password.
     private suspend fun confirmVaultAuth(): Boolean = suspendCancellableCoroutine { cont ->
         val cipher = runCatching { vaultManager.biometricDecryptCipher() }.getOrNull()
         if (cipher == null) {

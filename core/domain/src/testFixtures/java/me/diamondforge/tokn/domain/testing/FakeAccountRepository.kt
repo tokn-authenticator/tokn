@@ -121,7 +121,8 @@ class FakeAccountRepository(
             changed++
             account.copy(groups = account.groups.filterNot { it.equals(target, ignoreCase = true) })
         }
-        groupsState.value = groupsState.value.filterNot { it.name.equals(target, ignoreCase = true) }
+        groupsState.value =
+            groupsState.value.filterNot { it.name.equals(target, ignoreCase = true) }
         return changed
     }
 
@@ -137,7 +138,12 @@ class FakeAccountRepository(
         if (existing != null) return existing.id
         val id = nextGroupId++
         groupsState.value = groupsState.value +
-            Group(id = id, name = trimmed, colorArgb = colorArgb, sortOrder = groupsState.value.size)
+                Group(
+                    id = id,
+                    name = trimmed,
+                    colorArgb = colorArgb,
+                    sortOrder = groupsState.value.size
+                )
         return id
     }
 

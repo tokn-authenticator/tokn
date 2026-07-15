@@ -2,7 +2,7 @@ name: Crowdin
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
     paths:
       - '**/src/main/res/values/strings.xml'
       - 'crowdin.yml'

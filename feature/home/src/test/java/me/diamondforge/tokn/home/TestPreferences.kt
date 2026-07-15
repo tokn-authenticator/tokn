@@ -34,6 +34,7 @@ internal class FakeUserPreferences(context: Context) :
     override suspend fun setRecycleBinEnabled(enabled: Boolean) {
         recycleBin.value = enabled
     }
+
     val showGroupChip = MutableStateFlow(false)
     override val showGroupChipEnabled = showGroupChip
     override suspend fun setShowGroupChipEnabled(enabled: Boolean) {

@@ -153,7 +153,13 @@ class AccountRepositoryImpl @Inject constructor(
             if (existing != null) return@withTransaction existing.id
             created = true
             val nextOrder = groupDao.maxSortOrder() + 1
-            groupDao.insert(GroupEntity(name = trimmed, colorArgb = colorArgb, sortOrder = nextOrder))
+            groupDao.insert(
+                GroupEntity(
+                    name = trimmed,
+                    colorArgb = colorArgb,
+                    sortOrder = nextOrder
+                )
+            )
         }
         if (created) {
             auditLogger.log(AuditEventType.GROUP_CREATED, detail = trimmed)

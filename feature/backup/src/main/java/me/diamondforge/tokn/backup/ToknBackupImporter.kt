@@ -34,7 +34,10 @@ class ToknBackupImporter @Inject constructor(
 
     private fun parsePlain(raw: ByteArray): ImportOutcome = runCatching {
         val json = raw.toString(Charsets.UTF_8)
-        ImportOutcome.Success(deserializeAccountsFromJson(json), declaredGroups = readDeclaredGroups(json))
+        ImportOutcome.Success(
+            deserializeAccountsFromJson(json),
+            declaredGroups = readDeclaredGroups(json)
+        )
     }.getOrElse { ImportOutcome.Malformed(it) }
 
     private fun parseEncrypted(raw: ByteArray, password: String?): ImportOutcome {

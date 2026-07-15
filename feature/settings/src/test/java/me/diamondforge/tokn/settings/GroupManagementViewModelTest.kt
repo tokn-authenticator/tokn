@@ -143,15 +143,16 @@ class GroupManagementViewModelTest {
     }
 
     @Test
-    fun `setSort to name descending reorders the list reverse alphabetically`() = runTest(dispatcher) {
-        val vm = newVm()
-        val current = state(vm)
+    fun `setSort to name descending reorders the list reverse alphabetically`() =
+        runTest(dispatcher) {
+            val vm = newVm()
+            val current = state(vm)
 
-        userPreferences.groupSortState.value = GroupSort.NAME_DESC
-        runCurrent()
+            userPreferences.groupSortState.value = GroupSort.NAME_DESC
+            runCurrent()
 
-        assertEquals(listOf("Work", "VIP", "Personal"), current().groups.map { it.name })
-    }
+            assertEquals(listOf("Work", "VIP", "Personal"), current().groups.map { it.name })
+        }
 
     @Test
     fun `setSort persists through the use case`() = runTest(dispatcher) {

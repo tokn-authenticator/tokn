@@ -56,8 +56,6 @@ fun SimpleOTPTheme(
             else dynamicLightColorScheme(context)
         }
 
-        // No expressive dark scheme ships yet; dark falls back to the baseline
-        // scheme while still picking up expressive motion + shapes from the theme.
         darkTheme -> darkColorScheme()
         else -> expressiveLightColorScheme()
     }

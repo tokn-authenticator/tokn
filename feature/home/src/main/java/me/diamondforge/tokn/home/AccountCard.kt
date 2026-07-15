@@ -308,7 +308,8 @@ private fun AccountGroupChip(
     colorArgb: Int?,
     modifier: Modifier = Modifier,
 ) {
-    val containerColor = colorArgb?.let { Color(it) } ?: MaterialTheme.colorScheme.secondaryContainer
+    val containerColor =
+        colorArgb?.let { Color(it) } ?: MaterialTheme.colorScheme.secondaryContainer
     val contentColor = colorArgb?.let { Color(it).readableOnColor() }
         ?: MaterialTheme.colorScheme.onSecondaryContainer
     Surface(
