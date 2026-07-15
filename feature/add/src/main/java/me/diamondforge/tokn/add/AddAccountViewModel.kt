@@ -23,6 +23,7 @@ import me.diamondforge.tokn.data.icon.IconMatchType
 import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.data.icon.InstalledIconPack
 import me.diamondforge.tokn.data.icon.suggestionsFor
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
@@ -46,8 +47,7 @@ class AddAccountViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddAccountUiState())
     val uiState: StateFlow<AddAccountUiState> = _uiState.asStateFlow()
 
-    val availableGroups: StateFlow<List<String>> = listGroupsUseCase()
-        .map { groups -> groups.map { it.name } }
+    val declaredGroups: StateFlow<List<Group>> = listGroupsUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {

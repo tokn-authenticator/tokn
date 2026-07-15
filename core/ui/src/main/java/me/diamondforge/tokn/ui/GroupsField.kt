@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
@@ -34,8 +39,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -43,6 +53,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
@@ -63,6 +74,7 @@ fun GroupsField(
     label: String,
     modifier: Modifier = Modifier,
     suggestions: List<String> = emptyList(),
+    colorFor: (String) -> Int? = { null },
 ) {
     var pending by rememberSaveable { mutableStateOf("") }
     var isFocused by remember { mutableStateOf(false) }
@@ -84,7 +96,6 @@ fun GroupsField(
                         !s.equals(query, ignoreCase = true)
             }
             .distinctBy { it.lowercase() }
-            .take(MAX_SUGGESTIONS)
     }
 
     val borderColor = if (isFocused) {
@@ -121,6 +132,18 @@ fun GroupsField(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 values.forEach { value ->
+                    val colorArgb = colorFor(value)
+                    val chipColors = if (colorArgb != null) {
+                        val base = Color(colorArgb)
+                        val onBase = base.readableOnColor()
+                        InputChipDefaults.inputChipColors(
+                            containerColor = base,
+                            labelColor = onBase,
+                            trailingIconColor = onBase,
+                        )
+                    } else {
+                        InputChipDefaults.inputChipColors()
+                    }
                     InputChip(
                         selected = false,
                         onClick = { onValuesChange(values - value) },
@@ -132,6 +155,7 @@ fun GroupsField(
                                 modifier = Modifier.size(InputChipDefaults.IconSize),
                             )
                         },
+                        colors = chipColors,
                         modifier = Modifier.align(Alignment.CenterVertically),
                     )
                 }
@@ -181,14 +205,29 @@ fun GroupsField(
         }
 
         if (activeSuggestions.isNotEmpty()) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
+            val suggestionsListState = rememberLazyListState()
+            LazyRow(
+                state = suggestionsListState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalFadingEdges(suggestionsListState),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                activeSuggestions.forEach { suggestion ->
+                items(activeSuggestions, key = { it.lowercase() }) { suggestion ->
+                    val colorArgb = colorFor(suggestion)
+                    val chipColors = if (colorArgb != null) {
+                        val base = Color(colorArgb)
+                        AssistChipDefaults.assistChipColors(
+                            containerColor = base.copy(alpha = 0.24f),
+                            labelColor = base,
+                        )
+                    } else {
+                        AssistChipDefaults.assistChipColors()
+                    }
                     AssistChip(
                         onClick = { commit(suggestion) },
                         label = { Text(suggestion) },
+                        colors = chipColors,
                     )
                 }
             }
@@ -196,5 +235,32 @@ fun GroupsField(
     }
 }
 
+private fun Modifier.horizontalFadingEdges(
+    state: LazyListState,
+    edgeWidth: Dp = 48.dp,
+): Modifier = graphicsLayer { alpha = 0.99f }.drawWithContent {
+    drawContent()
+    val edgeWidthPx = edgeWidth.toPx()
+    if (state.canScrollBackward) {
+        drawRect(
+            brush = Brush.horizontalGradient(
+                colors = listOf(Color.Transparent, Color.Black),
+                startX = 0f,
+                endX = edgeWidthPx,
+            ),
+            blendMode = BlendMode.DstIn,
+        )
+    }
+    if (state.canScrollForward) {
+        drawRect(
+            brush = Brush.horizontalGradient(
+                colors = listOf(Color.Black, Color.Transparent),
+                startX = size.width - edgeWidthPx,
+                endX = size.width,
+            ),
+            blendMode = BlendMode.DstIn,
+        )
+    }
+}
+
 private val ChipRowHeight = 32.dp
-private const val MAX_SUGGESTIONS = 8
