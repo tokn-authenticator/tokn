@@ -16,7 +16,7 @@ import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
-import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -66,7 +66,7 @@ class EditAccountViewModelHotpCounterTest {
             getAccountByIdUseCase = GetAccountByIdUseCase(repo),
             updateAccountUseCase = UpdateAccountUseCase(repo),
             iconPackManager = iconPackManager,
-            getAccountsUseCase = GetAccountsUseCase(repo),
+            listGroupsUseCase = ListGroupsUseCase(repo),
         )
     }
 

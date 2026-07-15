@@ -59,6 +59,7 @@ internal fun HomeTopBar(
     onExportSelected: () -> Unit,
     onDeleteSelected: () -> Unit,
     onSelectAll: () -> Unit,
+    onAddToGroup: () -> Unit,
     sort: AccountSort,
     onSetSort: (AccountSort) -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
@@ -76,6 +77,7 @@ internal fun HomeTopBar(
                 onExportSelected = onExportSelected,
                 onDeleteSelected = onDeleteSelected,
                 onSelectAll = onSelectAll,
+                onAddToGroup = onAddToGroup,
                 scrollBehavior = scrollBehavior,
             )
         } else {
@@ -114,6 +116,7 @@ private fun SelectionTopBar(
     onExportSelected: () -> Unit,
     onDeleteSelected: () -> Unit,
     onSelectAll: () -> Unit,
+    onAddToGroup: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
     var overflowOpen by remember { mutableStateOf(false) }
@@ -160,6 +163,13 @@ private fun SelectionTopBar(
                     onClick = {
                         overflowOpen = false
                         onSelectAll()
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.add_to_group)) },
+                    onClick = {
+                        overflowOpen = false
+                        onAddToGroup()
                     },
                 )
             }

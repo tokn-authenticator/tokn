@@ -17,11 +17,13 @@ import kotlinx.coroutines.test.setMain
 import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
+import me.diamondforge.tokn.domain.usecase.AddAccountsToGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.PurgeExpiredTrashUseCase
 import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
@@ -79,6 +81,8 @@ class HomeViewModelGroupFilterTest {
     private fun newVm(): HomeViewModel = HomeViewModel(
         context = context,
         getAccountsUseCase = GetAccountsUseCase(repo),
+        listGroupsUseCase = ListGroupsUseCase(repo),
+        addAccountsToGroupsUseCase = AddAccountsToGroupsUseCase(repo),
         deleteAccountUseCase = DeleteAccountUseCase(repo),
         deleteAccountsUseCase = DeleteAccountsUseCase(repo),
         restoreAccountsUseCase = RestoreAccountsUseCase(repo),

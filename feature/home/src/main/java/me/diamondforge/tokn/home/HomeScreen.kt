@@ -63,6 +63,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val declaredGroups by viewModel.declaredGroups.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -70,6 +71,7 @@ fun HomeScreen(
     var fabMenuOpen by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
     var showBulkDeleteConfirm by remember { mutableStateOf(false) }
+    var showAddToGroupDialog by remember { mutableStateOf(false) }
     var exportAccount by remember { mutableStateOf<OtpAccount?>(null) }
 
     val selectionMode = uiState.selectionMode
@@ -136,6 +138,7 @@ fun HomeScreen(
                     },
                     onDeleteSelected = { showBulkDeleteConfirm = true },
                     onSelectAll = { viewModel.selectAll() },
+                    onAddToGroup = { showAddToGroupDialog = true },
                     sort = uiState.sort,
                     onSetSort = viewModel::setSort,
                     scrollBehavior = scrollBehavior,
@@ -313,6 +316,23 @@ fun HomeScreen(
                 }
             },
             onDismiss = { showBulkDeleteConfirm = false },
+        )
+    }
+
+    if (showAddToGroupDialog) {
+        val addedMessage = pluralStringResource(
+            R.plurals.add_to_group_snackbar,
+            uiState.selectedIds.size,
+            uiState.selectedIds.size,
+        )
+        AddToGroupDialog(
+            groups = declaredGroups,
+            onConfirm = { names ->
+                viewModel.addSelectedToGroups(names)
+                showAddToGroupDialog = false
+                scope.launch { snackbarHostState.showSnackbar(addedMessage) }
+            },
+            onDismiss = { showAddToGroupDialog = false },
         )
     }
 

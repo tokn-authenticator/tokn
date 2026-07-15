@@ -27,7 +27,7 @@ import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
-import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.importer.otpauth.OtpAuthParser
 import me.diamondforge.tokn.security.LockManager
 import javax.inject.Inject
@@ -38,7 +38,7 @@ class AddAccountViewModel @Inject constructor(
     private val addAccountUseCase: AddAccountUseCase,
     private val lockManager: LockManager,
     private val iconPackManager: IconPackManager,
-    getAccountsUseCase: GetAccountsUseCase,
+    listGroupsUseCase: ListGroupsUseCase,
 ) : ViewModel() {
 
     val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackManager.installed
@@ -46,12 +46,8 @@ class AddAccountViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddAccountUiState())
     val uiState: StateFlow<AddAccountUiState> = _uiState.asStateFlow()
 
-    val availableGroups: StateFlow<List<String>> = getAccountsUseCase()
-        .map { accounts ->
-            accounts.flatMap { it.groups }
-                .distinctBy { it.lowercase() }
-                .sortedBy { it.lowercase() }
-        }
+    val availableGroups: StateFlow<List<String>> = listGroupsUseCase()
+        .map { groups -> groups.map { it.name } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {

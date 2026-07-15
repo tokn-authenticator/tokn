@@ -24,14 +24,17 @@ import me.diamondforge.tokn.data.icon.IconPackManager
 import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.AccountSort
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.model.TapBehavior
+import me.diamondforge.tokn.domain.usecase.AddAccountsToGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GenerateOtpUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.OtpResult
 import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.PurgeExpiredTrashUseCase
@@ -45,6 +48,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getAccountsUseCase: GetAccountsUseCase,
+    private val listGroupsUseCase: ListGroupsUseCase,
+    private val addAccountsToGroupsUseCase: AddAccountsToGroupsUseCase,
     private val deleteAccountUseCase: DeleteAccountUseCase,
     private val deleteAccountsUseCase: DeleteAccountsUseCase,
     private val restoreAccountsUseCase: RestoreAccountsUseCase,
@@ -219,6 +224,16 @@ class HomeViewModel @Inject constructor(
 
     fun selectAll() {
         _selectedIds.value = uiState.value.items.map { it.account.id }.toSet()
+    }
+
+    val declaredGroups: StateFlow<List<Group>> = listGroupsUseCase()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun addSelectedToGroups(names: Set<String>) {
+        val ids = _selectedIds.value
+        if (ids.isEmpty() || names.isEmpty()) return
+        _selectedIds.value = emptySet()
+        viewModelScope.launch { addAccountsToGroupsUseCase(ids, names) }
     }
 
     fun clearSelection() {

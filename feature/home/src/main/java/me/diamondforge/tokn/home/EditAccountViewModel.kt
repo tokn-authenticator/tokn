@@ -23,7 +23,7 @@ import me.diamondforge.tokn.data.icon.InstalledIconPack
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.usecase.GetAccountByIdUseCase
-import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ class EditAccountViewModel @Inject constructor(
     private val getAccountByIdUseCase: GetAccountByIdUseCase,
     private val updateAccountUseCase: UpdateAccountUseCase,
     private val iconPackManager: IconPackManager,
-    getAccountsUseCase: GetAccountsUseCase,
+    listGroupsUseCase: ListGroupsUseCase,
 ) : ViewModel() {
 
     private val accountId: Long = checkNotNull(savedStateHandle["accountId"])
@@ -44,15 +44,8 @@ class EditAccountViewModel @Inject constructor(
 
     val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackManager.installed
 
-    // Suggestion source for the group chip field: every distinct group
-    // currently in use across all stored accounts, case-insensitive,
-    // alphabetically sorted.
-    val availableGroups: StateFlow<List<String>> = getAccountsUseCase()
-        .map { accounts ->
-            accounts.flatMap { it.groups }
-                .distinctBy { it.lowercase() }
-                .sortedBy { it.lowercase() }
-        }
+    val availableGroups: StateFlow<List<String>> = listGroupsUseCase()
+        .map { groups -> groups.map { it.name } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
