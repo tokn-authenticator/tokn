@@ -21,7 +21,7 @@
     <string name="sync_wfd_scan">Nach Geräten suchen</string>
     <string name="sync_wfd_unsupported">Wi-Fi Direct wird auf diesem Gerät nicht unterstützt.</string>
     <string name="sync_wfd_permission">Berechtigung erforderlich, um Geräte in der Nähe zu finden.</string>
-    <string name="sync_lan_permission">Permission is needed to discover and connect to devices on your local network.</string>
+    <string name="sync_lan_permission">Es wird eine Berechtigung benötigt, um Geräte in Deinem lokalen Netzwerk zu entdecken und zu verbinden.</string>
     <string name="sync_wfd_grant">Berechtigung erteilen</string>
     <string name="sync_wfd_no_peers">Suche nach Geräten in der Nähe…</string>
     <string name="sync_pairing_code">Verbindungscode</string>
