@@ -50,6 +50,7 @@ import kotlinx.coroutines.launch
 import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.TapBehavior
+import me.diamondforge.tokn.ui.horizontalFadingEdges
 import me.diamondforge.tokn.ui.readableOnColor
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -158,10 +159,14 @@ fun HomeScreen(
                     .padding(padding),
             ) {
                 if (uiState.availableGroups.isNotEmpty()) {
+                    val groupFilterListState = rememberLazyListState()
                     LazyRow(
+                        state = groupFilterListState,
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .horizontalFadingEdges(groupFilterListState),
                     ) {
                         item(key = "__all__") {
                             FilterChip(

@@ -235,7 +235,7 @@ fun GroupsField(
     }
 }
 
-private fun Modifier.horizontalFadingEdges(
+fun Modifier.horizontalFadingEdges(
     state: LazyListState,
     edgeWidth: Dp = 48.dp,
 ): Modifier = graphicsLayer { alpha = 0.99f }.drawWithContent {
