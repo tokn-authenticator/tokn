@@ -25,6 +25,7 @@ import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
 import me.diamondforge.tokn.domain.model.AccountSort
 import me.diamondforge.tokn.domain.model.Group
+import me.diamondforge.tokn.domain.model.GroupSort
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpType
 import me.diamondforge.tokn.domain.model.TapBehavior
@@ -198,6 +199,20 @@ class HomeViewModel @Inject constructor(
         state.copy(recycleBinEnabled = recycleBinEnabled)
     }.combine(userPreferences.showGroupChipEnabled) { state, showGroupChipEnabled ->
         state.copy(showGroupChipEnabled = showGroupChipEnabled)
+    }.combine(
+        combine(listGroupsUseCase(), userPreferences.groupSort, ::Pair),
+    ) { state, (groups, sort) ->
+        val ordered = when (sort) {
+            GroupSort.CUSTOM -> groups.map { it.name }
+            GroupSort.NAME_ASC -> groups.sortedBy { it.name.lowercase() }.map { it.name }
+            GroupSort.NAME_DESC -> groups.sortedByDescending { it.name.lowercase() }.map { it.name }
+        }
+        val orderIndex = ordered.withIndex().associate { (i, name) -> name.lowercase() to i }
+        state.copy(
+            availableGroups = state.availableGroups.sortedWith(
+                compareBy { orderIndex[it.lowercase()] ?: Int.MAX_VALUE },
+            ),
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(isLoading = true))
 
     init {

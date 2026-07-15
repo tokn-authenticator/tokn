@@ -6,15 +6,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
@@ -49,6 +53,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.diamondforge.tokn.domain.model.GroupSort
 import me.diamondforge.tokn.ui.GroupColorDot
 import me.diamondforge.tokn.ui.GroupColorPicker
 import sh.calvin.reorderable.ReorderableCollectionItemScope
@@ -69,10 +74,12 @@ fun GroupManagementScreen(
     var showCreateDialog by remember { mutableStateOf(false) }
 
     var groups by remember(uiState.groups) { mutableStateOf(uiState.groups) }
+    val canDrag = uiState.sort == GroupSort.CUSTOM
     val lazyListState = rememberLazyListState()
     val reorderableState = rememberReorderableLazyListState(
         lazyListState = lazyListState,
         onMove = { from, to ->
+            if (!canDrag) return@rememberReorderableLazyListState
             groups = groups.toMutableList().apply { add(to.index, removeAt(from.index)) }
             viewModel.reorder(groups.map { it.name })
         },
@@ -88,6 +95,9 @@ fun GroupManagementScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
+                },
+                actions = {
+                    GroupSortMenu(sort = uiState.sort, onSetSort = viewModel::setSort)
                 },
                 scrollBehavior = scrollBehavior,
             )
@@ -112,6 +122,7 @@ fun GroupManagementScreen(
                         ReorderableItem(reorderableState, key = row.name.lowercase()) {
                             GroupListRow(
                                 row = row,
+                                canDrag = canDrag,
                                 onColorTap = { colorTarget = row },
                                 onRename = { renameTarget = row },
                                 onDelete = { deleteTarget = row },
@@ -180,6 +191,7 @@ fun GroupManagementScreen(
 @Composable
 private fun ReorderableCollectionItemScope.GroupListRow(
     row: GroupRow,
+    canDrag: Boolean,
     onColorTap: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
@@ -230,12 +242,14 @@ private fun ReorderableCollectionItemScope.GroupListRow(
                         )
                     }
                 }
-                Icon(
-                    Icons.Default.DragHandle,
-                    contentDescription = stringResource(R.string.cd_drag_handle),
-                    modifier = Modifier.draggableHandle(),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                if (canDrag) {
+                    Icon(
+                        Icons.Default.DragHandle,
+                        contentDescription = stringResource(R.string.cd_drag_handle),
+                        modifier = Modifier.draggableHandle(),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         },
     )
@@ -350,6 +364,48 @@ private fun RenameGroupDialog(
             }
         },
     )
+}
+
+@Composable
+private fun GroupSortMenu(
+    sort: GroupSort,
+    onSetSort: (GroupSort) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    IconButton(onClick = { expanded = true }) {
+        Icon(
+            Icons.AutoMirrored.Filled.Sort,
+            contentDescription = stringResource(R.string.groups_sort_cd),
+        )
+    }
+    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        GroupSort.entries.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(stringResource(option.labelRes())) },
+                leadingIcon = {
+                    if (option == sort) {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.size(24.dp))
+                    }
+                },
+                onClick = {
+                    expanded = false
+                    onSetSort(option)
+                },
+            )
+        }
+    }
+}
+
+private fun GroupSort.labelRes(): Int = when (this) {
+    GroupSort.CUSTOM -> R.string.groups_sort_custom
+    GroupSort.NAME_ASC -> R.string.groups_sort_name_asc
+    GroupSort.NAME_DESC -> R.string.groups_sort_name_desc
 }
 
 @Composable

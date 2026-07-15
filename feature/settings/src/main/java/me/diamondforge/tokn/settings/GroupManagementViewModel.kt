@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
+import me.diamondforge.tokn.domain.model.GroupSort
 import me.diamondforge.tokn.domain.usecase.CreateGroupUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteGroupUseCase
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
@@ -26,13 +28,23 @@ class GroupManagementViewModel @Inject constructor(
     private val deleteGroupUseCase: DeleteGroupUseCase,
     private val setGroupColorUseCase: SetGroupColorUseCase,
     private val reorderGroupsUseCase: ReorderGroupsUseCase,
+    private val userPreferences: UserPreferencesRepository,
 ) : ViewModel() {
+
+    private val _groupSort: StateFlow<GroupSort> = userPreferences.groupSort
+        .stateIn(viewModelScope, SharingStarted.Eagerly, GroupSort.CUSTOM)
 
     val uiState: StateFlow<GroupManagementUiState> = combine(
         listGroupsUseCase(),
         getAccountsUseCase(),
-    ) { groups, accounts ->
-        val rows = groups.map { group ->
+        userPreferences.groupSort,
+    ) { groups, accounts, sort ->
+        val ordered = when (sort) {
+            GroupSort.CUSTOM -> groups
+            GroupSort.NAME_ASC -> groups.sortedBy { it.name.lowercase() }
+            GroupSort.NAME_DESC -> groups.sortedByDescending { it.name.lowercase() }
+        }
+        val rows = ordered.map { group ->
             GroupRow(
                 name = group.name,
                 colorArgb = group.colorArgb,
@@ -41,7 +53,7 @@ class GroupManagementViewModel @Inject constructor(
                 },
             )
         }
-        GroupManagementUiState(groups = rows, isLoading = false)
+        GroupManagementUiState(groups = rows, isLoading = false, sort = sort)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -68,7 +80,12 @@ class GroupManagementViewModel @Inject constructor(
         viewModelScope.launch { setGroupColorUseCase(name, colorArgb) }
     }
 
+    fun setSort(sort: GroupSort) {
+        viewModelScope.launch { userPreferences.setGroupSort(sort) }
+    }
+
     fun reorder(names: List<String>) {
+        if (_groupSort.value != GroupSort.CUSTOM) return
         viewModelScope.launch { reorderGroupsUseCase(names) }
     }
 }
@@ -76,6 +93,7 @@ class GroupManagementViewModel @Inject constructor(
 data class GroupManagementUiState(
     val groups: List<GroupRow> = emptyList(),
     val isLoading: Boolean = false,
+    val sort: GroupSort = GroupSort.CUSTOM,
 )
 
 data class GroupRow(

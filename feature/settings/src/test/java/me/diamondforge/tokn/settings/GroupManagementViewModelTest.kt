@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import me.diamondforge.tokn.domain.model.GroupSort
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.testing.FakeAccountRepository
 import me.diamondforge.tokn.domain.usecase.CreateGroupUseCase
@@ -37,6 +38,7 @@ class GroupManagementViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private lateinit var context: Context
     private lateinit var repo: FakeAccountRepository
+    private lateinit var userPreferences: FakeUserPreferences
 
     @Before
     fun setUp() {
@@ -49,6 +51,7 @@ class GroupManagementViewModelTest {
                 account(3, listOf("VIP")),
             ),
         )
+        userPreferences = FakeUserPreferences(context)
     }
 
     @After
@@ -71,6 +74,7 @@ class GroupManagementViewModelTest {
         deleteGroupUseCase = DeleteGroupUseCase(repo),
         setGroupColorUseCase = SetGroupColorUseCase(repo),
         reorderGroupsUseCase = ReorderGroupsUseCase(repo),
+        userPreferences = userPreferences,
     )
 
     private fun TestScope.state(vm: GroupManagementViewModel): () -> GroupManagementUiState {
@@ -124,5 +128,55 @@ class GroupManagementViewModelTest {
         advanceUntilIdle()
 
         assertEquals(emptyList<String>(), repo.snapshot.first { it.id == 3L }.groups)
+    }
+
+    @Test
+    fun `setSort to name ascending reorders the list alphabetically`() = runTest(dispatcher) {
+        val vm = newVm()
+        val current = state(vm)
+
+        userPreferences.groupSortState.value = GroupSort.NAME_ASC
+        runCurrent()
+
+        assertEquals(GroupSort.NAME_ASC, current().sort)
+        assertEquals(listOf("Personal", "VIP", "Work"), current().groups.map { it.name })
+    }
+
+    @Test
+    fun `setSort to name descending reorders the list reverse alphabetically`() = runTest(dispatcher) {
+        val vm = newVm()
+        val current = state(vm)
+
+        userPreferences.groupSortState.value = GroupSort.NAME_DESC
+        runCurrent()
+
+        assertEquals(listOf("Work", "VIP", "Personal"), current().groups.map { it.name })
+    }
+
+    @Test
+    fun `setSort persists through the use case`() = runTest(dispatcher) {
+        val vm = newVm()
+        state(vm)
+
+        vm.setSort(GroupSort.NAME_ASC)
+        advanceUntilIdle()
+
+        assertEquals(GroupSort.NAME_ASC, userPreferences.groupSortState.value)
+    }
+
+    @Test
+    fun `reorder is ignored while sort is not custom`() = runTest(dispatcher) {
+        val vm = newVm()
+        val current = state(vm)
+        userPreferences.groupSortState.value = GroupSort.NAME_ASC
+        runCurrent()
+
+        vm.reorder(listOf("VIP", "Work", "Personal"))
+        advanceUntilIdle()
+
+        userPreferences.groupSortState.value = GroupSort.CUSTOM
+        runCurrent()
+
+        assertEquals(listOf("Work", "Personal", "VIP"), current().groups.map { it.name })
     }
 }

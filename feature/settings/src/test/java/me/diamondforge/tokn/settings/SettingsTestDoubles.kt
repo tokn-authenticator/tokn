@@ -6,6 +6,7 @@ import me.diamondforge.tokn.data.preferences.AppPreferencesRepository
 import me.diamondforge.tokn.data.preferences.FakePreferencesDataStore
 import me.diamondforge.tokn.data.preferences.ThemeMode
 import me.diamondforge.tokn.data.preferences.UserPreferencesRepository
+import me.diamondforge.tokn.domain.model.GroupSort
 import me.diamondforge.tokn.domain.model.TapBehavior
 import me.diamondforge.tokn.security.KeystoreManager
 import me.diamondforge.tokn.security.VaultPasswordManager
@@ -27,6 +28,7 @@ internal class FakeUserPreferences(context: Context) :
     val reminderEnabled = MutableStateFlow(true)
     val reminderLastShownAt = MutableStateFlow(0L)
     val reminderStage = MutableStateFlow(0)
+    val groupSortState = MutableStateFlow(GroupSort.CUSTOM)
 
     override val themeMode = theme
     override val autoLockTimeoutSeconds = autoLock
@@ -41,6 +43,11 @@ internal class FakeUserPreferences(context: Context) :
     override val passwordReminderEnabled = reminderEnabled
     override val passwordReminderLastShownAt = reminderLastShownAt
     override val passwordReminderStage = reminderStage
+    override val groupSort = groupSortState
+
+    override suspend fun setGroupSort(sort: GroupSort) {
+        groupSortState.value = sort
+    }
 
     override suspend fun setThemeMode(mode: ThemeMode) {
         theme.value = mode
