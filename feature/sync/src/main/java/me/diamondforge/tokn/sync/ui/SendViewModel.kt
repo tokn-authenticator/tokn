@@ -21,6 +21,7 @@ import me.diamondforge.tokn.data.security.VaultAuthGate
 import me.diamondforge.tokn.data.security.VaultAuthMode
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.security.EncryptionManager
 import me.diamondforge.tokn.sync.AppInfo
 import me.diamondforge.tokn.sync.SyncPayload
@@ -51,6 +52,7 @@ data class SendUiState(
 class SendViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getAccountsUseCase: GetAccountsUseCase,
+    private val listGroupsUseCase: ListGroupsUseCase,
     private val encryptionManager: EncryptionManager,
     private val appInfo: AppInfo,
     private val vaultAuthGate: VaultAuthGate,
@@ -92,6 +94,8 @@ class SendViewModel @Inject constructor(
         return all.filter { it.id in ids }
     }
 
+    private suspend fun declaredGroups() = listGroupsUseCase().first()
+
     fun startLanSend() {
         if (lanJob?.isActive == true) return
         val code = Handshake.newPairingCode()
@@ -105,7 +109,7 @@ class SendViewModel @Inject constructor(
         }
         lanJob = viewModelScope.launch {
             runCatching {
-                val payload = SyncPayload.serialize(selectedAccounts())
+                val payload = SyncPayload.serialize(selectedAccounts(), declaredGroups())
                     .toByteArray(Charsets.UTF_8)
                 val server = LanSyncServer(context)
                 val result = server.sendPayload(
@@ -178,7 +182,7 @@ class SendViewModel @Inject constructor(
             runCatching {
                 val groupOk = wfdManager.createGroup()
                 if (!groupOk) error(context.getString(me.diamondforge.tokn.sync.R.string.sync_error_wfd_start_group))
-                val payload = SyncPayload.serialize(selectedAccounts())
+                val payload = SyncPayload.serialize(selectedAccounts(), declaredGroups())
                     .toByteArray(Charsets.UTF_8)
                 WfdSyncTransport.sendOverWfd(
                     code = code,
@@ -245,7 +249,7 @@ class SendViewModel @Inject constructor(
             }
             runCatching {
                 withContext(Dispatchers.Default) {
-                    val plain = SyncPayload.serialize(selectedAccounts())
+                    val plain = SyncPayload.serialize(selectedAccounts(), declaredGroups())
                     val compressed = Gzip.compress(plain.toByteArray(Charsets.UTF_8))
                     val payload = encryptionManager.encrypt(compressed, passphrase)
                     val wrapper = JSONObject().apply {

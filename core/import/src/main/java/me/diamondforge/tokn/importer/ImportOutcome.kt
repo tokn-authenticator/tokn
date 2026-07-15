@@ -1,10 +1,14 @@
 package me.diamondforge.tokn.importer
 
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 
 sealed interface ImportOutcome {
-    data class Success(val accounts: List<OtpAccount>, val unsupportedCount: Int = 0) :
-        ImportOutcome
+    data class Success(
+        val accounts: List<OtpAccount>,
+        val unsupportedCount: Int = 0,
+        val declaredGroups: List<Group> = emptyList(),
+    ) : ImportOutcome
 
     data object NeedsPassword : ImportOutcome
     data class WrongPassword(val cause: Throwable? = null) : ImportOutcome

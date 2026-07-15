@@ -196,8 +196,9 @@ class ReceiveViewModel @Inject constructor(
                 val encrypted = EncryptedPayload.fromJson(wrapper)
                 val plain = encryptionManager.decrypt(encrypted, passphrase)
                 val decoded = if (Gzip.looksGzipped(plain)) Gzip.decompress(plain) else plain
-                val accounts = SyncPayload.deserialize(String(decoded, Charsets.UTF_8))
-                importAccountsUseCase(accounts)
+                val decodedJson = String(decoded, Charsets.UTF_8)
+                val accounts = SyncPayload.deserialize(decodedJson)
+                importAccountsUseCase(accounts, SyncPayload.readDeclaredGroups(decodedJson))
             }.onSuccess { summary ->
                 _uiState.update {
                     it.copy(
@@ -326,7 +327,7 @@ class ReceiveViewModel @Inject constructor(
     private suspend fun applyJsonPayload(json: String) {
         runCatching {
             val accounts = SyncPayload.deserialize(json)
-            importAccountsUseCase(accounts)
+            importAccountsUseCase(accounts, SyncPayload.readDeclaredGroups(json))
         }.onSuccess { summary ->
             _uiState.update {
                 it.copy(

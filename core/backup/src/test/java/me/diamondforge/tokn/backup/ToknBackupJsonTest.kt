@@ -1,5 +1,6 @@
 package me.diamondforge.tokn.backup
 
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -72,5 +73,37 @@ class ToknBackupJsonTest {
         """.trimIndent()
         val restored = deserializeAccountsFromJson(raw)
         assertTrue(restored.first().groups.isEmpty())
+    }
+
+    @Test
+    fun `old backup without declaredGroups still restores accounts and yields no declared groups`() {
+        val raw = """
+            {
+              "version": 1,
+              "accounts": [
+                {"issuer":"GitHub","accountName":"alice","secret":"JBSWY3DPEHPK3PXP","group":"Work"}
+              ]
+            }
+        """.trimIndent()
+        val restored = deserializeAccountsFromJson(raw)
+        assertEquals(listOf("Work"), restored.first().groups)
+        assertTrue(readDeclaredGroups(raw).isEmpty())
+    }
+
+    @Test
+    fun `declaredGroups round trips name color and order`() {
+        val groups = listOf(
+            Group(name = "Work", colorArgb = 0xFF1155CC.toInt(), sortOrder = 0),
+            Group(name = "Empty", colorArgb = null, sortOrder = 1),
+        )
+        val json = serializeAccountsToJson(emptyList(), groups)
+        val restored = readDeclaredGroups(json)
+        assertEquals(2, restored.size)
+        assertEquals("Work", restored[0].name)
+        assertEquals(0xFF1155CC.toInt(), restored[0].colorArgb)
+        assertEquals(0, restored[0].sortOrder)
+        assertEquals("Empty", restored[1].name)
+        assertEquals(null, restored[1].colorArgb)
+        assertEquals(1, restored[1].sortOrder)
     }
 }
