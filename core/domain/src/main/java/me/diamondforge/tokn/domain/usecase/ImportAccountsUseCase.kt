@@ -1,6 +1,7 @@
 package me.diamondforge.tokn.domain.usecase
 
 import kotlinx.coroutines.flow.first
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.repository.AccountRepository
 
@@ -16,7 +17,10 @@ class ImportAccountsUseCase(private val repository: AccountRepository) {
         val found: Int get() = imported + skipped
     }
 
-    suspend operator fun invoke(incoming: List<OtpAccount>): Summary {
+    suspend operator fun invoke(
+        incoming: List<OtpAccount>,
+        declaredGroups: List<Group> = emptyList(),
+    ): Summary {
         val existing = repository.getAccounts().first()
             .mapTo(HashSet()) { it.secret.normalize() }
         var imported = 0
@@ -30,6 +34,10 @@ class ImportAccountsUseCase(private val repository: AccountRepository) {
             repository.addAccount(account.copy(id = 0))
             existing.add(normalized)
             imported++
+        }
+        declaredGroups.forEach { repository.createGroup(it.name, it.colorArgb) }
+        if (declaredGroups.isNotEmpty()) {
+            repository.reorderGroups(declaredGroups.sortedBy { it.sortOrder }.map { it.name })
         }
         return Summary(imported = imported, skipped = skipped)
     }

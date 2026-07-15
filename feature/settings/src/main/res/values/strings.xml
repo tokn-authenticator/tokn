@@ -270,6 +270,8 @@
     <string name="audit_event_item_purged_auto">Accounts auto-removed from Recycle Bin</string>
     <string name="audit_event_group_renamed">Group renamed</string>
     <string name="audit_event_group_removed">Group removed</string>
+    <string name="audit_event_group_created">Group created</string>
+    <string name="audit_event_accounts_added_to_group">Accounts added to group</string>
     <string name="audit_event_theme_changed">Theme changed</string>
     <string name="audit_event_dynamic_color_enabled">Material You colors enabled</string>
     <string name="audit_event_dynamic_color_disabled">Material You colors disabled</string>
@@ -289,6 +291,8 @@
     <string name="audit_event_password_reminder_disabled">Password reminder disabled</string>
     <string name="audit_event_recycle_bin_setting_enabled">Recycle Bin enabled</string>
     <string name="audit_event_recycle_bin_setting_disabled">Recycle Bin disabled</string>
+    <string name="audit_event_show_group_chip_enabled">Account group chip enabled</string>
+    <string name="audit_event_show_group_chip_disabled">Account group chip disabled</string>
     <string name="audit_event_audit_log_enabled">Audit log enabled</string>
     <string name="audit_event_audit_log_disabled">Audit log disabled</string>
     <string name="audit_event_audit_log_retention_changed">Audit log retention changed</string>

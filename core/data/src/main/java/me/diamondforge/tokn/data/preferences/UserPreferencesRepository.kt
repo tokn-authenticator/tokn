@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import me.diamondforge.tokn.audit.AuditCategory
 import me.diamondforge.tokn.domain.model.AccountSort
+import me.diamondforge.tokn.domain.model.GroupSort
 import me.diamondforge.tokn.domain.model.TapBehavior
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -64,6 +65,10 @@ open class UserPreferencesRepository(
         prefs[Keys.RECYCLE_BIN_ENABLED] ?: true
     }
 
+    open val showGroupChipEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.SHOW_GROUP_CHIP_ENABLED] ?: false
+    }
+
     open val dynamicColorEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.DYNAMIC_COLOR_ENABLED] ?: true
     }
@@ -82,6 +87,12 @@ open class UserPreferencesRepository(
         prefs[Keys.ACCOUNT_SORT]
             ?.let { runCatching { AccountSort.valueOf(it) }.getOrNull() }
             ?: AccountSort.CUSTOM
+    }
+
+    open val groupSort: Flow<GroupSort> = dataStore.data.map { prefs ->
+        prefs[Keys.GROUP_SORT]
+            ?.let { runCatching { GroupSort.valueOf(it) }.getOrNull() }
+            ?: GroupSort.CUSTOM
     }
 
     open val tapBehavior: Flow<TapBehavior> = dataStore.data.map { prefs ->
@@ -164,6 +175,10 @@ open class UserPreferencesRepository(
         dataStore.edit { it[Keys.RECYCLE_BIN_ENABLED] = enabled }
     }
 
+    open suspend fun setShowGroupChipEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.SHOW_GROUP_CHIP_ENABLED] = enabled }
+    }
+
     open suspend fun setDynamicColorEnabled(enabled: Boolean) {
         dataStore.edit { it[Keys.DYNAMIC_COLOR_ENABLED] = enabled }
     }
@@ -178,6 +193,10 @@ open class UserPreferencesRepository(
 
     open suspend fun setAccountSort(sort: AccountSort) {
         dataStore.edit { it[Keys.ACCOUNT_SORT] = sort.name }
+    }
+
+    open suspend fun setGroupSort(sort: GroupSort) {
+        dataStore.edit { it[Keys.GROUP_SORT] = sort.name }
     }
 
     open suspend fun setTapBehavior(behavior: TapBehavior) {
@@ -230,10 +249,12 @@ open class UserPreferencesRepository(
         val STAY_REVEALED_ENABLED = booleanPreferencesKey("stay_revealed_enabled")
         val SHOW_NEXT_CODE_ENABLED = booleanPreferencesKey("show_next_code_enabled")
         val RECYCLE_BIN_ENABLED = booleanPreferencesKey("recycle_bin_enabled")
+        val SHOW_GROUP_CHIP_ENABLED = booleanPreferencesKey("show_group_chip_enabled")
         val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")
         val ACCOUNT_SORT = stringPreferencesKey("account_sort")
+        val GROUP_SORT = stringPreferencesKey("group_sort")
         val TAP_BEHAVIOR = stringPreferencesKey("tap_behavior")
         val PASSWORD_REMINDER_ENABLED = booleanPreferencesKey("password_reminder_enabled")
         val PASSWORD_REMINDER_LAST_SHOWN_AT = longPreferencesKey("password_reminder_last_shown_at")

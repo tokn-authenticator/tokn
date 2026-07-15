@@ -1,6 +1,7 @@
 package me.diamondforge.tokn.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.TrashedAccount
 
@@ -37,4 +38,10 @@ interface AccountRepository {
      * accounts that had the group.
      */
     suspend fun removeGroup(name: String): Int
+
+    fun listGroups(): Flow<List<Group>>
+    suspend fun createGroup(name: String, colorArgb: Int? = null): Long
+    suspend fun setGroupColor(name: String, colorArgb: Int?)
+    suspend fun reorderGroups(orderedNames: List<String>)
+    suspend fun addAccountsToGroups(ids: Set<Long>, groupNames: Set<String>): Int
 }

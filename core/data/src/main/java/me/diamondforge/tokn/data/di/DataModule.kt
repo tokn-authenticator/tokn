@@ -9,10 +9,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.diamondforge.tokn.data.db.AppDatabase
+import me.diamondforge.tokn.data.db.dao.GroupDao
 import me.diamondforge.tokn.data.db.dao.OtpAccountDao
 import me.diamondforge.tokn.data.repository.AccountRepositoryImpl
 import me.diamondforge.tokn.domain.repository.AccountRepository
 import me.diamondforge.tokn.domain.usecase.AddAccountUseCase
+import me.diamondforge.tokn.domain.usecase.AddAccountsToGroupsUseCase
+import me.diamondforge.tokn.domain.usecase.CreateGroupUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.DeleteGroupUseCase
@@ -23,12 +26,15 @@ import me.diamondforge.tokn.domain.usecase.GetAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.GetTrashedAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.ImportAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.IncrementHotpCounterUseCase
+import me.diamondforge.tokn.domain.usecase.ListGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.PurgeAccountsUseCase
 import me.diamondforge.tokn.domain.usecase.PurgeExpiredTrashUseCase
 import me.diamondforge.tokn.domain.usecase.RecordUsageUseCase
 import me.diamondforge.tokn.domain.usecase.RenameGroupUseCase
 import me.diamondforge.tokn.domain.usecase.ReorderAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.ReorderGroupsUseCase
 import me.diamondforge.tokn.domain.usecase.RestoreAccountsUseCase
+import me.diamondforge.tokn.domain.usecase.SetGroupColorUseCase
 import me.diamondforge.tokn.domain.usecase.UpdateAccountUseCase
 import me.diamondforge.tokn.security.vault.VaultSession
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
@@ -55,12 +61,16 @@ object DataModule {
                 AppDatabase.MIGRATION_3_4,
                 AppDatabase.MIGRATION_4_5,
                 AppDatabase.MIGRATION_5_6,
+                AppDatabase.MIGRATION_6_7,
             )
             .build()
     }
 
     @Provides
     fun provideOtpAccountDao(db: AppDatabase): OtpAccountDao = db.otpAccountDao()
+
+    @Provides
+    fun provideGroupDao(db: AppDatabase): GroupDao = db.groupDao()
 
     @Provides
     fun provideGetAccountsUseCase(repo: AccountRepository) = GetAccountsUseCase(repo)
@@ -113,6 +123,22 @@ object DataModule {
 
     @Provides
     fun provideDeleteGroupUseCase(repo: AccountRepository) = DeleteGroupUseCase(repo)
+
+    @Provides
+    fun provideListGroupsUseCase(repo: AccountRepository) = ListGroupsUseCase(repo)
+
+    @Provides
+    fun provideCreateGroupUseCase(repo: AccountRepository) = CreateGroupUseCase(repo)
+
+    @Provides
+    fun provideSetGroupColorUseCase(repo: AccountRepository) = SetGroupColorUseCase(repo)
+
+    @Provides
+    fun provideReorderGroupsUseCase(repo: AccountRepository) = ReorderGroupsUseCase(repo)
+
+    @Provides
+    fun provideAddAccountsToGroupsUseCase(repo: AccountRepository) =
+        AddAccountsToGroupsUseCase(repo)
 
     @Provides
     fun provideGenerateOtpUseCase() = GenerateOtpUseCase()

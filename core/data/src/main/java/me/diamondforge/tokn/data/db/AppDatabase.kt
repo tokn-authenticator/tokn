@@ -4,16 +4,19 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import me.diamondforge.tokn.data.db.dao.GroupDao
 import me.diamondforge.tokn.data.db.dao.OtpAccountDao
+import me.diamondforge.tokn.data.db.entity.GroupEntity
 import me.diamondforge.tokn.data.db.entity.OtpAccountEntity
 
 @Database(
-    entities = [OtpAccountEntity::class],
-    version = 6,
+    entities = [OtpAccountEntity::class, GroupEntity::class],
+    version = 7,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun otpAccountDao(): OtpAccountDao
+    abstract fun groupDao(): GroupDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -53,6 +56,21 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE otp_accounts ADD COLUMN deleted_at INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `groups` (" +
+                            "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                            "`name` TEXT NOT NULL COLLATE NOCASE, " +
+                            "`color_argb` INTEGER, " +
+                            "`sort_order` INTEGER NOT NULL DEFAULT 0)"
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_groups_name` ON `groups` (`name`)"
+                )
             }
         }
     }

@@ -595,6 +595,8 @@ private fun eventTypeLabel(type: AuditEventType): Int = when (type) {
     AuditEventType.ITEM_PURGED_AUTO -> R.string.audit_event_item_purged_auto
     AuditEventType.GROUP_RENAMED -> R.string.audit_event_group_renamed
     AuditEventType.GROUP_REMOVED -> R.string.audit_event_group_removed
+    AuditEventType.GROUP_CREATED -> R.string.audit_event_group_created
+    AuditEventType.ACCOUNTS_ADDED_TO_GROUP -> R.string.audit_event_accounts_added_to_group
     AuditEventType.THEME_CHANGED -> R.string.audit_event_theme_changed
     AuditEventType.DYNAMIC_COLOR_ENABLED -> R.string.audit_event_dynamic_color_enabled
     AuditEventType.DYNAMIC_COLOR_DISABLED -> R.string.audit_event_dynamic_color_disabled
@@ -614,6 +616,8 @@ private fun eventTypeLabel(type: AuditEventType): Int = when (type) {
     AuditEventType.PASSWORD_REMINDER_DISABLED -> R.string.audit_event_password_reminder_disabled
     AuditEventType.RECYCLE_BIN_SETTING_ENABLED -> R.string.audit_event_recycle_bin_setting_enabled
     AuditEventType.RECYCLE_BIN_SETTING_DISABLED -> R.string.audit_event_recycle_bin_setting_disabled
+    AuditEventType.SHOW_GROUP_CHIP_ENABLED -> R.string.audit_event_show_group_chip_enabled
+    AuditEventType.SHOW_GROUP_CHIP_DISABLED -> R.string.audit_event_show_group_chip_disabled
     AuditEventType.AUDIT_LOG_ENABLED -> R.string.audit_event_audit_log_enabled
     AuditEventType.AUDIT_LOG_DISABLED -> R.string.audit_event_audit_log_disabled
     AuditEventType.AUDIT_LOG_RETENTION_CHANGED -> R.string.audit_event_audit_log_retention_changed

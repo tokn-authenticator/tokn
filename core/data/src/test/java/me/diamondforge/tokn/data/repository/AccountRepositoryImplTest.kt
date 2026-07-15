@@ -28,7 +28,7 @@ class AccountRepositoryImplTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        repo = AccountRepositoryImpl(db.otpAccountDao(), db)
+        repo = AccountRepositoryImpl(db.otpAccountDao(), db.groupDao(), db)
     }
 
     @After
@@ -140,5 +140,81 @@ class AccountRepositoryImplTest {
         assertEquals(0, repo.getAccountById(c)!!.sortOrder)
         assertEquals(1, repo.getAccountById(a)!!.sortOrder)
         assertEquals(2, repo.getAccountById(b)!!.sortOrder)
+    }
+
+    @Test
+    fun `listGroups materializes group names already living on accounts`() = runBlocking {
+        repo.addAccount(account(listOf("Work", "Personal")))
+
+        val groups = repo.listGroups().first().map { it.name }.toSet()
+
+        assertEquals(setOf("Work", "Personal"), groups)
+    }
+
+    @Test
+    fun `createGroup makes an empty group visible even with no accounts`() = runBlocking {
+        repo.createGroup("Empty", colorArgb = 0xFF112233.toInt())
+
+        val groups = repo.listGroups().first()
+
+        assertEquals(1, groups.size)
+        assertEquals("Empty", groups.first().name)
+        assertEquals(0xFF112233.toInt(), groups.first().colorArgb)
+    }
+
+    @Test
+    fun `createGroup is idempotent case-insensitively`() = runBlocking {
+        val first = repo.createGroup("Work")
+        val second = repo.createGroup("work")
+
+        assertEquals(first, second)
+        assertEquals(1, repo.listGroups().first().size)
+    }
+
+    @Test
+    fun `addAccountsToGroups adds and materializes new group names`() = runBlocking {
+        val a = repo.addAccount(account(listOf("Work")))
+        val b = repo.addAccount(account(emptyList()))
+
+        val changed = repo.addAccountsToGroups(setOf(a, b), setOf("Work", "New"))
+
+        assertEquals(2, changed)
+        assertEquals(listOf("Work", "New"), groupsOf(a))
+        assertEquals(listOf("Work", "New"), groupsOf(b))
+        assertEquals(setOf("Work", "New"), repo.listGroups().first().map { it.name }.toSet())
+    }
+
+    @Test
+    fun `renameGroup onto a name that already has its own declared group merges the rows`() =
+        runBlocking {
+            val a = repo.addAccount(account(listOf("Work")))
+            repo.createGroup("Office", colorArgb = 0xFF445566.toInt())
+
+            val changed = repo.renameGroup("Work", "Office")
+
+            assertEquals(1, changed)
+            assertEquals(listOf("Office"), groupsOf(a))
+            val groups = repo.listGroups().first()
+            assertEquals(1, groups.size)
+            assertEquals(0xFF445566.toInt(), groups.first().colorArgb)
+        }
+
+    @Test
+    fun `removeGroup also removes the declared group row`() = runBlocking {
+        val a = repo.addAccount(account(listOf("Work")))
+        repo.removeGroup("Work")
+
+        assertEquals(emptyList<String>(), groupsOf(a))
+        assertEquals(emptyList<String>(), repo.listGroups().first().map { it.name })
+    }
+
+    @Test
+    fun `reorderGroups persists the given order by name`() = runBlocking {
+        repo.createGroup("B")
+        repo.createGroup("A")
+
+        repo.reorderGroups(listOf("A", "B"))
+
+        assertEquals(listOf("A", "B"), repo.listGroups().first().map { it.name })
     }
 }

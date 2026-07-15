@@ -20,6 +20,8 @@ enum class AuditEventType(val category: AuditCategory) {
     ITEM_PURGED_AUTO(AuditCategory.ITEMS),
     GROUP_RENAMED(AuditCategory.ITEMS),
     GROUP_REMOVED(AuditCategory.ITEMS),
+    GROUP_CREATED(AuditCategory.ITEMS),
+    ACCOUNTS_ADDED_TO_GROUP(AuditCategory.ITEMS),
 
     THEME_CHANGED(AuditCategory.SETTINGS),
     DYNAMIC_COLOR_ENABLED(AuditCategory.SETTINGS),
@@ -40,6 +42,8 @@ enum class AuditEventType(val category: AuditCategory) {
     PASSWORD_REMINDER_DISABLED(AuditCategory.SETTINGS),
     RECYCLE_BIN_SETTING_ENABLED(AuditCategory.SETTINGS),
     RECYCLE_BIN_SETTING_DISABLED(AuditCategory.SETTINGS),
+    SHOW_GROUP_CHIP_ENABLED(AuditCategory.SETTINGS),
+    SHOW_GROUP_CHIP_DISABLED(AuditCategory.SETTINGS),
     AUDIT_LOG_ENABLED(AuditCategory.SETTINGS),
     AUDIT_LOG_DISABLED(AuditCategory.SETTINGS),
     AUDIT_LOG_RETENTION_CHANGED(AuditCategory.SETTINGS),
