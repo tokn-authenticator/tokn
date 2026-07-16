@@ -16,7 +16,8 @@ A small, opinionated 2FA / MFA authenticator for Android. Your one-time codes
 stay on the device, encrypted. No sign-up, no sync server, no analytics.
 
 Website: [usetokn.app](https://usetokn.app) - feature tour, app comparisons,
-and step-by-step migration guides.
+and step-by-step migration guides. For the cryptography, key handling, and
+threat model, see [SECURITY.md](SECURITY.md).
 
 ## Why Tokn?
 
