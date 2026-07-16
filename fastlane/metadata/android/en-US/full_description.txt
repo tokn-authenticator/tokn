@@ -35,5 +35,8 @@ LICENSE
 
 Tokn is free software, released under the GNU General Public License v3.0 or later.
 
+Website with comparisons and migration guides:
+https://usetokn.app
+
 Source code, releases and issue tracker:
-https://github.com/fthomys/tokn
+https://github.com/tokn-authenticator/tokn

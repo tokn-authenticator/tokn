@@ -5,8 +5,8 @@ alt="App icon">
 
 <br>
 
-[![Build](https://github.com/fthomys/tokn/actions/workflows/build.yml/badge.svg)](https://github.com/fthomys/tokn/actions/workflows/build.yml?query=branch%3Amain)
-[![GitHub release](https://img.shields.io/github/v/release/fthomys/tokn?label=GitHub)](https://github.com/fthomys/tokn/releases/latest)
+[![Build](https://github.com/tokn-authenticator/tokn/actions/workflows/build.yml/badge.svg)](https://github.com/tokn-authenticator/tokn/actions/workflows/build.yml?query=branch%3Amain)
+[![GitHub release](https://img.shields.io/github/v/release/tokn-authenticator/tokn?label=GitHub)](https://github.com/tokn-authenticator/tokn/releases/latest)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
 <a href="https://play.google.com/store/apps/details?id=me.diamondforge.tokn"><img height="20" alt="Google Play" src="https://playbadges.pavi2410.com/badge/version?id=me.diamondforge.tokn"></a>
 [![F-Droid](https://img.shields.io/f-droid/v/me.diamondforge.tokn.svg?label=F-Droid)](https://f-droid.org/app/me.diamondforge.tokn)
@@ -14,6 +14,9 @@ alt="App icon">
 
 A small, opinionated 2FA / MFA authenticator for Android. Your one-time codes
 stay on the device, encrypted. No sign-up, no sync server, no analytics.
+
+Website: [usetokn.app](https://usetokn.app) - feature tour, app comparisons,
+and step-by-step migration guides.
 
 ## Why Tokn?
 
@@ -58,8 +61,20 @@ src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
 />](https://f-droid.org/app/me.diamondforge.tokn)
 
 Signed APKs are also attached to each
-[GitHub Release](https://github.com/fthomys/tokn/releases) if you prefer
-sideloading.
+[GitHub Release](https://github.com/tokn-authenticator/tokn/releases) if you
+prefer sideloading.
+
+## Switching from another app
+
+Tokn reads backups from Aegis, 2FAS and Stratum directly, scans Google
+Authenticator's export QR codes, and accepts plain `otpauth://` URI lists.
+Step-by-step guides for each app live on the website:
+[Aegis](https://usetokn.app/guides/switch-from-aegis),
+[Google Authenticator](https://usetokn.app/guides/switch-from-google-authenticator),
+[2FAS](https://usetokn.app/guides/switch-from-2fas),
+[Stratum](https://usetokn.app/guides/switch-from-stratum),
+[Authy](https://usetokn.app/guides/switch-from-authy) and
+[Microsoft Authenticator](https://usetokn.app/guides/switch-from-microsoft-authenticator).
 
 ## A look around
 
@@ -163,7 +178,7 @@ attached to GitHub Releases.
 ## Bugs, ideas, patches
 
 Please open an issue or PR on
-[GitHub](https://github.com/fthomys/tokn).
+[GitHub](https://github.com/tokn-authenticator/tokn).
 
 ## Translations
 

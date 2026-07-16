@@ -1,4 +1,4 @@
-Tokn ist ein kleiner, datenschutzorientierter 2FA / MFA Authenticator. Deine Einmalcodes bleiben verschlüsselt auf deinem Gerät. Kein Konto, keine Cloud, keine Analyse, keine Werbung.
+Tokn ist eine leichtgewichtige 2FA-/MFA-Authentifizierungs-App mit Fokus auf Privatsphäre. Deine Einmalcodes bleiben verschlüsselt auf deinem Gerät. Kein Konto, keine Cloud, keine Analyse, keine Werbung.
 
 Eine einfache, quelloffene TOTP / HOTP App für alle, die ihren zweiten Faktor nicht in der Cloud anderer Leute haben wollen.
 
@@ -20,20 +20,25 @@ FUNKTIONEN
 • Direkte Geräte-zu-Geräte Synchronisierung über lokales WLAN, Wi-Fi Direct oder animierten QR Code. Nichts verlässt dein Netzwerk und der Handshake ist Ende-zu-Ende verschlüsselt
 • Konten mit eigenen Gruppen organisieren, mehrere Gruppen pro Konto möglich
 • Eigene Icons und importierbare Icon Packs (Aegis-kompatibel)
-• Material 3 Design mit hellem, dunklem oder System-Theme und optional Material You Farben
+• Material 3 Expressive Design mit hellem, dunklem oder System-Theme und optional Material You Farben
 • Screenshot-Schutz hält Codes aus der App-Übersicht heraus und blockiert Bildschirmaufnahmen
 
 WECHSEL VON EINER ANDEREN 2FA APP
 
-Tokn importiert Backups von Aegis, 2FAS, Google Authenticator und standardmäßigen otpauth:// URIs. Bring deine bestehenden Konten in wenigen Minuten herüber.
+Du suchst eine Google-Authenticator-Alternative? Tokn importiert Backups von Aegis, 2FAS, Google Authenticator und Standard-otpauth://-URIs. Deine bestehenden Konten sind in wenigen Minuten übernommen.
 
 FUNKTIONIERT MIT
 
 Jedem Dienst, der TOTP oder HOTP zur Zwei-Faktor-Authentifizierung unterstützt. Google, GitHub, GitLab, Microsoft, Amazon, Discord, Twitch, Reddit, Dropbox, Proton und tausenden mehr.
 
+Ob du es Zwei-Faktor-Authentifizierung, Multi-Faktor-Authentifizierung, 2FA, MFA oder Einmalpasswort (OTP) nennst – Tokn erzeugt deine Bestätigungscodes sicher und privat, ohne Konto und ohne Cloud.
+
 LIZENZ
 
 Tokn ist freie Software, veröffentlicht unter der GNU General Public License v3.0 oder später.
 
+Website mit Vergleichen und Umstiegs-Guides:
+https://usetokn.app
+
 Quellcode, Releases und Issue Tracker:
-https://github.com/fthomys/tokn
+https://github.com/tokn-authenticator/tokn
