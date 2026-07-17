@@ -19,6 +19,8 @@ FEATURES
 • Encrypted backup and restore for moving to a new phone or keeping a copy
 • Device-to-device sync over local Wi-Fi, Wi-Fi Direct or animated QR code. Nothing leaves your network and the handshake is end-to-end encrypted
 • Organize accounts with custom groups, multiple groups per account
+• Recycle Bin that keeps deleted items optionally for 30d. Configurable
+• Audit Log to see your vault actions
 • Custom icons and importable icon packs (Aegis-compatible)
 • Material 3 design with light, dark or system theme and optional Material You colors
 • Screenshot protection keeps codes out of the recents preview and blocks screen capture
