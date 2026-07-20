@@ -21,7 +21,7 @@
     <string name="sync_wfd_scan">Поиск ближайших устройств</string>
     <string name="sync_wfd_unsupported">Это устройство не поддерживает Wi-Fi Direct.</string>
     <string name="sync_wfd_permission">Для обнаружения ближайших устройств необходимо разрешение.</string>
-    <string name="sync_lan_permission">Permission is needed to discover and connect to devices on your local network.</string>
+    <string name="sync_lan_permission">Требуется разрешение для обнаружения и подключения к устройствам в вашей локальной сети.</string>
     <string name="sync_wfd_grant">Разрешить</string>
     <string name="sync_wfd_no_peers">Поиск ближайших устройств…</string>
     <string name="sync_pairing_code">Код сопряжения</string>
