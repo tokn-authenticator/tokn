@@ -3,9 +3,9 @@
     <string name="backup_title">Импорт &amp; экспорт</string>
     <string name="section_import">Импорт</string>
     <string name="section_export">Экспорт</string>
-    <string name="section_automatic">Automatic</string>
-    <string name="auto_backup_entry_title">Automatic backup</string>
-    <string name="auto_backup_entry_desc">Back up to a folder on every change</string>
+    <string name="section_automatic">Автоматически</string>
+    <string name="auto_backup_entry_title">Автоматическое резервное копирование</string>
+    <string name="auto_backup_entry_desc">Создавать резервную копию в папку при каждом изменении</string>
     <string name="import_from_file">Импорт учётных записей из файла</string>
     <string name="import_from_file_desc">Импорт учётных записей из резервной копии или другого приложения</string>
     <string name="import_from_google_auth">Перенос из Google Authenticator</string>

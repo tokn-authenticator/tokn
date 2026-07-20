@@ -11,8 +11,8 @@
     <string name="add_from_image">Из изображения</string>
     <string name="add_manually">Ввести вручную</string>
     <string name="delete_confirm_title">Удалить аккаунт?</string>
-    <string name="delete_confirm_message">This account will be moved to the Recycle Bin.</string>
-    <string name="undo">Undo</string>
+    <string name="delete_confirm_message">Этот аккаунт будет перемещён в корзину.</string>
+    <string name="undo">Отменить</string>
     <string name="cancel">Отмена</string>
     <string name="search">Поиск</string>
     <string name="search_placeholder">Поиск аккаунтов…</string>
@@ -32,21 +32,21 @@
     <string name="edit_group">Группа (необязательно)</string>
     <string name="group_all">Все</string>
     <string name="edit">Изменить</string>
-    <string name="export_qr">Export as QR code</string>
-    <string name="export_secret_warning">This QR code contains your secret in plain text. Only scan it on a device you trust.</string>
-    <string name="export_copy_uri">Copy otpauth URI</string>
-    <string name="export_copied">Copied to clipboard</string>
+    <string name="export_qr">Экспортировать как QR-код</string>
+    <string name="export_secret_warning">Этот QR-код содержит ваш секретный ключ в виде обычного текста. Сканируйте его только на устройстве, которому вы доверяете.</string>
+    <string name="export_copy_uri">Копировать otpauth URI</string>
+    <string name="export_copied">Скопировано в буфер обмена</string>
     <string name="select_all">Выбрать все</string>
-    <string name="add_to_group">Add to group</string>
-    <string name="add_to_group_title">Add to group</string>
-    <string name="add_to_group_new_group_label">New group</string>
-    <string name="add_to_group_confirm">Add</string>
-    <string name="add_to_group_empty">No groups yet. Create one below.</string>
+    <string name="add_to_group">Добавить в группу</string>
+    <string name="add_to_group_title">Добавить в группу</string>
+    <string name="add_to_group_new_group_label">Новая группа</string>
+    <string name="add_to_group_confirm">Добавить</string>
+    <string name="add_to_group_empty">Пока нет групп. Создайте её ниже.</string>
     <plurals name="add_to_group_snackbar">
-        <item quantity="one">Added 1 account to group</item>
-        <item quantity="few">Added %d accounts to group</item>
-        <item quantity="many">Added %d accounts to group</item>
-        <item quantity="other">Added %d accounts to group</item>
+        <item quantity="one">1 аккаунт добавлен в группу</item>
+        <item quantity="few">%d аккаунта добавлено в группу</item>
+        <item quantity="many">%d аккаунтов добавлено в группу</item>
+        <item quantity="other">%d аккаунта добавлено в группу</item>
     </plurals>
     <string name="cd_exit_selection">Выйти из режима выбора</string>
     <string name="cd_exit_search">Закрыть поиск</string>
@@ -75,23 +75,23 @@
         <item quantity="other">Удалить %d аккаунта?</item>
     </plurals>
     <plurals name="delete_count_confirm_message">
-        <item quantity="one">This account will be moved to the Recycle Bin.</item>
-        <item quantity="few">These %d accounts will be moved to the Recycle Bin.</item>
-        <item quantity="many">These %d accounts will be moved to the Recycle Bin.</item>
-        <item quantity="other">These %d accounts will be moved to the Recycle Bin.</item>
+        <item quantity="one">Этот аккаунт будет перемещён в корзину.</item>
+        <item quantity="few">Эти %d аккаунта будут перемещены в корзину.</item>
+        <item quantity="many">Эти %d аккаунтов будут перемещены в корзину.</item>
+        <item quantity="other">Эти %d аккаунта будут перемещены в корзину.</item>
     </plurals>
     <plurals name="delete_count_immediate_message">
-        <item quantity="one">This account will be permanently removed and cannot be restored.</item>
-        <item quantity="few">These %d accounts will be permanently removed and cannot be restored.</item>
-        <item quantity="many">These %d accounts will be permanently removed and cannot be restored.</item>
-        <item quantity="other">These %d accounts will be permanently removed and cannot be restored.</item>
+        <item quantity="one">Этот аккаунт будет удалён без возможности восстановления.</item>
+        <item quantity="few">Эти %d аккаунта будут удалены без возможности восстановления.</item>
+        <item quantity="many">Эти %d аккаунтов будут удалены без возможности восстановления.</item>
+        <item quantity="other">Эти %d аккаунта будут удалены без возможности восстановления.</item>
     </plurals>
-    <string name="delete_immediately">Delete immediately</string>
+    <string name="delete_immediately">Удалить немедленно</string>
     <plurals name="trash_snackbar_deleted">
-        <item quantity="one">Moved to Recycle Bin</item>
-        <item quantity="few">%d accounts moved to Recycle Bin</item>
-        <item quantity="many">%d accounts moved to Recycle Bin</item>
-        <item quantity="other">%d accounts moved to Recycle Bin</item>
+        <item quantity="one">Перемещено в корзину</item>
+        <item quantity="few">%d аккаунта перемещены в корзину</item>
+        <item quantity="many">%d аккаунтов перемещены в корзину</item>
+        <item quantity="other">%d аккаунта перемещены в корзину</item>
     </plurals>
     <string name="edit_error_secret_required">Требуется секретный ключ</string>
     <string name="edit_error_invalid_secret">Недопустимый секретный ключ: разрешены только буквы A-Z и цифры 2-7</string>
