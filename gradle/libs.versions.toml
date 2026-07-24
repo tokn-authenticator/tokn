@@ -2,7 +2,7 @@
 agp = "9.3.1"
 # Pinned below 2.3.30: CodeQL's Kotlin extractor can't analyze 2.4.0 yet
 # (github/codeql#21938).
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 ksp = "2.3.10"
 composeBom = "2026.06.01"
 material3 = "1.5.0-alpha24"
