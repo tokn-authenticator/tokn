@@ -12,6 +12,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
@@ -34,9 +35,10 @@ class IconPackManager @Inject constructor(
     }
 
     fun refresh() {
-        val packs = rootDir.listFiles { f -> f.isDirectory }?.mapNotNull { dir ->
-            runCatching { loadPackFromDir(dir) }.getOrNull()
-        } ?: emptyList()
+        val packs = rootDir.listFiles { f -> f.isDirectory && !f.name.startsWith(".") }
+            ?.mapNotNull { dir ->
+                runCatching { loadPackFromDir(dir) }.getOrNull()
+            } ?: emptyList()
         _installed.value = packs.sortedBy { it.pack.name.lowercase() }
     }
 
@@ -51,7 +53,7 @@ class IconPackManager @Inject constructor(
 
     suspend fun install(uri: Uri): InstallResult = withContext(Dispatchers.IO) {
         mutex.withLock {
-            val staging = File(rootDir, ".staging-${System.currentTimeMillis()}")
+            val staging = File(rootDir, ".staging-${UUID.randomUUID()}")
             staging.mkdirs()
             try {
                 val packJsonBytes = extractZip(uri, staging)
@@ -75,11 +77,11 @@ class IconPackManager @Inject constructor(
                     ?: return@withLock InstallResult.Failed("Installed but not loaded")
                 InstallResult.Success(installed)
             } catch (e: IOException) {
-                staging.deleteRecursively()
                 InstallResult.Failed(e.message ?: "I/O error")
             } catch (e: Exception) {
-                staging.deleteRecursively()
                 InstallResult.Failed(e.message ?: "Unexpected error")
+            } finally {
+                if (staging.exists()) staging.deleteRecursively()
             }
         }
     }
