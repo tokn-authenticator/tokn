@@ -19,10 +19,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.data.icon.IconImageUtil
-import me.diamondforge.tokn.data.icon.IconMatchType
 import me.diamondforge.tokn.data.icon.IconPackManager
+import me.diamondforge.tokn.data.icon.IconPackRegistry
 import me.diamondforge.tokn.data.icon.InstalledIconPack
-import me.diamondforge.tokn.data.icon.suggestionsFor
+import me.diamondforge.tokn.data.icon.bestAutoMatch
 import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAccount
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
@@ -39,10 +39,12 @@ class AddAccountViewModel @Inject constructor(
     private val addAccountUseCase: AddAccountUseCase,
     private val lockManager: LockManager,
     private val iconPackManager: IconPackManager,
+    iconPackRegistry: IconPackRegistry,
     listGroupsUseCase: ListGroupsUseCase,
 ) : ViewModel() {
 
-    val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackManager.installed
+    val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackRegistry.activePacks
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _uiState = MutableStateFlow(AddAccountUiState())
     val uiState: StateFlow<AddAccountUiState> = _uiState.asStateFlow()
@@ -62,11 +64,7 @@ class AddAccountViewModel @Inject constructor(
 
     private fun applyIconSuggestion(issuer: String, packs: List<InstalledIconPack>) {
         if (_uiState.value.iconExplicitlySet) return
-        val match = packs.firstNotNullOfOrNull { pack ->
-            pack.suggestionsFor(issuer)
-                .firstOrNull { it.matchType == IconMatchType.EXACT || it.matchType == IconMatchType.NORMAL }
-                ?.let { pack to it.icon }
-        }
+        val match = bestAutoMatch(packs, issuer)
         if (match != null) {
             val (pack, icon) = match
             val path =

@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.diamondforge.tokn.data.icon.IconImageUtil
 import me.diamondforge.tokn.data.icon.IconPackManager
+import me.diamondforge.tokn.data.icon.IconPackRegistry
 import me.diamondforge.tokn.data.icon.InstalledIconPack
 import me.diamondforge.tokn.domain.model.Group
 import me.diamondforge.tokn.domain.model.OtpAlgorithm
@@ -34,6 +35,7 @@ class EditAccountViewModel @Inject constructor(
     private val getAccountByIdUseCase: GetAccountByIdUseCase,
     private val updateAccountUseCase: UpdateAccountUseCase,
     private val iconPackManager: IconPackManager,
+    iconPackRegistry: IconPackRegistry,
     listGroupsUseCase: ListGroupsUseCase,
 ) : ViewModel() {
 
@@ -42,7 +44,8 @@ class EditAccountViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(EditAccountUiState())
     val uiState: StateFlow<EditAccountUiState> = _uiState.asStateFlow()
 
-    val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackManager.installed
+    val installedPacks: StateFlow<List<InstalledIconPack>> = iconPackRegistry.activePacks
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val declaredGroups: StateFlow<List<Group>> = listGroupsUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
