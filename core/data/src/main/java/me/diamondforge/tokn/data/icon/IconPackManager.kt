@@ -135,13 +135,6 @@ class IconPackManager @Inject constructor(
         val pack = IconPackParser.parse(packJson.readText(Charsets.UTF_8))
         return InstalledIconPack(pack, dir)
     }
-
-    fun suggestionsAcross(issuer: String): List<Pair<InstalledIconPack, IconSuggestion>> {
-        if (issuer.isBlank()) return emptyList()
-        return _installed.value.flatMap { installed ->
-            installed.suggestionsFor(issuer).map { installed to it }
-        }
-    }
 }
 
 sealed interface InstallResult {
