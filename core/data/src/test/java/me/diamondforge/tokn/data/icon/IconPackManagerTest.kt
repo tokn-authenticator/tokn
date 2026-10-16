@@ -201,6 +201,26 @@ class IconPackManagerTest {
         return """{"uuid":"$uuid","name":"$name","icons":[$iconsJson]}""".toByteArray()
     }
 
+    @Test
+    fun `a zip without pack json leaves no staging directory behind`() = runBlocking {
+        val zip = makeZip("nopack.zip", "icon.svg" to "<svg/>".toByteArray())
+
+        val result = manager.install(Uri.fromFile(zip))
+
+        assertTrue(result is InstallResult.MissingPackJson)
+        assertEquals(0, File(context.filesDir, "icon-packs").listFiles()?.size ?: 0)
+    }
+
+    @Test
+    fun `a zip with invalid pack json leaves no staging directory behind`() = runBlocking {
+        val zip = makeZip("bad.zip", "pack.json" to "garbage".toByteArray())
+
+        val result = manager.install(Uri.fromFile(zip))
+
+        assertTrue(result is InstallResult.InvalidPackJson)
+        assertEquals(0, File(context.filesDir, "icon-packs").listFiles()?.size ?: 0)
+    }
+
     private fun makeZip(name: String, vararg entries: Pair<String, ByteArray>): File {
         val out = File(stagingDir, name)
         ZipOutputStream(out.outputStream()).use { zos ->

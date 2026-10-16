@@ -38,14 +38,34 @@
     <string name="icon_packs_section_desc">Bundles of icons assignable per account</string>
     <string name="icon_packs_title">Icon packs</string>
     <string name="icon_packs_import">Import a pack</string>
-    <string name="icon_packs_import_desc">Aegis-compatible .zip with pack.json and icon files</string>
-    <string name="icon_packs_pick_zip">Choose .zip file…</string>
-    <string name="icon_packs_count_v">%1$d icons · v%2$d</string>
+    <string name="icon_packs_import_desc">Aegis-compatible .zip files with pack.json and icon files. You can pick several at once.</string>
+    <string name="icon_packs_pick_zip">Choose .zip files…</string>
     <string name="icon_packs_count_v_used">%1$d icons · v%2$d · used by %3$d</string>
     <string name="icon_packs_delete_body_used">%1$d accounts use icons from this pack. They will fall back to fetched logos or the letter avatar.</string>
     <string name="icon_packs_empty">No icon packs installed yet.</string>
+    <string name="icon_packs_import_progress">Importing %1$d of %2$d…</string>
+    <plurals name="icon_packs_import_result">
+        <item quantity="one">Imported %1$d icon pack.</item>
+        <item quantity="other">Imported %1$d icon packs.</item>
+    </plurals>
+    <plurals name="icon_packs_import_failed">
+        <item quantity="one">%1$d file could not be imported.</item>
+        <item quantity="other">%1$d files could not be imported.</item>
+    </plurals>
+    <string name="icon_packs_import_none">No icon packs were imported.</string>
+    <string name="icon_packs_enable_cd">Use this pack for suggestions</string>
+    <string name="icon_packs_disabled_badge">Off</string>
+    <string name="icon_packs_delete_cd">Remove pack</string>
     <string name="icon_packs_automatch_title">Auto-assign icons?</string>
-    <string name="icon_packs_automatch_body">%1$d of your accounts can use icons from \"%2$s\". Apply them?</string>
+    <plurals name="icon_packs_automatch_fresh">
+        <item quantity="one">%1$d account without an icon can get one from %2$s.</item>
+        <item quantity="other">%1$d accounts without an icon can get one from %2$s.</item>
+    </plurals>
+    <string name="icon_packs_automatch_replace_only">%1$s only matches accounts that already have an icon.</string>
+    <plurals name="icon_packs_automatch_replace">
+        <item quantity="one">Also replace the icon of %1$d account that already uses another pack</item>
+        <item quantity="other">Also replace the icons of %1$d accounts that already use another pack</item>
+    </plurals>
     <string name="icon_packs_automatch_apply">Apply</string>
     <string name="icon_packs_automatch_skip">Skip</string>
     <string name="icon_packs_delete_title">Remove icon pack?</string>

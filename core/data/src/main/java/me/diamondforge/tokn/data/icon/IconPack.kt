@@ -67,3 +67,18 @@ fun InstalledIconPack.suggestionsFor(issuer: String): List<IconSuggestion> {
             normal.map { IconSuggestion(it, IconMatchType.NORMAL) } +
             inverse.map { IconSuggestion(it, IconMatchType.INVERSE) }
 }
+
+fun bestAutoMatch(
+    packs: List<InstalledIconPack>,
+    issuer: String,
+): Pair<InstalledIconPack, IconPackIcon>? {
+    if (issuer.isBlank()) return null
+    val perPack = packs.map { pack -> pack to pack.suggestionsFor(issuer) }
+    for (type in listOf(IconMatchType.EXACT, IconMatchType.NORMAL)) {
+        for ((pack, suggestions) in perPack) {
+            val hit = suggestions.firstOrNull { it.matchType == type } ?: continue
+            return pack to hit.icon
+        }
+    }
+    return null
+}
