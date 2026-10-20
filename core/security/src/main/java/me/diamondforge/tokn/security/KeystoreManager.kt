@@ -85,7 +85,7 @@ open class KeystoreManager @Inject constructor(
             )
             keyGen.generateKey()
         }
-        return (keystore.getEntry(KEY_ALIAS, null) as KeyStore.SecretKeyEntry).secretKey
+        return keystore.getKey(KEY_ALIAS, null) as SecretKey
     }
 
     open fun hasBiometricKey(): Boolean = keystore.containsAlias(BIOMETRIC_KEY_ALIAS)
