@@ -179,7 +179,8 @@ attached to GitHub Releases.
 ## Bugs, ideas, patches
 
 Please open an issue or PR on
-[GitHub](https://github.com/tokn-authenticator/tokn).
+[GitHub](https://github.com/tokn-authenticator/tokn). Before sending a PR,
+have a look at [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Translations
 
