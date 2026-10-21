@@ -297,7 +297,7 @@ class IconPacksViewModelTest {
         runBlocking { repo.addAccount(account(issuer = "GitHub")) }
         val vm = newVm()
         vm.importPacks(listOf(packZip(packUuid, "Brands", "github.svg" to listOf("GitHub"))))
-        advanceUntilIdle()
+        vm.uiState.first { it.autoMatch != null }
         vm.dismissAutoMatch()
 
         vm.setPackEnabled(packUuid, enabled = false)
@@ -306,7 +306,7 @@ class IconPacksViewModelTest {
         assertEquals(1, disabled.rows.size)
 
         vm.importPacks(listOf(packZip(packUuid, "Brands", "github.svg" to listOf("GitHub"))))
-        advanceUntilIdle()
+        vm.uiState.first { it.importSummary != null }
         assertTrue(vm.uiState.first { it.rows.all { row -> row.enabled } }.rows.single().enabled)
     }
 
@@ -314,7 +314,7 @@ class IconPacksViewModelTest {
     fun `uninstall forgets the stored preferences for that pack`() = runTest(dispatcher) {
         val vm = newVm()
         vm.importPacks(listOf(packZip(packUuid, "Brands", "github.svg" to listOf("GitHub"))))
-        advanceUntilIdle()
+        vm.uiState.first { it.importSummary != null }
         vm.setPackEnabled(packUuid, enabled = false)
         advanceUntilIdle()
         assertTrue(packUuid in prefs.disabledIconPacks.first())
