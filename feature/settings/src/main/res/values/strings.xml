@@ -25,6 +25,8 @@
     <string name="theme_system">System</string>
     <string name="material_you">Material You colors</string>
     <string name="material_you_desc">Use the wallpaper-based color palette from your system</string>
+    <string name="oled_mode">OLED mode</string>
+    <string name="oled_mode_desc">Use a black background in dark mode, ideal for AMOLED screens</string>
     <string name="show_next_code">Show next code</string>
     <string name="show_next_code_desc">Preview the upcoming code beneath the current one</string>
     <string name="settings_section_groups">Groups</string>
@@ -287,6 +289,8 @@
     <string name="audit_event_theme_changed">Theme changed</string>
     <string name="audit_event_dynamic_color_enabled">Material You colors enabled</string>
     <string name="audit_event_dynamic_color_disabled">Material You colors disabled</string>
+    <string name="audit_event_oled_mode_enabled">OLED mode enabled</string>
+    <string name="audit_event_oled_mode_disabled">OLED mode disabled</string>
     <string name="audit_event_icon_fetch_enabled">Account icon fetching enabled</string>
     <string name="audit_event_icon_fetch_disabled">Account icon fetching disabled</string>
     <string name="audit_event_show_next_code_enabled">Show next code enabled</string>

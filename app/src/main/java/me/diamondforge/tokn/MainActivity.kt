@@ -133,6 +133,9 @@ class MainActivity : AppCompatActivity() {
             val dynamicColorEnabled by userPreferencesRepository.dynamicColorEnabled.collectAsStateWithLifecycle(
                 true
             )
+            val oledModeEnabled by userPreferencesRepository.oledModeEnabled.collectAsStateWithLifecycle(
+                false
+            )
             val isLocked by lockManager.isLocked.collectAsStateWithLifecycle()
             val screenshotsEnabled by userPreferencesRepository.screenshotsEnabled.collectAsStateWithLifecycle(
                 false
@@ -162,7 +165,11 @@ class MainActivity : AppCompatActivity() {
             val upgradeDue by upgradeNeeded.collectAsStateWithLifecycle()
             var upgradeDismissed by rememberSaveable { mutableStateOf(false) }
 
-            ToknTheme(themeMode = themeMode, dynamicColor = dynamicColorEnabled) {
+            ToknTheme(
+                themeMode = themeMode,
+                dynamicColor = dynamicColorEnabled,
+                oledMode = oledModeEnabled,
+            ) {
                 val reminderViewModel: PasswordReminderViewModel = hiltViewModel()
                 val reminderDue by reminderViewModel.shouldPrompt.collectAsStateWithLifecycle()
                 val nextReminderDays by reminderViewModel.nextReminderDays.collectAsStateWithLifecycle()

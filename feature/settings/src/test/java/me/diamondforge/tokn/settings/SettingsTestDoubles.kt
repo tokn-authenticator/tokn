@@ -23,6 +23,7 @@ internal class FakeUserPreferences(context: Context) :
     val tapReveal = MutableStateFlow(false)
     val tapBehaviorState = MutableStateFlow(TapBehavior.SINGLE)
     val dynamicColor = MutableStateFlow(true)
+    val oledMode = MutableStateFlow(false)
     val showNext = MutableStateFlow(false)
     val recycleBin = MutableStateFlow(true)
     val reminderEnabled = MutableStateFlow(true)
@@ -38,6 +39,7 @@ internal class FakeUserPreferences(context: Context) :
     override val tapToRevealEnabled = tapReveal
     override val tapBehavior = tapBehaviorState
     override val dynamicColorEnabled = dynamicColor
+    override val oledModeEnabled = oledMode
     override val showNextCodeEnabled = showNext
     override val recycleBinEnabled = recycleBin
     override val passwordReminderEnabled = reminderEnabled
@@ -79,6 +81,10 @@ internal class FakeUserPreferences(context: Context) :
 
     override suspend fun setDynamicColorEnabled(enabled: Boolean) {
         dynamicColor.value = enabled
+    }
+
+    override suspend fun setOledModeEnabled(enabled: Boolean) {
+        oledMode.value = enabled
     }
 
     override suspend fun setShowNextCodeEnabled(enabled: Boolean) {

@@ -66,6 +66,8 @@ class SettingsViewModel @Inject constructor(
         state.copy(tapBehavior = tapBehavior)
     }.combine(preferences.dynamicColorEnabled) { state, dynamicColor ->
         state.copy(dynamicColorEnabled = dynamicColor)
+    }.combine(preferences.oledModeEnabled) { state, oledMode ->
+        state.copy(oledModeEnabled = oledMode)
     }.combine(preferences.showNextCodeEnabled) { state, showNextCode ->
         state.copy(showNextCodeEnabled = showNextCode)
     }.combine(preferences.recycleBinEnabled) { state, recycleBin ->
@@ -166,6 +168,15 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setOledModeEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferences.setOledModeEnabled(enabled)
+            auditLogger.log(
+                if (enabled) AuditEventType.OLED_MODE_ENABLED else AuditEventType.OLED_MODE_DISABLED,
+            )
+        }
+    }
+
     fun setShowNextCodeEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferences.setShowNextCodeEnabled(enabled)
@@ -249,6 +260,7 @@ data class SettingsUiState(
     val stayRevealedEnabled: Boolean = false,
     val tapBehavior: TapBehavior = TapBehavior.SINGLE,
     val dynamicColorEnabled: Boolean = true,
+    val oledModeEnabled: Boolean = false,
     val showNextCodeEnabled: Boolean = false,
     val recycleBinEnabled: Boolean = true,
     val showGroupChipEnabled: Boolean = false,
