@@ -73,6 +73,10 @@ open class UserPreferencesRepository(
         prefs[Keys.DYNAMIC_COLOR_ENABLED] ?: true
     }
 
+    open val oledModeEnabled: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[Keys.OLED_MODE_ENABLED] ?: false
+    }
+
     open val onboardingDone: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[Keys.ONBOARDING_DONE] ?: false
     }
@@ -183,6 +187,10 @@ open class UserPreferencesRepository(
         dataStore.edit { it[Keys.DYNAMIC_COLOR_ENABLED] = enabled }
     }
 
+    open suspend fun setOledModeEnabled(enabled: Boolean) {
+        dataStore.edit { it[Keys.OLED_MODE_ENABLED] = enabled }
+    }
+
     open suspend fun setOnboardingDone(done: Boolean) {
         dataStore.edit { it[Keys.ONBOARDING_DONE] = done }
     }
@@ -251,6 +259,7 @@ open class UserPreferencesRepository(
         val RECYCLE_BIN_ENABLED = booleanPreferencesKey("recycle_bin_enabled")
         val SHOW_GROUP_CHIP_ENABLED = booleanPreferencesKey("show_group_chip_enabled")
         val DYNAMIC_COLOR_ENABLED = booleanPreferencesKey("dynamic_color_enabled")
+        val OLED_MODE_ENABLED = booleanPreferencesKey("oled_mode_enabled")
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
         val LAST_SYNC_METHOD = stringPreferencesKey("last_sync_method")
         val ACCOUNT_SORT = stringPreferencesKey("account_sort")

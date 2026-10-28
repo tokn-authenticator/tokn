@@ -26,6 +26,8 @@ enum class AuditEventType(val category: AuditCategory) {
     THEME_CHANGED(AuditCategory.SETTINGS),
     DYNAMIC_COLOR_ENABLED(AuditCategory.SETTINGS),
     DYNAMIC_COLOR_DISABLED(AuditCategory.SETTINGS),
+    OLED_MODE_ENABLED(AuditCategory.SETTINGS),
+    OLED_MODE_DISABLED(AuditCategory.SETTINGS),
     ICON_FETCH_ENABLED(AuditCategory.SETTINGS),
     ICON_FETCH_DISABLED(AuditCategory.SETTINGS),
     SHOW_NEXT_CODE_ENABLED(AuditCategory.SETTINGS),

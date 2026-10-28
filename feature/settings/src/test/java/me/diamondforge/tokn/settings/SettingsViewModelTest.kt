@@ -115,11 +115,13 @@ class SettingsViewModelTest {
         vm.setThemeMode(ThemeMode.LIGHT)
         vm.setScreenshotsEnabled(true)
         vm.setShowNextCodeEnabled(true)
+        vm.setOledModeEnabled(true)
         advanceUntilIdle()
 
         assertEquals(ThemeMode.LIGHT, prefs.theme.value)
         assertTrue(prefs.screenshots.value)
         assertTrue(prefs.showNext.value)
+        assertTrue(prefs.oledMode.value)
     }
 
     @Test

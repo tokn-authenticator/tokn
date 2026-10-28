@@ -600,6 +600,8 @@ private fun eventTypeLabel(type: AuditEventType): Int = when (type) {
     AuditEventType.THEME_CHANGED -> R.string.audit_event_theme_changed
     AuditEventType.DYNAMIC_COLOR_ENABLED -> R.string.audit_event_dynamic_color_enabled
     AuditEventType.DYNAMIC_COLOR_DISABLED -> R.string.audit_event_dynamic_color_disabled
+    AuditEventType.OLED_MODE_ENABLED -> R.string.audit_event_oled_mode_enabled
+    AuditEventType.OLED_MODE_DISABLED -> R.string.audit_event_oled_mode_disabled
     AuditEventType.ICON_FETCH_ENABLED -> R.string.audit_event_icon_fetch_enabled
     AuditEventType.ICON_FETCH_DISABLED -> R.string.audit_event_icon_fetch_disabled
     AuditEventType.SHOW_NEXT_CODE_ENABLED -> R.string.audit_event_show_next_code_enabled

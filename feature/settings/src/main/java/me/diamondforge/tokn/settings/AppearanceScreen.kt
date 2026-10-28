@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
@@ -154,6 +155,21 @@ fun AppearanceScreen(
                                 SettingsSwitch(
                                     checked = uiState.dynamicColorEnabled,
                                     onCheckedChange = { viewModel.setDynamicColorEnabled(it) },
+                                )
+                            },
+                        )
+                    }
+                }
+                if (uiState.themeMode != ThemeMode.LIGHT) {
+                    add {
+                        SettingsRow(
+                            title = stringResource(R.string.oled_mode),
+                            subtitle = stringResource(R.string.oled_mode_desc),
+                            icon = Icons.Default.Contrast,
+                            trailing = {
+                                SettingsSwitch(
+                                    checked = uiState.oledModeEnabled,
+                                    onCheckedChange = { viewModel.setOledModeEnabled(it) },
                                 )
                             },
                         )
