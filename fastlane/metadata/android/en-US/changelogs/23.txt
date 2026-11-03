@@ -1,0 +1,3 @@
+* New: OLED mode with a pure black background in dark mode, ideal for AMOLED screens (Settings > Appearance).
+* New: import several icon packs at once, and turn packs on or off for icon suggestions (Settings > Icon packs).
+* Improved: auto-assigning icons after importing a pack no longer replaces icons from other packs unless you choose to, and shows the correct number of accounts.
